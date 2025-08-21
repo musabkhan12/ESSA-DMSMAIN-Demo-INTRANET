@@ -1,6 +1,6 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
-  "id": "62686655-f064-46fc-bfc3-54ade05328da",
+  "id": "62686655-f064-46fc-bfc3-2c99425328da",
   "alias": "HorizontalNavBarWebPart",
   "componentType": "WebPart",
 

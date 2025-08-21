@@ -133,7 +133,7 @@ p.folder {font-size: 14px; font-weight: 600; margin-bottom: 7px; }
         color: #333;
     }
     .btn-primary{
-      background:#1fb0e5; border-color:#1fb0e5;
+      background:#2c9942; border-color:#2c9942;
     }
  
 .btn-secondary {
@@ -230,7 +230,7 @@ display: flex;
   border-radius: 20px;
   width: 100%;
   margin: 0px auto 0px auto;
-  border: 2px solid #54ade0;
+  border: 2px solid #2c9942;
 }
 .manage-master .box1 {
   background: #fff !important;
@@ -256,7 +256,7 @@ a:hover
   text-decoration: none;
 }
 .manage-master .box1:hover {
-  border: 2px solid #54ade0;
+  border: 2px solid #2c9942;
   background: #efefef !important;
 }
 
@@ -827,21 +827,21 @@ top: 0;
   .form-control:focus{box-shadow: none;}
   .row1{width: 33.3%; float: left;}
 .popup-menu ul li{ padding: 7px; cursor: pointer; margin-bottom: 1px;font-size: 13px;}
-.popup-menu ul li:hover{background: #f7fbfc;color: #1fb0e5;}
+.popup-menu ul li:hover{background: #f7fbfc;color: #2c9942;}
 .popup-menu ul li img{width: 14px; float: left; margin-top: 2px; margin-right: 5px;}
 .sidebardmsButton:hover{background: #fff;}
 
 .popup-menu ul li:hover img{filter: sepia(100%) hue-rotate(190deg) saturate(500%);}
 #hidegidvewlistviewbutton, #hidegidvewlistviewbutton2{justify-content: end; display: flex; gap: 5px;}
 .btngridview.active {
-  background: #1fb0e5 ; color: #fff; border-color: #1fb0e5;
+  background: #2c9942 ; color: #fff; border-color: #2c9942;
 }
 .btngridview.active svg{color: #fff !important;}
 
 .btnlistview {
-  color: #000;  border: 1px solid #54ade0 !important;
+  color: #000;  border: 1px solid #2c9942 !important;
   font-weight: 500; background: #fff ;
-  border: 1px solid #54ade0 !important;
+  border: 1px solid #2c9942 !important;
 }
 #hidegidvewlistviewbutton button:hover, #hidegidvewlistviewbutton2 button:hover,#createuploadfilecont button:hover {
   background: #008751 !important; border-color: #008751 !important; color: #fff !important;
@@ -862,7 +862,7 @@ top: 0;
     width: 32.1%; margin: 5px; float: left;
   } 
  #files-container .card {
-    border: 1px solid #54ade0 !important;
+    border: 1px solid #2c9942 !important;
     border-radius: 6px !important;
     height: 94px; padding: 0.75rem; position: relative !important;
 }
@@ -883,11 +883,11 @@ top: 0;
 }
 #createuploadfilecont .mybutton1{
 
-     border: 0px solid #1fb0e5;
+     border: 0px solid #2c9942;
 }
 #createuploadfilecont .mybutton2{
   background: #fff;
-    color: #000; border: 1px solid #1fb0e5;
+    color: #000; border: 1px solid #2c9942;
 }
 .input-container input{height: 36px;}
 .main-containeruploadfile h1{font-size: 20px; text-align: center;}
@@ -933,12 +933,12 @@ top: 0;
     padding-left: 4px;
 }
 .cardborder {
-  border: 1px solid #54ade0 !important; border-radius: 20px !important; padding: 15px !important;
+  border: 1px solid #2c9942 !important; border-radius: 20px !important; padding: 15px !important;
 }
 .css-b62m3t-container{font-size: 14px;}
 .subheader {color: #6b6b6b !important;}
 .p-31{padding: 20px !important; width: 100% !important;}
-.modal .cardborder{border: 0px solid #54ade0 !important; }
+.modal .cardborder{border: 0px solid #2c9942 !important; }
 .mtbalenew{
   width: 100%;
     position: relative;
@@ -1000,8 +1000,8 @@ text-align: center;
   background: #ececec;
 }
 .indexdesign{
-  background: #d2effa !important;
-    color: #1fb0e5 !important;
+  background: #e3ece2 !important;
+    color: #2c9942 !important;
     width: 28px !important;
     height:28px !important;
     font-size: 16px !important;

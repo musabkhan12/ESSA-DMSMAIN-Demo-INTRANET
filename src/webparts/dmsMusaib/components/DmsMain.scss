@@ -25,7 +25,7 @@
   float: left; margin-top: 30px;
 
 }
-.cardsearch{    border: 1px solid #54ade0 !important;
+.cardsearch{    border: 1px solid #2c9942 !important;
   border-radius: 6px !important;
   float: left;
   height: 140px;
@@ -36,7 +36,7 @@
   .cardsearch p.mb-0{margin-bottom: 0px !important;}
   .cardsearch .p1st a{color: #000 !important;}
   .width50{width: 50% !important; float: left;}
-  .cardsearch .p1st a:hover{color: #1fb0e5 !important;}
+  .cardsearch .p1st a:hover{color: #2c9942 !important;}
   .cardsearch .p2nd span{font-weight: 600; color: #000;}
   .cardsearch .newfont{font-size: 14px;}
   .cardsearch .newdes{display: flex; gap: 10px;}
@@ -57,7 +57,7 @@
   padding-right: 10px;
 }
 button:hover{
-  background-color: #1fb0e5 !important;
+  background-color: #2c9942 !important;
 }
 .mainsidebardms button:hover{
   background-color: #959b95 !important; color: #fff !important;
@@ -88,7 +88,7 @@ button:hover{
         color: #333;
     }
     .btn-primary{
-      background:#1fb0e5; border-color:#1fb0e5;
+      background:#2c9942; border-color:#2c9942;
     }
  
 .btn-secondary {
@@ -184,7 +184,7 @@ display: flex;
   border-radius: 20px;
   width: 100%;
   margin: 0px auto 0px auto;
-  border: 2px solid #54ade0;
+  border: 2px solid #2c9942;
 }
 .manage-master .box1 {
   background: #fff !important;
@@ -210,7 +210,7 @@ a:hover
   text-decoration: none;
 }
 .manage-master .box1:hover {
-  border: 2px solid #54ade0;
+  border: 2px solid #2c9942;
   background: #efefef !important;
 }
 
@@ -575,7 +575,7 @@ top: 0;
 }
  #files-container button{    position: absolute;
   right: 28px;
-  font-size: 14px; background: #1fb0e5;
+  font-size: 14px; background: #2c9942;
   margin-top: 0px;
     right: 40px;
     top: 27%;
@@ -867,11 +867,11 @@ border-radius: 5px;}
   width: 32.1%; margin: 5px; float: left;
 } 
 #files-container .card {
-  border: 1px solid #54ade0 !important;
+  border: 1px solid #2c9942 !important;
   border-radius: 6px !important;
   height: 107px; padding: 0.75rem; position: relative !important;
 }
-.search-container input:focus{outline: 1px solid #1fb0e5 !important;}
+.search-container input:focus{outline: 1px solid #2c9942 !important;}
 @media(max-width:640px){
   .w90{width: 80% !important; float: left;}
   .w20{
@@ -933,7 +933,7 @@ text-align: center;}
   border-radius: 3px;
   width: 35px;
   height: 35px;
-  background-color: #1fb0e5;
+  background-color: #2c9942;
   display: flex;
   color: white;
   align-items: center;
@@ -951,7 +951,7 @@ text-align: center;}
   .OneUpTextFileContainer{
     width: 100% !important;
   }
-.borderprev{border: 1px solid #1fb0e5;
+.borderprev{border: 1px solid #2c9942;
   //  height: 483px; 
    height: 98% !important;  
   
@@ -1029,11 +1029,11 @@ text-align: center;}
   
 // next button
 .pagination-container-buttons2{
-     background-color: #1fb0e5 !important;
+     background-color: #2c9942 !important;
      color: #ffffff !important;
 }
 .pagination-container-buttons1{
-     background-color: #1fb0e5 !important;
+     background-color: #2c9942 !important;
      color: #ffffff !important;
      margin-right: 64px !important;
 }

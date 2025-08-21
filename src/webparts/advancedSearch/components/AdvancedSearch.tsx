@@ -497,7 +497,7 @@ const AdvancedSearch: React.FC<IAdvancedSearchProps> = (props) => {
                                             <h5 style={{textAlign:'left', fontSize:'18px',borderBottom:'1px solid #ccc'}} className='text-dark  mb-2 fw-bold'>Refiners</h5>
                                             <div className='row p-0'>
                                                 {searchRefiners?.map(refiner => (
-                                                    <div  style={{border:'0px solid #1fb0e5', borderRadius:'0px', background:'transparent'}} key={refiner.field} className="card col-12 mb-3 pt-2">
+                                                    <div  style={{border:'0px solid #2c9942', borderRadius:'0px', background:'transparent'}} key={refiner.field} className="card col-12 mb-3 pt-2">
                                                         <h6 style={{textAlign:'left', fontSize:'16px', margin:'inherit'}} className='mt-0 mb-1'>{GetFieldName(refiner.field)}</h6>
 
                                                         <div className="form-check">

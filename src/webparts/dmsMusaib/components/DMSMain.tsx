@@ -13571,7 +13571,7 @@ window.renameFolder=(siteName:any,folderName:any,itemId:any,siteId:any)=>{
      const submitButton = document.createElement("button");
      submitButton.innerText = "Submit";
      submitButton.style.padding = "6px 20px";
-     submitButton.style.backgroundColor = "#1fb0e5";
+     submitButton.style.backgroundColor = "#2c9942";
      submitButton.style.color = "#fff";
      submitButton.style.border = "none";
      submitButton.style.borderRadius = "4px";
@@ -13675,7 +13675,7 @@ window.renameColumn=async(siteName:string,documentLibraryName:string)=>{
   //         cursor: pointer; 
   //         margin-right: 10px;">Cancel</button>
   //       <button type="submit" style="
-  //         background: #1fb0e5; 
+  //         background: #2c9942; 
   //         color: white; 
   //         border: none; 
   //         padding: 6px 15px; 
@@ -13710,7 +13710,7 @@ window.renameColumn=async(siteName:string,documentLibraryName:string)=>{
         cursor: pointer; 
         margin-right: 10px;">Cancel</button>
       <button type="submit" style="
-        background: #1fb0e5; 
+        background: #2c9942; 
         color: white; 
         border: none; 
         padding: 6px 15px; 
@@ -14169,7 +14169,7 @@ const myFavorite = async (event: any = null, siteIdToUpdate: string = null, sear
         padding: "5px 15px",
         border: "1px solid #ddd",
         borderRadius: "4px",
-        backgroundColor: "#1fb0e5",
+        backgroundColor: "#2c9942",
         cursor: "pointer",
         fontSize: "14px",
         color: "#ffffff",

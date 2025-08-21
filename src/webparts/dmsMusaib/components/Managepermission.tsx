@@ -264,7 +264,7 @@ export const ManagePermission = (props:any) => {
                       marginLeft:"50px",
                       marginTop:"50px",
                       padding:"20px",
-                      border:"2px solid #54ade0",
+                      border:"2px solid #2c9942",
                       borderRadius:"10px",
                       background:"#fff",
 
