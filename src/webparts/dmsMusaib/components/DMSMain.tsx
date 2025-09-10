@@ -17,7 +17,15 @@ declare global {
   }
 
 }
-
+interface IFileWithListItem {
+  Name: string;
+  ServerRelativeUrl: string;
+  UniqueId: string;
+  ListItemAllFields: {
+    Id: number;
+    ParentList: { Id: string };
+  };
+}
     // props for Manage work flow
 // props for Manage work flow
 const propsForManageWorkFlow={
@@ -110,8 +118,8 @@ import CreateFolder from "./CreateFolder";
 import Table from "./Table";
 import { IFileInfo } from "@pnp/sp/files";
 import { Popup } from "@fluentui/react";
-
-
+import DocumentTemplate from "./DocumentTemplate";
+import DocumentTemplatetofill from "./DocumentTemplatetofill";
 import {IDmsMusaibProps} from './IDmsMusaibProps'
 import HorizontalNavbar from "../../horizontalNavBar/components/HorizontalNavBar";
 import ManageWorkFlow from "./ManageWorkFlow";
@@ -133,7 +141,7 @@ import { Listing } from "../EDCprocessComponent/ListingComponent/Listing";
 import { GraphFI, graphfi, SPFx as graphSPFx } from "@pnp/graph";
 import { blue, brown } from "@mui/material/colors";
 
-
+let documenttemplatetofill : any;
 let isprocessfolder :any;
 let folderpathbacktodmsfrompreviewisprocessfolder :any
 let Undo = require('../assets/Undo.svg');
@@ -566,17 +574,66 @@ const [currentSearchPath, setcurrentSearchPath] = useState((props.context as Bas
 const [currentFilters, setcurrentFilters] = useState(""); // Initially hidden
 const [currentSearchText, setcurrentSearchText] = useState(""); // Initially hidden
 const [RootsiteUrl, setRootsiteUrl] = useState(location.origin); // Initially hidden
-
+ const [navItems, setNavItems] = React.useState<any[]>([]);
 // console.log(Myreqormyfav , "Myreqormyfav")
   // console.log("This is current side ID",currentsiteID)
   const currentUserEmailRef = useRef('');
   const currentUserIDref = useRef<number>(0);
   const currentUserTitleRef = useRef('');
   useEffect(() => {
+     getdocumentcategory()
      getcurrentuseremail()
 getdata()
      
 }, []);
+const getdocumentcategory = async ()=>{
+
+  const arr:any = [];
+  const navItem = await sp.web.lists.getByTitle("TemplateDocumentCategory").items.select("DocumentCategory").getAll();
+
+  // alert("navItem" + JSON.stringify(navItem))
+
+  console.log("navItem", navItem);
+  setNavItems(navItem)
+}
+const handlecategoryselect = async  (DocumentCategory:any)=>{
+ const files = await sp.web.lists
+  .getByTitle("Document Template")
+  .rootFolder.files
+  .select("Name", "UniqueId", "ListItemAllFields/Id", "ListItemAllFields/ParentList/Id")
+  .expand("ListItemAllFields", "ListItemAllFields/ParentList")() as IFileWithListItem[];
+
+console.log("Files in Document Template:", files);
+
+// Match your category
+const matchedFile = files.find(f => f.Name === `${DocumentCategory}.docx`);
+console.log("Matched File:", matchedFile);
+
+if (!matchedFile) {
+  alert("No file found for the selected category.");
+} else {
+  const siteUrl = sp.web.toUrl();
+
+  // ✅ UniqueId is already in file object
+  const uniqueId = matchedFile.UniqueId; // string GUID
+
+  // ✅ ItemId and ListId come from ListItemAllFields
+  const itemId = matchedFile.ListItemAllFields.Id;
+  const listId = matchedFile.ListItemAllFields.ParentList.Id;
+
+  // Build edit URL
+  const editUrl = `https://officeindia.sharepoint.com/:w:/r/sites/Intranetdemos/_layouts/15/Doc.aspx?sourcedoc=%7B${uniqueId}%7D&action=edit&uid=%7B${uniqueId.toUpperCase()}%7D&ListItemId=${itemId}&ListId=%7B${listId}%7D&odsp=1&env=prod`;
+  documenttemplatetofill = editUrl;
+  console.log("Edit URL:", editUrl);
+}
+
+ setSelectedText(DocumentCategory)
+ const filecontainer= document.getElementById('files-container')
+  if(filecontainer){
+    filecontainer.innerHTML = ''; // Clear the container
+  }
+  setlistorgriddata(DocumentCategory)
+}
 const setfilepreviewcontainerblank = () => {
   // alert("back to dms")
   routefrommail = false
@@ -19712,19 +19769,212 @@ try {
    
  
 // }
+
+// working code 
+// window.auditHistory = async (fileId: string, siteId: string, DocumentLibraryName: string, SiteName: String) => {
+//   console.log("Audit History called", fileId, siteId);
+//   console.log("Audit History called", SiteName);
+//   console.log("Audit History called", DocumentLibraryName);
+
+//   // ====== NEW DATE FORMATTING FUNCTION ADDED ======
+//   const formatDate = (dateValue: any): string => {
+//     if (!dateValue) return "";
+    
+//     // Handle SharePoint date strings (e.g., "2024-05-01T14:30:00Z")
+//     const date = new Date(dateValue);
+    
+//     // Format as dd/mm/yyyy hh:mm AM/PM
+//     const day = date.getDate().toString().padStart(2, '0');
+//     const month = date.toLocaleString('default', { month: 'short' }).toLowerCase();
+//     const year = date.getFullYear();
+    
+//     let hours = date.getHours();
+//     const minutes = date.getMinutes().toString().padStart(2, '0');
+//     const ampm = hours >= 12 ? 'pm' : 'am';
+//     hours = hours % 12;
+//     hours = hours ? hours : 12; // Convert 0 to 12
+    
+//     return `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
+//   };
+//   const formatDate2 = (dateValue: any): string => {
+//     if (!dateValue) return "";
+    
+//     // Handle SharePoint date strings (e.g., "2024-05-01T14:30:00Z")
+//     const date = new Date(dateValue);
+    
+//     // Format as dd/mm/yyyy hh:mm AM/PM
+//     const day = date.getDate().toString().padStart(2, '0');
+//     const month = date.toLocaleString('default', { month: 'short' }).toLowerCase();
+//     const year = date.getFullYear();
+    
+//     let hours = date.getHours();
+//     const minutes = date.getMinutes().toString().padStart(2, '0');
+//     const ampm = hours >= 12 ? 'pm' : 'am';
+//     hours = hours % 12;
+//     hours = hours ? hours : 12; // Convert 0 to 12
+    
+//     return `${day}/${month}/${year}`;
+//   };
+//   // ====== END OF NEW FUNCTION ======
+
+//   const { web } = await sp.site.openWebById(siteId)
+
+//   // Get the list item corresponding to the file
+//   const fileItem: any = await web.getFileById(fileId).expand("ListItemAllFields")();
+//   console.log("fileItem", fileItem.ListItemAllFields.Status);
+
+//   // fetched the columns details corresponding to the file 
+//   const fileColumns = await sp.web.lists.getByTitle("DMSPreviewFormMaster").items.select("ColumnName", "SiteName", "DocumentLibraryName", "IsRename").filter(`SiteName eq '${SiteName}' and DocumentLibraryName eq '${DocumentLibraryName}' and IsDocumentLibrary ne 1`)();
+//   console.log("fileColumns", fileColumns);
+
+//   // Create an array of objects to store the columnName with there corresponding value
+//   const resultArrayThatContainstheColumnDetails = fileColumns.map((column) => {
+//     let columnName = column.ColumnName;
+//     let columnValue = fileItem.ListItemAllFields[columnName];
+    
+//     // ====== MODIFIED DATE HANDLING ======
+//     if (columnValue && typeof columnValue === 'string' && 
+//         columnValue.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
+//       columnValue = formatDate2(columnValue);
+//     }
+//     // ====== END OF MODIFICATION ======
+    
+//     if (column.IsRename !== null) {
+//       columnName = column.IsRename
+//     }
+
+//     return {
+//       label: columnName,
+//       // value: columnValue !== undefined ? columnValue : null
+//       value: columnValue !== undefined && columnValue !== null ? columnValue : ""
+
+//     };
+//   });
+
+//   const objectForStatus = {
+//     label: "Status",
+//     value: fileItem.ListItemAllFields.Status || ""
+//   }
+
+//   resultArrayThatContainstheColumnDetails.push(objectForStatus);
+//   console.log("result", resultArrayThatContainstheColumnDetails);
+
+//   // get the details of approver
+//   const itemsFromTaskList = await sp.web.lists.getByTitle('DMSFileApprovalTaskList').items.select(
+//     "Log", "CurrentUser", "Remark"
+//     , "LogHistory", "ID"
+//     , "FileUID/FileUID"
+//     , "FileUID/SiteName"
+//     , "FileUID/DocumentLibraryName"
+//     , "FileUID/FileName"
+//     , "FileUID/Status"
+//     , "FileUID/RequestedBy"
+//     , "FileUID/Created"
+//     , "FileUID/ApproveAction"
+//     , "MasterApproval/ApprovalType"
+//     , "MasterApproval/Level"
+//     , "MasterApproval/DocumentLibraryName"
+//     , "Modified"
+//   )
+//     .expand("FileUID", "MasterApproval")
+//     .filter(`FileUID/FileUID eq '${fileId}'`)
+//     .orderBy("Modified", false)();
+
+//   console.log("itemsFromTaskList", itemsFromTaskList);
+
+//   // Mapping to the desired format
+//   const approverDetailsArray = itemsFromTaskList.map(task => ({
+//     level: `Level ${task.MasterApproval.Level}`,
+//     approver: task.CurrentUser,
+//     actionDateTime: formatDate(task.Modified), // ====== ADDED DATE FORMATTING HERE ======
+//     status: task.Log || "",
+//     remark: task.Remark || ""
+//   }));
+
+//   console.log("approverDetailsArray", approverDetailsArray);
+
+//   // Generate the dynamic HTML for the detail rows
+//   let detailRowsHTML = "";
+//   resultArrayThatContainstheColumnDetails.forEach((item, index) => {
+//     if (index % 3 === 0) {
+//       detailRowsHTML += '<div class="detail-row">';
+//     }
+
+//     detailRowsHTML += `
+//     <div class="detail-column">
+//       <div class="detail-label">${item.label}:</div>
+//       <div class="detail-value">${item.value}</div>
+//     </div>
+//   `;
+
+//     if ((index + 1) % 3 === 0) {
+//       detailRowsHTML += '</div>';
+//     }
+//   });
+
+//   if (resultArrayThatContainstheColumnDetails.length % 3 !== 0) {
+//     detailRowsHTML += '</div>';
+//   }
+
+//   // Generate the dynamic HTML for the approver details
+//   let approverRowsHTML = "";
+//   approverDetailsArray.forEach((approver) => {
+//     approverRowsHTML += `
+//     <tbody class="">
+//      <td class="">${approver.level}</td>
+//      <td class="">${approver.approver}</td>
+//      <td class="">${approver.actionDateTime}</td>
+//      <td class="">${approver.status}</td>
+//      <td class="">${approver.remark}</td>
+//    </tbody>
+//  `;
+//   });
+
+//   // Create the popup
+//   const popup = document.createElement("div");
+//   popup.className = "audit-history-popup";
+//   popup.innerHTML = `
+// <div class="popup-content-auditHistory">
+//   <div class="popup-header mb-0">
+//     <h5>Audit History</h5>
+//     <span class="close-btn" onclick="hideAuditHistoryPopup()">&times;</span>
+//   </div>
+//   <div class="popup-details">
+//     ${detailRowsHTML}
+//     <table class="mtbalenew">
+//     ${fileItem.ListItemAllFields.Status !== "Auto Approved" ?
+//       `
+//       <thead>
+//       <th class="">Approval Level</th>
+//       <th class="">Approver</th>
+//       <th class="">Action DateTime</th>
+//       <th class="">Status</th>
+//       <th >Remark</th>
+//     </thead>
+//     ${approverRowsHTML}
+//   </table>
+//      `
+//       :
+//       `Audit History is not available as the file does not have approval`
+//     }
+   
+// </div>
+// `;
+
+//   document.body.appendChild(popup);
+// }
+
 window.auditHistory = async (fileId: string, siteId: string, DocumentLibraryName: string, SiteName: String) => {
   console.log("Audit History called", fileId, siteId);
   console.log("Audit History called", SiteName);
   console.log("Audit History called", DocumentLibraryName);
 
-  // ====== NEW DATE FORMATTING FUNCTION ADDED ======
+  // Date formatting function
   const formatDate = (dateValue: any): string => {
     if (!dateValue) return "";
     
-    // Handle SharePoint date strings (e.g., "2024-05-01T14:30:00Z")
     const date = new Date(dateValue);
     
-    // Format as dd/mm/yyyy hh:mm AM/PM
     const day = date.getDate().toString().padStart(2, '0');
     const month = date.toLocaleString('default', { month: 'short' }).toLowerCase();
     const year = date.getFullYear();
@@ -19733,17 +19983,16 @@ window.auditHistory = async (fileId: string, siteId: string, DocumentLibraryName
     const minutes = date.getMinutes().toString().padStart(2, '0');
     const ampm = hours >= 12 ? 'pm' : 'am';
     hours = hours % 12;
-    hours = hours ? hours : 12; // Convert 0 to 12
+    hours = hours ? hours : 12;
     
     return `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
   };
+  
   const formatDate2 = (dateValue: any): string => {
     if (!dateValue) return "";
     
-    // Handle SharePoint date strings (e.g., "2024-05-01T14:30:00Z")
     const date = new Date(dateValue);
     
-    // Format as dd/mm/yyyy hh:mm AM/PM
     const day = date.getDate().toString().padStart(2, '0');
     const month = date.toLocaleString('default', { month: 'short' }).toLowerCase();
     const year = date.getFullYear();
@@ -19752,11 +20001,10 @@ window.auditHistory = async (fileId: string, siteId: string, DocumentLibraryName
     const minutes = date.getMinutes().toString().padStart(2, '0');
     const ampm = hours >= 12 ? 'pm' : 'am';
     hours = hours % 12;
-    hours = hours ? hours : 12; // Convert 0 to 12
+    hours = hours ? hours : 12;
     
     return `${day}/${month}/${year}`;
   };
-  // ====== END OF NEW FUNCTION ======
 
   const { web } = await sp.site.openWebById(siteId)
 
@@ -19764,43 +20012,122 @@ window.auditHistory = async (fileId: string, siteId: string, DocumentLibraryName
   const fileItem: any = await web.getFileById(fileId).expand("ListItemAllFields")();
   console.log("fileItem", fileItem.ListItemAllFields.Status);
 
-  // fetched the columns details corresponding to the file 
-  const fileColumns = await sp.web.lists.getByTitle("DMSPreviewFormMaster").items.select("ColumnName", "SiteName", "DocumentLibraryName", "IsRename").filter(`SiteName eq '${SiteName}' and DocumentLibraryName eq '${DocumentLibraryName}' and IsDocumentLibrary ne 1`)();
-  console.log("fileColumns", fileColumns);
+  // Get the document library/list to retrieve all fields
+  const list = await web.lists.getByTitle(DocumentLibraryName);
+  const listFields = await list.fields.select('Title', 'InternalName', 'TypeAsString', 'Hidden')();
+  
+  // Filter out hidden and system fields
+  const visibleFields = listFields.filter(field => 
+    !field.Hidden && 
+    field.InternalName !== 'ContentType' && 
+    field.InternalName !== 'Attachments' &&
+    field.InternalName !== 'Edit' &&
+    field.InternalName !== 'DocIcon' &&
+    field.InternalName !== 'FileLeafRef' &&
+    field.InternalName !== 'FileRef' &&
+    !field.InternalName.startsWith('_') &&
+    field.TypeAsString !== 'Computed' &&
+    field.TypeAsString !== 'Threading' &&
+    field.TypeAsString !== 'Guid'
+  );
+  
+  console.log("Visible fields", visibleFields);
 
-  // Create an array of objects to store the columnName with there corresponding value
-  const resultArrayThatContainstheColumnDetails = fileColumns.map((column) => {
-    let columnName = column.ColumnName;
-    let columnValue = fileItem.ListItemAllFields[columnName];
+
+    // Define fields you don't want to show in Audit History
+  const excludedFieldsByTitle = [
+    "Checked Out To",
+    "Item Child Count",
+    "Folder Child Count",
+    "App Created By",
+    "App Modified By",
+    "Source Version (Converted Document)",
+    "Source Name (Converted Document)",
+    "Modified By",
+    "Created By",
+    "Title",
+    "IsDeleted",
+    "Compliance Asset Id"
+  ];
+  // Create an array of objects to store the columnName with their corresponding value
+  // const resultArrayThatContainstheColumnDetails = visibleFields.map((field) => {
+  //   let columnName = field.Title;
+  //   let columnValue = fileItem.ListItemAllFields[field.InternalName];
     
-    // ====== MODIFIED DATE HANDLING ======
-    if (columnValue && typeof columnValue === 'string' && 
-        columnValue.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
-      columnValue = formatDate2(columnValue);
-    }
-    // ====== END OF MODIFICATION ======
+  //   // Format date values
+  //   if (columnValue && typeof columnValue === 'string' && 
+  //       columnValue.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
+  //     columnValue = formatDate2(columnValue);
+  //   }
     
-    if (column.IsRename !== null) {
-      columnName = column.IsRename
-    }
+  //   // Handle boolean values
+  //   if (typeof columnValue === 'boolean') {
+  //     columnValue = columnValue ? 'Yes' : 'No';
+  //   }
+    
+  //   // Handle user fields
+  //   if (field.TypeAsString === 'User' && columnValue) {
+  //     columnValue = columnValue.Title || columnValue.Email || columnValue;
+  //   }
+    
+  //   // Handle lookup fields
+  //   if (field.TypeAsString === 'Lookup' && columnValue) {
+  //     columnValue = columnValue.LookupValue || columnValue;
+  //   }
+    
+  //   return {
+  //     label: columnName,
+  //     value: columnValue !== undefined && columnValue !== null ? columnValue.toString() : ""
+  //   };
+  // });
 
-    return {
-      label: columnName,
-      // value: columnValue !== undefined ? columnValue : null
-      value: columnValue !== undefined && columnValue !== null ? columnValue : ""
+   // Create an array of objects to store the columnName with their corresponding value
+  const resultArrayThatContainstheColumnDetails = visibleFields
+    .filter(field => !excludedFieldsByTitle.includes(field.Title)) // <--- filter out unwanted
+    .map((field) => {
+      let columnName = field.Title;
+      let columnValue = fileItem.ListItemAllFields[field.InternalName];
 
-    };
-  });
+      // Format date values
+      if (columnValue && typeof columnValue === "string" &&
+          columnValue.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
+        columnValue = formatDate2(columnValue);
+      }
 
-  const objectForStatus = {
-    label: "Status",
-    value: fileItem.ListItemAllFields.Status || ""
+      // Handle boolean values
+      if (typeof columnValue === "boolean") {
+        columnValue = columnValue ? "Yes" : "No";
+      }
+
+      // Handle user fields
+      if (field.TypeAsString === "User" && columnValue) {
+        columnValue = columnValue.Title || columnValue.Email || columnValue;
+      }
+
+      // Handle lookup fields
+      if (field.TypeAsString === "Lookup" && columnValue) {
+        columnValue = columnValue.LookupValue || columnValue;
+      }
+
+      return {
+        label: columnName,
+        value: columnValue !== undefined && columnValue !== null ? columnValue.toString() : ""
+      };
+    })
+    // remove any empty value fields (extra safety)
+    .filter(item => item.value.trim() !== "");
+
+  // Add status if it's not already included
+  if (!resultArrayThatContainstheColumnDetails.some(item => item.label === "Status")) {
+    resultArrayThatContainstheColumnDetails.push({
+      label: "Status",
+      value: fileItem.ListItemAllFields.Status || ""
+    });
   }
 
-  resultArrayThatContainstheColumnDetails.push(objectForStatus);
   console.log("result", resultArrayThatContainstheColumnDetails);
 
-  // get the details of approver
+  // Get the details of approver
   const itemsFromTaskList = await sp.web.lists.getByTitle('DMSFileApprovalTaskList').items.select(
     "Log", "CurrentUser", "Remark"
     , "LogHistory", "ID"
@@ -19825,9 +20152,9 @@ window.auditHistory = async (fileId: string, siteId: string, DocumentLibraryName
 
   // Mapping to the desired format
   const approverDetailsArray = itemsFromTaskList.map(task => ({
-    level: `Level ${task.MasterApproval.Level}`,
+    level: `Level ${task.MasterApproval?.Level || 'N/A'}`,
     approver: task.CurrentUser,
-    actionDateTime: formatDate(task.Modified), // ====== ADDED DATE FORMATTING HERE ======
+    actionDateTime: formatDate(task.Modified),
     status: task.Log || "",
     remark: task.Remark || ""
   }));
@@ -19848,26 +20175,22 @@ window.auditHistory = async (fileId: string, siteId: string, DocumentLibraryName
     </div>
   `;
 
-    if ((index + 1) % 3 === 0) {
+    if ((index + 1) % 3 === 0 || index === resultArrayThatContainstheColumnDetails.length - 1) {
       detailRowsHTML += '</div>';
     }
   });
-
-  if (resultArrayThatContainstheColumnDetails.length % 3 !== 0) {
-    detailRowsHTML += '</div>';
-  }
 
   // Generate the dynamic HTML for the approver details
   let approverRowsHTML = "";
   approverDetailsArray.forEach((approver) => {
     approverRowsHTML += `
-    <tbody class="">
-     <td class="">${approver.level}</td>
-     <td class="">${approver.approver}</td>
-     <td class="">${approver.actionDateTime}</td>
-     <td class="">${approver.status}</td>
-     <td class="">${approver.remark}</td>
-   </tbody>
+    <tr class="approver-row">
+     <td class="approver-level">${approver.level}</td>
+     <td class="approver-name">${approver.approver}</td>
+     <td class="approver-date">${approver.actionDateTime}</td>
+     <td class="approver-status">${approver.status}</td>
+     <td class="approver-remark">${approver.remark}</td>
+   </tr>
  `;
   });
 
@@ -19882,28 +20205,164 @@ window.auditHistory = async (fileId: string, siteId: string, DocumentLibraryName
   </div>
   <div class="popup-details">
     ${detailRowsHTML}
-    <table class="mtbalenew">
     ${fileItem.ListItemAllFields.Status !== "Auto Approved" ?
       `
-      <thead>
-      <th class="">Approval Level</th>
-      <th class="">Approver</th>
-      <th class="">Action DateTime</th>
-      <th class="">Status</th>
-      <th >Remark</th>
-    </thead>
-    ${approverRowsHTML}
-  </table>
+      <div class="approval-table-container">
+        <table class="approval-table mtbalenew">
+          <thead>
+            <tr>
+              <th>Approval Level</th>
+              <th>Approver</th>
+              <th>Action DateTime</th>
+              <th>Status</th>
+              <th>Remark</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${approverRowsHTML}
+          </tbody>
+        </table>
+      </div>
      `
       :
-      `Audit History is not available as the file does not have approval`
+      `<div class="auto-approved-message">Audit History is not available as the file does not have approval</div>`
     }
-   
+  </div>
 </div>
 `;
 
-  document.body.appendChild(popup);
+  // Add CSS styles
+  const style = document.createElement('style');
+  style.textContent = `
+    .audit-history-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border: 1px solid #ccc;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 1000;
+      width: 90%;
+      max-width: 1200px;
+      max-height: auto !important;
+      height: auto !important;
+      overflow-y: auto;
+      border-radius: 8px;
+    }
+    
+    .popup-content-auditHistory {
+      padding: 20px;
+      display: block; width:100% !important;
+    }
+      .popup-content-auditHistory .mtbalenew tbody {
+    
+    max-height: 200px !important;
+    overflow-y: auto !important;
+   
 }
+   .popup-content-auditHistory  .detail-row{margin-bottom:0px !important;}
+
+    .popup-content-auditHistory  .detail-column {
+   
+    padding: 0px 15px;
+}
+    .popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e0e0e0;
+      position:relative;
+    }
+    
+    .popup-header h5 {
+      margin: 0;
+      color: #333;
+    }
+    
+    .close-btn {
+      cursor: pointer;
+      font-size: 24px;
+      color: #999;
+    }
+    
+    .close-btn:hover {
+      color: #333;
+    }
+    
+    .popup-details {
+      margin-top: 20px;
+    }
+    
+    .detail-row {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 0px;
+      border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 15px;
+    }
+    
+    .detail-column {
+      flex: 1;
+      min-width: 30%;
+      padding: 0px 15px;
+    }
+    
+    .detail-label {
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 5px;
+    }
+    
+    .detail-value {
+      color: #333;
+      word-break: break-word;
+    }
+    
+    .approval-table-container {
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+    
+    .approval-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .approval-table th {
+      background-color: #f5f5f5;
+      padding: 10px;
+      text-align: left;
+      border-bottom: 2px solid #ddd;
+    }
+    
+    .approval-table td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .approver-row:hover {
+      background-color: #f9f9f9;
+    }
+    
+    .auto-approved-message {
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      text-align: center;
+      margin-top: 20px;
+    }
+  `;
+
+
+  
+  document.head.appendChild(style);
+  document.body.appendChild(popup);
+};
+
+
+
 // function to hide audit history pop
 // @ts-ignore
 window.hideAuditHistoryPopup=()=> {
@@ -21474,7 +21933,7 @@ librarydiv.appendChild(mainContainer)
         {isLoading && (
       <div className='loaderOverlay'>
         <div className='loader'>
-        <img style={{width :'116px'  ,margin: '31px'}} src={require("../../../CustomAsset/arground.gif")} alt="Loading..." />
+        <img style={{width :'116px'  ,margin: '31px'}} src={require("../assets/ESSAROLLER.gif")} alt="Loading..." />
         </div>
       </div>
     )}
@@ -21530,6 +21989,11 @@ librarydiv.appendChild(mainContainer)
                 {/* Start Code Update by Amjad */}
                     <div className="row">
                              <div className="col-lg-6">
+                                 <button  type="button" className="btn me-1 btngridview mt-0 grid-view active"    
+                                onClick={()=>window.open('https://officeindia.sharepoint.com/sites/Intranetdemos/SitePages/CheckUrl.aspx' , "_blank") }>
+                                  <a className="listviewfonticon">          
+                                    <FontAwesomeIcon style={{color: "black"}} icon={faTableCells}/> </a>Check Missing Links
+                                </button>
                                 <h4 className="page-title fw-bold mb-1 font-20">Dossier</h4>
                                 <ol className="breadcrumb m-0">
                     {" "}
@@ -21575,6 +22039,24 @@ librarydiv.appendChild(mainContainer)
         </Dropdown.Menu>
       </Dropdown>
                               </div> */}
+                               <div>
+                      <Dropdown as={ButtonGroup} style={{ padding: '9.4px 3px 0px 0px', marginTop: '0px' }}>
+                        <Dropdown.Toggle variant="primary" id="dropdown-left" className="mt-0 newho">
+                          Select Document Categoty
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu className="dropdown-menu-start newtheme font-14">
+                          {console.log("navItems", navItems)}
+                          {navItems.map(item => (
+                            <Dropdown.Item 
+                              onClick={(event) => {
+                               handlecategoryselect(item.DocumentCategory);
+                              }}>{item.DocumentCategory}</Dropdown.Item>
+                          ))}
+                      
+                        </Dropdown.Menu>
+                      </Dropdown>
+                    </div>
                               <div id="hidegidvewlistviewbutton" className="view-buttons mt-2">
                                 <button  type="button" className="btn me-1 btngridview mt-0 grid-view active"    
                                 onClick={(event: any = null, siteIdToUpdate: string = null)=>myRequest(event) }>
@@ -21788,7 +22270,7 @@ librarydiv.appendChild(mainContainer)
                       </div>
                       <div  style={{position:'sticky', top:'100px'}} className="is-sticky"> 
                       <div id="loader" style={{display: "none"  }}>
-                            <img style={{width :'116px'  ,margin: '31px'}} src={require("../../../CustomAsset/arground.gif")} alt="Loading..." />
+                            <img style={{width :'116px'  ,margin: '31px'}} src={require("../assets/ESSAROLLER.gif")} alt="Loading..." />
                       </div>
                          <div   id="folderContainer2"></div>
                       
@@ -21867,7 +22349,7 @@ librarydiv.appendChild(mainContainer)
                             display: "none",
                             textAlign: "center",
                             padding: "20px"}}>
-                         <img src={require("../../../CustomAsset/arground.gif")} alt="Loading..."/>
+                         <img src={require("../assets/ESSAROLLER.gif")} alt="Loading..."/>
                        </div>
                      {/* {
                          
@@ -21921,6 +22403,24 @@ librarydiv.appendChild(mainContainer)
          context={props.context}
         />
       )}
+      {navItems.some(item => item.DocumentCategory === listorgriddata) ? (
+    //   <DocumentTemplate 
+    //  selectedCategory={listorgriddata}
+    //  userid={currentUserIDref.current}
+    //  context={props.context}
+    //  currentuseremail = {currentUserEmailRef.current}
+    //  onReturnToMain={handleReturnToMain}
+    //     />
+    <DocumentTemplatetofill
+    selectedCategory={listorgriddata}
+    userid={currentUserIDref.current}
+    context={props.context}
+    currentuseremail = {currentUserEmailRef.current}
+    onReturnToMain={handleReturnToMain}
+    fileinedit = {documenttemplatetofill}
+    />
+      ) 
+: null}
     </>
   )
 }

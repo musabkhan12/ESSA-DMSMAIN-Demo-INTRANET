@@ -144,14 +144,14 @@ display: none !important;
   gap: 15px;
   padding: 10px;
   background: #fff;
-  border-radius: 10px;    border: 1px solid #4fc6e1;
+  border-radius: 10px;    border: 1px solid #2c9942;
   }
 
   /* Child divs */
   .main-containeruploadfile .column {
     border-radius: 10px;
     padding: 15px;
-    /* border: 1px solid #4fc6e1; */
+    /* border: 1px solid #2c9942; */
     font-size: 16px;
   
   }
@@ -200,7 +200,7 @@ display: none !important;
   button {
     margin-top: 20px;
     padding: 6px 10px;
-    background-color: #4fc6e1;
+    background-color: #2c9942;
     color: white;
     border: none;
     border-radius: 4px;
@@ -388,7 +388,7 @@ display: none !important;
   gap: 15px;
   padding: 10px;
   background: #fff;
-  border-radius: 10px;    border: 1px solid #4fc6e1;
+  border-radius: 10px;    border: 1px solid #2c9942;
   height: 100% !important;
   }
 
@@ -396,7 +396,7 @@ display: none !important;
   .main-containeruploadfile .column {
     border-radius: 10px;
     padding: 15px;
-    /* border: 1px solid #4fc6e1; */
+    /* border: 1px solid #2c9942; */
     font-size: 16px;
  
   }
@@ -460,7 +460,7 @@ display: none !important;
   button {
     margin-top: 20px;
     padding: 6px 10px;
-    background-color: #4fc6e1;
+    background-color: #2c9942;
     color: white;
     border: none;
     border-radius: 4px;
@@ -580,7 +580,7 @@ div[class*=OneUpModalSizing]>div.ms-Dialog-main{
 
 .borderprev {
 
-  border: 1px solid #4fc6e1;
+  border: 1px solid #2c9942;
 
   border-radius: 10px;
 

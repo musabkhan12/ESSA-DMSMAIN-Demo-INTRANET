@@ -1,0 +1,23 @@
+<!-- Carousel Container -->
+<div id="infoCarousel" style="width:100%; margin:10px 0; background:#fce8e6; border:1px solid #e0b4b4; border-radius:5px; padding:10px; text-align:center; font-family:Segoe UI; font-size:15px; color:#b71c1c; font-weight:600;">
+  <div class="carousel-message"> &times; This is old workspace, please refer new links.</div>
+
+  <div class="carousel-message" style="display:none;">&#8618; For accessing the new links please refer New Link Column Link.</div>
+</div>
+
+<script type="text/javascript">
+(function(){
+    var index = 0;
+    function rotateMessages() {
+        var msgs = document.querySelectorAll("#infoCarousel .carousel-message");
+        for (var i = 0; i < msgs.length; i++) {
+            msgs[i].style.display = "none";
+        }
+        index++;
+        if (index > msgs.length) { index = 1 }
+        msgs[index-1].style.display = "block";
+        setTimeout(rotateMessages, 4000); // Change every 4 seconds
+    }
+    rotateMessages();
+})();
+</script>

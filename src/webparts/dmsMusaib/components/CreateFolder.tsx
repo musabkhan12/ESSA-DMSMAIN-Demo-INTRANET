@@ -1351,7 +1351,7 @@ const validateFields = () => {
       {isLoading && (
       <div className='loaderOverlay'>
         <div className='loader'>
-        <img style={{width :'116px'  ,margin: '31px'}} src={require("../../../CustomAsset/arground.gif")} alt="Loading..." />
+        <img style={{width :'116px'  ,margin: '31px'}} src={require("../assets/ESSAROLLER.gif")} alt="Loading..." />
         </div>
       </div>
     )}

@@ -2132,7 +2132,7 @@ useEffect(()=>{
           {index + 1}.
         </div> 
         <div className="font-14" style={{overflow:'hidden', width:'66%', textAlign:'left', textOverflow:'ellipsis',whiteSpace:'nowrap', padding:'0px 5px',  fontWeight:'500'}}>  
-          <a style={{color:'#4fc6e1'}} href="#" onClick={() => {
+          <a style={{color:'#2c9942'}} href="#" onClick={() => {
               handlePreview(file.url)
               setSelectedIndex(index);
             }

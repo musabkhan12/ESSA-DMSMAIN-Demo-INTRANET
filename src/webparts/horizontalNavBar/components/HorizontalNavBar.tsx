@@ -476,7 +476,7 @@ const HorizontalNavbar = ({ _context, siteUrl,context }: any) => {
                   <div className="loadernewadd">
                     <div>
                       <img style={{ width: '60px' }}
-                        src={require("../../../CustomAsset/birdloader.gif")}
+                        src={require("../assets/ESSAROLLER.gif")}
                         className="alignrightl"
                         alt="Loading..."
                       />
@@ -485,7 +485,7 @@ const HorizontalNavbar = ({ _context, siteUrl,context }: any) => {
                       <span>Loading </span>{" "}
                       <span>
                         <img style={{ width: '35px' }}
-                          src={require("../../../CustomAsset/argloader.gif")}
+                          src={require("../assets/ESSAROLLER.gif")}
                           className="alignrightl"
                           alt="Loading..."
                         />
