@@ -73,6 +73,7 @@ import {SharingRole} from "@pnp/sp/sharing";
 import "../../verticalSideBar/components/VerticalSidebar2.scss";
 import VerticalSideBar from "../../verticalSideBar/components/VerticalSideBar";
 import UserContext from "../../../GlobalContext/context";
+import BulkUpload from "./bulkUpload";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {  
   faUser, 
@@ -236,6 +237,8 @@ const ArgPoc = ({ props }: any) => {
   const [routeFromMail2, setRouteFromMail2] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showfolderpermission, setShowfolderpermission] = useState(false);
+
+    const [showBulkUpload, setshowBulkUpload] = useState(false);
   let cleanUrlInMyRequest=false;
   // const handleButtonClickShow = () => {
   //   setShowFirstDiv(false);
@@ -7312,7 +7315,7 @@ const searchFiles = async (event: React.FormEvent) => {
 // //   console.log("currentDocumentLibrary --->",currentDocumentLibrary)
 // // }
 // // const testidsub = await sp.site.openWebById(currentsiteID);
-// // const library = await testidsub.web.lists.getByTitle(currentDocumentLibrary).select("Id")();
+// // const library = await testidsub.web.lists.getByTitle(currentDocumentLibrary). ("Id")();
 // // console.log("Library",library);
 // // console.log(`Document Library ID: ${library.Id}`);
 
@@ -21948,11 +21951,16 @@ librarydiv.appendChild(mainContainer)
      
     <iframe src={mailsharefilewithpreview} id="routefrommailfilePreview" style={{ width: '100%', height: '100%' }}></iframe> */}
   </div>
-) : (
+) :
+ (
       <div className="content" style={{marginLeft: `${!useHide ? '240px' : '80px'}`,marginTop:'2.8rem'}}>
        
       <div className="container-fluid  paddb">
-                {activeComponent === "" ? (
+         {showBulkUpload ?<><button type="button"  onClick={() => {
+                                            setshowBulkUpload(false);
+                                          }} > Back </button><BulkUpload /></>  : <>
+                {
+                activeComponent === "" ? (
                   <div className=" dmsmaincontainer">
 
 {/* <div className="btn-group dropleft">
@@ -22039,6 +22047,29 @@ librarydiv.appendChild(mainContainer)
         </Dropdown.Menu>
       </Dropdown>
                               </div> */}
+                               <div>
+                                                        <Dropdown as={ButtonGroup} style={{ padding: '9.4px 3px 0px 0px', marginTop: '0px' }}>
+                                                          <Dropdown.Toggle variant="primary" id="dropdown-left" className="mt-0 newho" onClick={() => {
+                                                                  setshowBulkUpload(true);
+                                                                }}>
+                                                            Bulk Upload
+                                                          </Dropdown.Toggle>
+                              
+                                                          {/* <Dropdown.Menu className="dropdown-menu-start newtheme font-14">
+                                                            {docTypes.map(type => (
+                                                              <Dropdown.Item
+                                                                onClick={() => {
+                                                                  setshowBulkUpload(true);
+                                                                }}
+                                                              >
+                                                                {type}
+                                                              </Dropdown.Item>
+                                                            ))}
+                              
+                                                          </Dropdown.Menu> */}
+                                                        </Dropdown>
+                              
+                                                      </div>
                                <div>
                       <Dropdown as={ButtonGroup} style={{ padding: '9.4px 3px 0px 0px', marginTop: '0px' }}>
                         <Dropdown.Toggle variant="primary" id="dropdown-left" className="mt-0 newho">
@@ -22183,6 +22214,7 @@ librarydiv.appendChild(mainContainer)
                               handleShowContent(event)
                           }
                         }
+                        
                         >
                           <span className="sidebarIcon">
                             {/* <FontAwesomeIcon icon={faList} /> */}
@@ -22468,8 +22500,11 @@ librarydiv.appendChild(mainContainer)
                    
                   </div>
                 )}
+                 </>
+                 }
               </div>
             </div>
+
 )}
           </div>
           </div>
