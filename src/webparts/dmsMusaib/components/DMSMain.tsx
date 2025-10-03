@@ -14,8 +14,13 @@ declare global {
     confirmUndo:(fileId:any, siteId:any, FileMasterList:any, documentLibraryName:any, ID:any,folderPath:any,fileName:any) =>void;
     hideSharePopUp : ()=>void;
     revokeAccess :  (UserArray:string,FileName:string,fileId:any,siteId:any,folderpath:any)=>void
+    RenameFile : (FileName:string ,CurrentFolderPath:string  ,SiteID:string ,myrequest:any,FileUID:string , SiteName:any) =>void
   }
 
+}
+interface IFile {
+  // other properties...
+  rename(newName: string): Promise<void>;
 }
 interface IFileWithListItem {
   Name: string;
@@ -74,6 +79,7 @@ import "../../verticalSideBar/components/VerticalSidebar2.scss";
 import VerticalSideBar from "../../verticalSideBar/components/VerticalSideBar";
 import UserContext from "../../../GlobalContext/context";
 import BulkUpload from "./bulkUpload";
+import UploadFileInDestination from "./uploadFileInDestination"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {  
   faUser, 
@@ -244,7 +250,14 @@ const ArgPoc = ({ props }: any) => {
   //   setShowFirstDiv(false);
   // };
 
-
+ useEffect(() => {
+    if (!showBulkUpload) {
+      // Your code here
+      fetchAndBuildTree2();      
+       myrequestbuttonclick();
+       myRequest();
+    }
+  }, [showBulkUpload]);
   React.useEffect(() => {
     // console.log("This function is called only once", useHide);
    graph = graphfi().using(graphSPFx(props.context));
@@ -16578,8 +16591,184 @@ const testProess5 = async (event:React.MouseEvent<HTMLButtonElement> ) => {
 //     if (loader) loader.style.display = 'none';
 //   }
 // };
+//window.RenameFile=(FileName ,CurrentFolderPath  ,SiteID ,'',FileUID)
 
+window.RenameFile = async (FileName:any,CurrentFolderPath:any,SiteID:any,myrequest:any , FileUID:any , SiteName:any)=>{
+  console.log("FileName",FileName)
+  console.log("CurrentFolderPath",CurrentFolderPath)
+  console.log("SiteID",SiteID)
+  console.log("FileUID",FileUID)
 
+     const newsp = await sp.site.openWebById(SiteID);
+     alert("newsp" + newsp)
+    // Check if a popup already exists, if so, remove it
+    const existingPopup = document.getElementById("renamefile-popup");
+    if (existingPopup) {
+      existingPopup.remove();
+    }
+  
+     // Create the popup container
+     const popup = document.createElement("div");
+     popup.id = "renamefile-popup";
+     popup.style.position = "fixed";
+    
+
+     // Create a wrapper div
+    const wrapper = document.createElement("div");
+    wrapper.id = "renamefile-wrapper";
+    wrapper.className = "blur-backround";
+
+     // Add the heading
+     const heading = document.createElement("h3");
+     heading.innerText = "Rename File";
+     heading.style.marginBottom = "0px";
+     heading.style.fontSize = "18px";
+     heading.style.borderBottom = "1px solid #ccc";
+     heading.style.paddingBottom = "15px";
+     heading.style.fontWeight = "bold";
+    //  popup.appendChild(heading);
+    wrapper.appendChild(heading);
+    
+   
+     // Add a close button
+     const closeButton = document.createElement("span");
+     closeButton.innerText = "×";
+     closeButton.style.position = "relative";
+     closeButton.style.top = "-42px";
+     closeButton.style.right = "0px";
+     closeButton.style.cursor = "pointer";
+     closeButton.style.fontSize = "18px";
+     closeButton.style.border = "1px solid #ccc";
+     closeButton.style.color = "#666";
+     closeButton.style.minWidth = "30px";
+     closeButton.style.height = "30px";
+     closeButton.style.textAlign = "center";
+     closeButton.style.borderRadius = "1000px";
+     closeButton.style.float = "right";
+     closeButton.style.lineHeight = "27px";
+     closeButton.onclick = () => popup.remove();
+     wrapper.appendChild(closeButton);
+    //  popup.appendChild(closeButton);
+   
+     // Add the input box with the current folder name as the default value
+     const input = document.createElement("input");
+     input.type = "text";
+     input.value = FileName; // Pre-fill with current name
+     input.style.width = "100%";
+     input.style.marginBottom = "15px";
+     input.style.padding = "8px";
+     input.style.border = "1px solid #ccc";
+     input.style.borderRadius = "4px";
+    //  popup.appendChild(input);
+    wrapper.appendChild(input);
+   
+     // Add the submit button
+     const submitButton = document.createElement("button");
+     submitButton.innerText = "Submit";
+     submitButton.style.padding = "6px 20px";
+     submitButton.style.backgroundColor = "#2c9942";
+     submitButton.style.color = "#fff";
+     submitButton.style.border = "none";
+     submitButton.style.borderRadius = "4px";
+     submitButton.style.cursor = "pointer";
+     submitButton.style.float = "right";
+     submitButton.style.marginTop = "0px";
+    submitButton.onclick = async() => {
+      const newName = input.value.trim();
+      if (newName) {
+        console.log("New  name:", newName);
+        // submit the new name to the list
+        try {
+          if(newName === ''){
+            console.log("required")
+            return;
+          }
+          await sp.web.lists.getByTitle('DMSFileApprovalList').
+          items.filter(`SiteName eq '${SiteName}' and FileName eq '${FileName}' and FileUID eq '${FileUID}'`).getAll().then((res)=>{
+            console.log("res",res)
+            res.map(async(item)=>{
+              const itemId=item.Id;
+              console.log("itemId",itemId)
+              await sp.web.lists.getByTitle('DMSFileApprovalList').items.getById(itemId).update({
+                FileName:newName
+              });
+            })
+          })
+          await sp.web.lists.getByTitle(`DMS${SiteName}FileMaster`).
+          items.filter(`SiteName eq '${SiteName}' and FileName eq '${FileName}' and FileUID eq '${FileUID}'`).getAll().then((res)=>{
+            console.log("res",res)
+            res.map(async(item)=>{
+              const itemId=item.Id;
+              console.log("itemId",itemId)
+              await sp.web.lists.getByTitle(`DMS${SiteName}FileMaster`).items.getById(itemId).update({
+                FileName:newName
+              });
+            })
+          })
+        // await newsp.web.getFileById(FileUID).rename(newName);
+        try {
+  // Get file by unique ID
+  const file = newsp.web.getFileById(FileUID);
+
+  // Get file properties including path
+  const fileProps = await file.select("ServerRelativeUrl", "Name")();
+  console.log("File Properties:", fileProps);
+
+  // Get the file's ListItem
+  const item = await file.getItem();
+  console.log("List Item:", item);
+
+  // Rename the file by updating FileLeafRef
+  const updateRes = await item.update({
+    FileLeafRef: newName
+  });
+
+  console.log("File renamed successfully:", updateRes);
+} catch (err) {
+  console.error("Error renaming file:", err);
+}
+//           try{
+//              const renamefile2 = await newsp.web.getFileById(FileUID)()
+//              console.log("renamefile2",renamefile2)
+//          const fileItem =  (renamefile2 as any).select('ServerRelativeUrl').get();
+//          console.log("fileItem",fileItem)
+//           const getfilebyser = await newsp.web.getFileByServerRelativePath(fileItem)();
+//            console.log(getfilebyser , "getfilebyser")
+//            await getfilebyser.update({
+//             FileLeafRef: newName
+//         });
+//            const file = newsp.web.getFileByServerRelativePath(fileItem);
+//          const getfileds = await file.listItemAllFields();
+//          console.log("getfileds",getfileds)
+//         const updatefilename = await newsp.web.lists.getByTitle(fileItem.ListTitle).items.getById(FileUID).update({
+//   FileLeafRef: newName
+// });
+//                console.log("updatefilename",updatefilename)
+//           console.log("Folder Rename successfully");
+//           }catch{
+
+//           }
+      
+          myRequest()
+          popup.remove();
+          Swal.fire('Successfull','Folder rename successfully','success');
+        } catch (error) {
+          console.log("Error in rename the folders ",error)
+        }
+        
+      } else {
+
+      }
+    };
+    // popup.appendChild(submitButton);
+    wrapper.appendChild(submitButton);
+
+    // Add the wrapper to the popup
+    popup.appendChild(wrapper);
+  
+    // Add the popup to the document body
+    document.body.appendChild(popup);
+}
 const myRequest = async (
   event: React.MouseEvent<HTMLButtonElement> = null,
   siteIdToUpdate: string = null,
@@ -16698,6 +16887,9 @@ const myRequest = async (
           </li>
           <li onclick="versionHistory('${file.FileName}', '${file.CurrentFolderPath}', '${file.SiteID}' ,'MyRequest','${file.FileUID}')">
             <img src=${editIcon} alt="Version History"/> Version History
+          </li>
+          <li onclick="RenameFile('${file.FileName}', '${file.CurrentFolderPath}', '${file.SiteID}' ,'MyRequest','${file.FileUID}' , '${file.SiteName}') ">
+            <img src=${editIcon} alt="Version History"/> Rename File
           </li>
           ${file.Status === "Rework" ? `
             <li onclick="rework('${file.FileUID}', '${file.SiteID}','${file?.DocumentLibraryName}','${file?.SiteName}','${file.CurrentFolderPath}/${file.FileName}')">
@@ -20151,16 +20343,67 @@ window.auditHistory = async (fileId: string, siteId: string, DocumentLibraryName
     .filter(`FileUID/FileUID eq '${fileId}'`)
     .orderBy("Modified", false)();
 
+   // Step 1: Extract and ensure Level is a number
+const maxLevelFromTaskList = itemsFromTaskList
+  .map(item => Number(item.MasterApproval?.Level) || 0) // force number
+  .reduce((max, curr) => (curr > max ? curr : max), 0);
+
+console.log("Max Level (Number):", maxLevelFromTaskList, typeof maxLevelFromTaskList);
+
+
+console.log("Max Level from TaskList:", maxLevelFromTaskList);
+    const itemfromapprovallist = await sp.web.lists.getByTitle('DMSFolderPermissionMaster').items.select(
+     "SiteName" , "DocumentLibraryName" , "CurrentUser" , "ApprovalUser/Title" , "ApprovalUser/EMail" , "Level" , "ApprovalType"
+    ).expand("ApprovalUser").filter(`SiteName eq '${SiteName}' and DocumentLibraryName eq 'TRANSMITTAL' and  Level gt ${maxLevelFromTaskList}`)();
+    console.log("itemfromapprovallist",itemfromapprovallist);
   console.log("itemsFromTaskList", itemsFromTaskList);
 
   // Mapping to the desired format
-  const approverDetailsArray = itemsFromTaskList.map(task => ({
+  // const approverDetailsArray = itemsFromTaskList.map(task => ({
+  //   level: `Level ${task.MasterApproval?.Level || 'N/A'}`,
+  //   approver: task.CurrentUser,
+  //   actionDateTime: formatDate(task.Modified),
+  //   status: task.Log || "",
+  //   remark: task.Remark || ""
+  // }));
+// From Task List (already approved / acted)
+const approverDetailsArrayFromTasks = itemsFromTaskList
+  .sort((a, b) => {
+    const levelA = parseInt(a.MasterApproval?.Level) || 0;
+    const levelB = parseInt(b.MasterApproval?.Level) || 0;
+    return levelA - levelB;
+  })
+  .map(task => ({
     level: `Level ${task.MasterApproval?.Level || 'N/A'}`,
     approver: task.CurrentUser,
     actionDateTime: formatDate(task.Modified),
-    status: task.Log || "",
+    status: task.Log || "Pending",
     remark: task.Remark || ""
   }));
+
+// From Approval Master (future approvers)
+const approverDetailsArrayFromApprovals = itemfromapprovallist
+  .sort((a, b) => {
+    // Convert to numbers for safe comparison
+    const levelA = parseInt(a.Level) || 0;
+    const levelB = parseInt(b.Level) || 0;
+    return levelA - levelB;
+  })
+  .map(item => ({
+    level: `Level ${item.Level}`,
+    approver: item.ApprovalUser?.EMail || "N/A",
+    actionDateTime: "",
+    status: "Pending",
+    remark: ""
+  }));
+
+// Combine both arrays
+const approverDetailsArray = [
+  ...approverDetailsArrayFromTasks,
+  ...approverDetailsArrayFromApprovals
+];
+
+console.log("approverDetailsArray", approverDetailsArray);
 
   console.log("approverDetailsArray", approverDetailsArray);
 
@@ -20185,17 +20428,33 @@ window.auditHistory = async (fileId: string, siteId: string, DocumentLibraryName
 
   // Generate the dynamic HTML for the approver details
   let approverRowsHTML = "";
-  approverDetailsArray.forEach((approver) => {
-    approverRowsHTML += `
+//   approverDetailsArray.forEach((approver) => {
+//     approverRowsHTML += `
+//     <tr class="approver-row">
+//      <td class="approver-level">${approver.level}</td>
+//      <td class="approver-name">${approver.approver}</td>
+//      <td class="approver-date">${approver.actionDateTime}</td>
+//      <td class="approver-status">${approver.status}</td>
+//      <td class="approver-remark">${approver.remark}</td>
+//    </tr>
+//  `;
+//   });
+approverDetailsArray.forEach((approver) => {
+  const status = approver.status && approver.status.trim() !== "" 
+    ? approver.status 
+    : "Pending";
+
+  approverRowsHTML += `
     <tr class="approver-row">
-     <td class="approver-level">${approver.level}</td>
-     <td class="approver-name">${approver.approver}</td>
-     <td class="approver-date">${approver.actionDateTime}</td>
-     <td class="approver-status">${approver.status}</td>
-     <td class="approver-remark">${approver.remark}</td>
-   </tr>
- `;
-  });
+      <td class="approver-level">${approver.level}</td>
+      <td class="approver-name">${approver.approver}</td>
+      <td class="approver-date">${approver.actionDateTime}</td>
+      <td class="approver-status">${status}</td>
+      <td class="approver-remark">${approver.remark || ""}</td>
+    </tr>
+  `;
+});
+
 
   // Create the popup
   const popup = document.createElement("div");
@@ -21958,7 +22217,11 @@ librarydiv.appendChild(mainContainer)
       <div className="container-fluid  paddb">
          {showBulkUpload ?<><button type="button"  onClick={() => {
                                             setshowBulkUpload(false);
-                                          }} > Back </button><BulkUpload /></>  : <>
+                                          }} > Back </button>
+                                          
+                                          {/* <BulkUpload /> */}
+                                                <UploadFileInDestination/>
+                                          </>  : <>
                 {
                 activeComponent === "" ? (
                   <div className=" dmsmaincontainer">
@@ -21996,12 +22259,8 @@ librarydiv.appendChild(mainContainer)
                     )}
                 {/* Start Code Update by Amjad */}
                     <div className="row">
-                             <div className="col-lg-6">
-                                 <button  type="button" className="btn me-1 btngridview mt-0 grid-view active"    
-                                onClick={()=>window.open('https://officeindia.sharepoint.com/sites/Intranetdemos/SitePages/CheckUrl.aspx' , "_blank") }>
-                                  <a className="listviewfonticon">          
-                                    <FontAwesomeIcon style={{color: "black"}} icon={faTableCells}/> </a>Check Missing Links
-                                </button>
+                             <div className="col-lg-4">
+                                
                                 <h4 className="page-title fw-bold mb-1 font-20">Dossier</h4>
                                 <ol className="breadcrumb m-0">
                     {" "}
@@ -22011,7 +22270,7 @@ librarydiv.appendChild(mainContainer)
                             </div>
 
                             
-                            <div style={{display:'flex', justifyContent:'end', gap:'5px'}} className="col-lg-6 newbutton">
+                            <div style={{display:'flex', justifyContent:'end', gap:'5px'}} className="col-lg-8 newbutton">
                               {/* <div>
                               <Dropdown as={ButtonGroup} style={{padding: '9.4px' , marginTop: '8px'}}>
         <Dropdown.Toggle variant="primary" id="dropdown-left">
@@ -22047,12 +22306,18 @@ librarydiv.appendChild(mainContainer)
         </Dropdown.Menu>
       </Dropdown>
                               </div> */}
+                               <button style={{marginTop:'8px'}}  type="button" className="btn me-1 btngridview grid-view active"    
+                                onClick={()=>window.open('https://officeindia.sharepoint.com/sites/Intranetdemos/SitePages/CheckUrl.aspx' , "_blank") }>
+                                  <a className="listviewfonticon">          
+                                    <FontAwesomeIcon style={{color: "black"}} icon={faTableCells}/> </a>Check Missing Links
+                                </button>
                                <div>
-                                                        <Dropdown as={ButtonGroup} style={{ padding: '9.4px 3px 0px 0px', marginTop: '0px' }}>
-                                                          <Dropdown.Toggle variant="primary" id="dropdown-left" className="mt-0 newho" onClick={() => {
+                                                        <Dropdown as={ButtonGroup} style={{ marginTop: '8px' }}>
+                                                          <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}}  id="dropdown-left" className="mt-0 newho" onClick={() => {
                                                                   setshowBulkUpload(true);
                                                                 }}>
-                                                            Bulk Upload
+                                                            {/* Bulk Upload */}
+                                                            Document type bulk uplaod
                                                           </Dropdown.Toggle>
                               
                                                           {/* <Dropdown.Menu className="dropdown-menu-start newtheme font-14">
@@ -22071,9 +22336,11 @@ librarydiv.appendChild(mainContainer)
                               
                                                       </div>
                                <div>
-                      <Dropdown as={ButtonGroup} style={{ padding: '9.4px 3px 0px 0px', marginTop: '0px' }}>
-                        <Dropdown.Toggle variant="primary" id="dropdown-left" className="mt-0 newho">
-                          Select Document Categoty
+                      <Dropdown as={ButtonGroup} style={{  marginTop: '8px' }}>
+                        <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}} id="dropdown-left" className="mt-0 newho">
+                          {/* Select Document Categoty
+                           */}
+                           Select Template
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu className="dropdown-menu-start newtheme font-14">
@@ -22444,12 +22711,12 @@ librarydiv.appendChild(mainContainer)
     //  onReturnToMain={handleReturnToMain}
     //     />
     <DocumentTemplatetofill
-    selectedCategory={listorgriddata}
-    userid={currentUserIDref.current}
-    context={props.context}
-    currentuseremail = {currentUserEmailRef.current}
-    onReturnToMain={handleReturnToMain}
-    fileinedit = {documenttemplatetofill}
+    // selectedCategory={listorgriddata}
+    // userid={currentUserIDref.current}
+    // context={props.context}
+    // currentuseremail = {currentUserEmailRef.current}
+    // onReturnToMain={handleReturnToMain}
+    // fileinedit = {documenttemplatetofill}
     />
       ) 
 : null}

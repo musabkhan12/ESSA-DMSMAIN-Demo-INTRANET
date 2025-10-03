@@ -9,6 +9,7 @@
   width: 100%;
 }
 .main-containeruploadfile #submitBtn{float: right;}
+.treeview button:hover,.newhover:hover{background: transparent !important;}
 .content-page{
   
    display: -webkit-box;

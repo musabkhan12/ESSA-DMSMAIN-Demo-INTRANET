@@ -509,9 +509,11 @@ a:hover
     text-align: center;
 }
 #rename-popup h3, #renamePopup h3{ font-weight: 600 !important; text-align: left !important;  font-size: 18px !important;}
+#renamefile-popup h3, #renamePopup h3{ font-weight: 600 !important; text-align: left !important;  font-size: 18px !important;}
+
 .setApprover{margin-left: 0px !important; justify-content: center;}
 #showfolderpermission .modal-dialog, #workflowdiv .modal-dialog {min-width: 70% !important;}
-#files-container iframe{width: 100% !important; margin-top: 35px;}
+#files-container iframe{width: 100% !important; margin-top: 77px;}
 #showfolderpermission .modal-dialog .modal-content, #workflowdiv .modal-dialog .modal-content{
   width: 100% !important; padding: 15px !important;
 }
