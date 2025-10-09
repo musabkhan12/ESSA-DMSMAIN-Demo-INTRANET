@@ -14,11 +14,11 @@ import CustomPopup from './CustomPopup';
 interface IMyTaskProps {
   context: WebPartContext;
   description: string;
-    siteUrl: string;
-    userDisplayName: string;
-    isDarkTheme: boolean;
-    environmentMessage: string;
-    hasTeamsContext: boolean;
+  siteUrl: string;
+  userDisplayName: string;
+  isDarkTheme: boolean;
+  environmentMessage: string;
+  hasTeamsContext: boolean;
 }
 
 interface Task {
@@ -35,6 +35,8 @@ interface Task {
   assignedTo: string;
   org: string;
   status: "Pending" | "Approved" | "In-Progress";
+  clientName: string;
+  creationDate: Date | undefined;
 }
 
 interface AuditHistoryItem {
@@ -50,6 +52,15 @@ interface AuditHistoryItem {
   status: string;
 }
 
+interface DocumentComment {
+  id: number;
+  userName: string;
+  commentDate: string;
+  pageNumber: string;
+  revision: string;
+  comment: string;
+}
+
 const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
   const [tasks, setTasks] = React.useState<Task[]>([]);
   const [currentFilter, setCurrentFilter] = React.useState<string>("Pending"); // Set default to "Pending"
@@ -63,19 +74,25 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
   const [documentControllerId, setDocumentControllerId] = React.useState<number | null>(null);
   const [uploadedFileName, setUploadedFileName] = React.useState<string>("");
   const [uploadedFileUrl, setUploadedFileUrl] = React.useState<string>("");
+  // Document Comments State
+  const [documentComments, setDocumentComments] = React.useState<DocumentComment[]>([]);
+  const [allDocumentComments, setAllDocumentComments] = React.useState<DocumentComment[]>([]);
+  const [versionList, setVersionList] = React.useState<string[]>([]);
+  const [selectedVersion, setSelectedVersion] = React.useState<string>("");
+  const [showDocumentComments, setShowDocumentComments] = React.useState<boolean>(false);
   // Popup state
-const [popup, setPopup] = React.useState<{
-  isOpen: boolean;
-  type: 'confirmation' | 'validation' | 'success' | 'error';
-  title: string;
-  message: string;
-  onConfirm?: () => void;
-}>({
-  isOpen: false,
-  type: 'success',
-  title: '',
-  message: ''
-});
+  const [popup, setPopup] = React.useState<{
+    isOpen: boolean;
+    type: 'confirmation' | 'validation' | 'success' | 'error';
+    title: string;
+    message: string;
+    onConfirm?: () => void;
+  }>({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    message: ''
+  });
 
 
 
@@ -112,7 +129,7 @@ const [popup, setPopup] = React.useState<{
       // Get Document Controller first
       const docControllerId = await getDocumentController();
       setDocumentControllerId(docControllerId);
-      
+
       // Then fetch tasks
       await fetchTasks();
     };
@@ -146,7 +163,7 @@ const [popup, setPopup] = React.useState<{
                 "ProjectType/ProjectType",
                 "ProjectType/Id"
               ).expand("ProjectType")();
-              console.log('Creation Item:', creationitem);
+            console.log('Creation Item:', creationitem);
 
             return {
               sno: index + 1,
@@ -162,7 +179,8 @@ const [popup, setPopup] = React.useState<{
               status: item.Status,
               projectId: item.ProjectCreationListID?.ID,
               revisionnumber: item.RevisionNumber || "0",
-              creationDate: creationitem.Created || "",
+              creationDate: creationitem.Created || undefined,
+              clientName: creationitem.ClientName || "",
             };
           } catch (error) {
             console.error(`Error fetching creation item for project ${item.ProjectCreationListID?.ID}:`, error);
@@ -181,7 +199,8 @@ const [popup, setPopup] = React.useState<{
               status: item.Status,
               projectId: item.ProjectCreationListID?.ID,
               revisionnumber: item.RevisionNumber || "0",
-              creationDate: "",
+              creationDate: undefined,
+              clientName: "",
             };
           }
         })
@@ -193,6 +212,84 @@ const [popup, setPopup] = React.useState<{
       setFilteredTasks(pendingTasks);
     } catch (error) {
       console.error("Error loading tasks:", error);
+    }
+  };
+  // Get Document Comments
+  const getDocumentComments = async (projectCreationID: number, deliverableDetailsID: number, revision: string) => {
+    try {
+      const items = await sp.web.lists.getByTitle("DocumentComments").items
+        .select("*")
+        .filter(`ProjectID eq ${projectCreationID} and DeliverableDetailsID/ID eq ${deliverableDetailsID}`)
+        .orderBy("ID", false)();
+      if (items.length > 0) {
+        const comments: DocumentComment[] = items.map((item: any) => ({
+          id: item.Id,
+          userName: item.UserName || "",
+          commentDate: item.CommentDate ? new Date(item.CommentDate).toLocaleString('en-GB') : "",
+          pageNumber: item.PageNumber || "",
+          revision: item.Revision || "",
+          comment: item.Comment || ""
+        }));
+        setAllDocumentComments(comments);
+        console.log("All Document Comments:", comments);
+
+        // Filter by current revision
+        const filteredComments = comments.filter(comment => comment.revision === revision);
+        setDocumentComments(filteredComments);
+
+        // Get unique versions
+        const uniqueVersions = [...new Set(comments.map(comment => comment.revision))].sort();
+        setVersionList(uniqueVersions);
+        setSelectedVersion(revision);
+        setShowDocumentComments(true);
+        console.log("Unique Versions:", uniqueVersions);
+        console.log("Filtered Document Comments:", filteredComments);
+      } else {
+        setShowDocumentComments(false);
+        setDocumentComments([]);
+        setAllDocumentComments([]);
+        setVersionList([]);
+      }
+    } catch (error) {
+      console.error("Error fetching document comments:", error);
+      setShowDocumentComments(false);
+    }
+  };
+  const onVersionChange = (version: string) => {
+    setSelectedVersion(version);
+    if (!version) {
+      setDocumentComments(allDocumentComments);
+    } else {
+      const filteredComments = allDocumentComments.filter(comment => comment.revision === version);
+      setDocumentComments(filteredComments);
+    }
+  };
+  const exportCommentsToExcel = () => {
+    // Basic CSV export implementation
+    const headers = ['Users', 'Comment Date', 'Page No.', 'Revision', 'Comments/Clarifications'];
+    const csvContent = [
+      headers.join(','),
+      ...documentComments.map(comment => [
+        `"${comment.userName}"`,
+        `"${comment.commentDate}"`,
+        `"${comment.pageNumber}"`,
+        `"${comment.revision}"`,
+        `"${comment.comment}"`
+      ].join(','))
+    ].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `DocumentComments_${selectedTask?.docNumber || 'export'}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+  const refreshDocComment = () => {
+    if (selectedTask) {
+      getDocumentComments(selectedTask.projectId, selectedTask.deliverableId, selectedTask.revisionnumber);
     }
   };
 
@@ -286,93 +383,92 @@ const [popup, setPopup] = React.useState<{
   //     setShowNoAuditHistory(true);
   //   }
   // };
-const handleViewClick = async (task: Task) => {
-  setSelectedTask(task);
-  setShowForm(true);
-  setUploadedFileName("");
-  setUploadedFileUrl("");
-  setComment("");
+  const handleViewClick = async (task: Task) => {
+    setSelectedTask(task);
+    setShowForm(true);
+    setUploadedFileName("");
+    setUploadedFileUrl("");
+    setComment("");
 
-  try {
-    // 1️⃣ Load Audit History
-    const history = await getAuditHistoryDeliverables(task, context);
-    setAuditHistory(history);
-    setShowNoAuditHistory(history.length === 0);
+    try {
+      // Load Audit History
+      const history = await getAuditHistoryDeliverables(task, context);
+      setAuditHistory(history);
+      setShowNoAuditHistory(history.length === 0);
 
-    // 2️⃣ Load file and comment if applicable
-    if (task.status === "Approved" || task.status === "In-Progress") {
-      const deliverablesList = sp.web.lists.getByTitle("DeliverablesDetails");
-      const deliverableItem = await deliverablesList.items
-        .getById(task.deliverableId)
-        .select("DeliverablesDocumentID/ID", "DocumentComments")
-        .expand("DeliverablesDocumentID")();
+      // Load Document Comments
+      await getDocumentComments(task.projectId, task.deliverableId, task.revisionnumber);
 
-      if (deliverableItem.DocumentComments) {
-        setComment(deliverableItem.DocumentComments);
-      }
+      // Load file and comment if applicable
+      if (task.status === "Approved" || task.status === "In-Progress") {
+        const deliverablesList = sp.web.lists.getByTitle("DeliverablesDetails");
+        const deliverableItem = await deliverablesList.items
+          .getById(task.deliverableId)
+          .select("DeliverablesDocumentID/ID", "DocumentComments")
+          .expand("DeliverablesDocumentID")();
 
-      const deliverablesDocumentId = deliverableItem.DeliverablesDocumentID?.ID;
-      if (deliverablesDocumentId) {
-        // Get the file directly from the document library
-        const fileItem = await sp.web.lists.getByTitle("DeliverablesDocument").items
-          .getById(deliverablesDocumentId)
-          .select("ID", "FileLeafRef", "File/ServerRelativeUrl")
-          .expand("File")();
-
-        if (fileItem.File) {
-          setUploadedFileName(fileItem.FileLeafRef);
-          
-          // Construct the proper file URL
-          const serverRelativeUrl = fileItem.File.ServerRelativeUrl;
-          const fileUrl = `${context.pageContext.web.absoluteUrl}/_layouts/15/download.aspx?SourceUrl=${encodeURIComponent(serverRelativeUrl)}`;
-          
-          console.log("File URL:", fileUrl);
-          setUploadedFileUrl(fileUrl);
+        if (deliverableItem.DocumentComments) {
+          setComment(deliverableItem.DocumentComments);
         }
+
+        const deliverablesDocumentId = deliverableItem.DeliverablesDocumentID?.ID;
+        if (deliverablesDocumentId) {
+          const fileItem = await sp.web.lists.getByTitle("DeliverablesDocument").items
+            .getById(deliverablesDocumentId)
+            .select("ID", "FileLeafRef", "File/ServerRelativeUrl")
+            .expand("File")();
+
+          if (fileItem.File) {
+            setUploadedFileName(fileItem.FileLeafRef);
+            const serverRelativeUrl = fileItem.File.ServerRelativeUrl;
+            const fileUrl = `${context.pageContext.web.absoluteUrl}/_layouts/15/download.aspx?SourceUrl=${encodeURIComponent(serverRelativeUrl)}`;
+            setUploadedFileUrl(fileUrl);
+          }
+        }
+      } else {
+        setComment("");
+        setUploadedFileName("");
+        setUploadedFileUrl("");
       }
-    } else {
-      setComment("");
-      setUploadedFileName("");
-      setUploadedFileUrl("");
+    } catch (error) {
+      console.error("Error loading task details:", error);
+      setAuditHistory([]);
+      setShowNoAuditHistory(true);
+      setShowDocumentComments(false);
     }
-  } catch (error) {
-    console.error("Error loading task details:", error);
-    setAuditHistory([]);
-    setShowNoAuditHistory(true);
-  }
-};
-
-
+  };
 
   const handleBackClick = () => {
     setSelectedTask(null);
     setShowForm(false);
     setAuditHistory([]);
     setShowNoAuditHistory(false);
+    setShowDocumentComments(false);
+    setDocumentComments([]);
   };
 
 
   const handleSubmitClick = async () => {
     if (!selectedTask || !selectedFile) {
       setPopup({
-  isOpen: true,
-  type: 'validation',
-  title: 'Validation',
-  message: 'Please select a file before submitting.'
-});
-return;
+        isOpen: true,
+        type: 'validation',
+        title: 'Validation',
+        message: 'Please select a file before submitting.'
+      });
+      return;
 
     }
 
     // Check if Document Controller ID is available
     if (!documentControllerId) {
       setPopup({
-  isOpen: true,
-  type: 'error',
-  title: 'Configuration Missing',
-  message: 'Document Controller not configured. Please contact administrator.'
-});
-return;
+        isOpen: true,
+        type: 'error',
+        title: 'Configuration Missing',
+        message: 'Document Controller not configured. Please contact administrator.'
+      });
+      return;
 
     }
 
@@ -459,27 +555,27 @@ return;
         Status: "Pending"
       });
 
-     setPopup({
-  isOpen: true,
-  type: 'success',
-  title: 'Success',
-  message: 'Task submitted successfully.',
-  onConfirm: () => {
-    setPopup(prev => ({ ...prev, isOpen: false }));
-    handleBackClick();
-    window.location.reload();
-  }
-});
+      setPopup({
+        isOpen: true,
+        type: 'success',
+        title: 'Success',
+        message: 'Task submitted successfully.',
+        onConfirm: () => {
+          setPopup(prev => ({ ...prev, isOpen: false }));
+          handleBackClick();
+          window.location.reload();
+        }
+      });
 
 
     } catch (error) {
       console.error("Error in submission:", error);
       setPopup({
-  isOpen: true,
-  type: 'error',
-  title: 'Error',
-  message: 'An error occurred during submission. Please check console for details.'
-});
+        isOpen: true,
+        type: 'error',
+        title: 'Error',
+        message: 'An error occurred during submission. Please check console for details.'
+      });
 
     }
   }
@@ -608,11 +704,11 @@ return;
                     </div>
                     <div>
                       <label>Client Name</label>
-                      <input type="text" value="Client 1" disabled />
+                      <input type="text" value={selectedTask?.clientName || ''} disabled />
                     </div>
                     <div>
                       <label>Project Date</label>
-                      <input type="text" value="25/09/2025" disabled />
+                      <input type="text" value={selectedTask?.creationDate ? new Date(selectedTask.creationDate).toLocaleDateString('en-GB') : ''} disabled />
                     </div>
                     <div>
                       <label>Prepared By</label>
@@ -630,7 +726,7 @@ return;
                       <label>Document Number</label>
                       <input
                         type="text"
-                        value={selectedTask?.docNumber || ''} 
+                        value={selectedTask?.docNumber || ''}
                         disabled
                       />
                     </div>
@@ -651,20 +747,20 @@ return;
                   {/* Upload & Comment Section */}
                   <div className={styles.formActions}>
                     {uploadedFileName ? (
-                <>
-                  <label>Uploaded Document:</label>
-                  <p>
-                    <a href={uploadedFileUrl} target="_blank" rel="noopener noreferrer">
-                      {uploadedFileName}
-                    </a>
-                  </p>
-                </>
-              ) : (
-                <>
-                  <label>Upload Document*</label>
-                  <input type="file" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} />
-                </>
-              )}
+                      <>
+                        <label>Uploaded Document:</label>
+                        <p>
+                          <a href={uploadedFileUrl} target="_blank" rel="noopener noreferrer">
+                            {uploadedFileName}
+                          </a>
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <label>Upload Document*</label>
+                        <input type="file" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} />
+                      </>
+                    )}
                     <label>Comment*</label>
                     <textarea
                       placeholder="Enter your comment"
@@ -674,44 +770,84 @@ return;
                     />
                   </div>
 
-                  {/* Audit History */}
-                  {/* <div className={styles.auditHistory}>
-                    <h4>Audit History</h4>
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>SNo</th>
-                          <th>Approval Level</th>
-                          <th>Assigned To</th>
-                          <th>Assigned To Role</th>
-                          <th>Requestor Name</th>
-                          <th>Requested Date</th>
-                          <th>Action Taken By</th>
-                          <th>Action Taken On</th>
-                          <th>Remark</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>1</td>
-                          <td>Level 0</td>
-                          <td>{selectedTask?.assignedTo}</td>
-                          <td>Vendor</td>
-                          <td>{selectedTask?.assignedTo}</td>
-                          <td>25.09.2025 12:26:53</td>
-                          <td>{selectedTask?.assignedTo}</td>
-                          <td></td>
-                          <td></td>
-                          <td>
-                            <span className={`${styles.statusBadge} ${getStatusClass(selectedTask?.status || '')}`}>
-                              {selectedTask?.status}
-                            </span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div> */}
+                  {/* Document Comments Accordion - Added before Audit History */}
+                  {showDocumentComments && (
+                    <div className={styles.accordionItem}>
+                      <h2 className={styles.accordionHeader}>
+                        <div className={styles.accordionButton}>
+                          Document Comments
+                        </div>
+                      </h2>
+
+                      <div className={styles.accordionBody}>
+                        <div className={styles.customCard}>
+                          <div className={styles.documentCommentsHeader}>
+                            <select
+                              className={styles.formSelect}
+                              value={selectedVersion}
+                              onChange={(e) => onVersionChange(e.target.value)}
+                            >
+                              <option value="">-- Select Revision --</option>
+                              {versionList.map(version => (
+                                <option key={version} value={version}>{version}</option>
+                              ))}
+                            </select>
+                            <button
+                              className={styles.btnOutlineSuccess}
+                              type="button"
+                              onClick={exportCommentsToExcel}
+                            >
+                              Export to Excel
+                            </button>
+                            <button
+                              className={styles.btnOutlineSuccess}
+                              type="button"
+                              onClick={refreshDocComment}
+                            >
+                              ↻
+                            </button>
+                          </div>
+
+                          <div className={styles.ribbonContent}>
+                            <table className={styles.commentsTable}>
+                              <thead>
+                                <tr>
+                                  <th style={{ minWidth: '80px', maxWidth: '80px' }}>Users</th>
+                                  <th style={{ minWidth: '100px', maxWidth: '100px' }}>Comment Date</th>
+                                  <th style={{ minWidth: '80px', maxWidth: '80px' }}>Page No.</th>
+                                  <th style={{ minWidth: '80px', maxWidth: '80px' }}>Revision</th>
+                                  <th style={{ minWidth: '200px', maxWidth: '200px' }}>Comments</th>
+                                </tr>
+                              </thead>
+                              <tbody style={{ maxHeight: '250px', overflowY: 'auto' }}>
+                                {documentComments.map((commentItem) => (
+                                  <tr key={commentItem.id}>
+                                    <td style={{ padding: '10px', verticalAlign: 'top', minWidth: '80px', maxWidth: '80px' }}>
+                                      {commentItem.userName}
+                                    </td>
+                                    <td style={{ padding: '10px', verticalAlign: 'top', minWidth: '100px', maxWidth: '100px' }}>
+                                      {commentItem.commentDate}
+                                    </td>
+                                    <td style={{ padding: '10px', verticalAlign: 'top', minWidth: '80px', maxWidth: '80px' }}>
+                                      {commentItem.pageNumber}
+                                    </td>
+                                    <td style={{ padding: '10px', verticalAlign: 'top', minWidth: '80px', maxWidth: '80px' }}>
+                                      {commentItem.revision}
+                                    </td>
+                                    <td style={{ padding: '15px', verticalAlign: 'top', minWidth: '200px', maxWidth: '200px' }}>
+                                      {commentItem.comment}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+
                   {/* Audit History */}
                   <div className={styles.auditHistory}>
                     <h4>Audit History</h4>
@@ -775,18 +911,18 @@ return;
         </>
       )}
       <CustomPopup
-  isOpen={popup.isOpen}
-  type={popup.type}
-  title={popup.title}
-  message={popup.message}
-  onConfirm={popup.onConfirm}
-  onCancel={() => setPopup(prev => ({ ...prev, isOpen: false }))}
-  onClose={() => setPopup(prev => ({ ...prev, isOpen: false }))}
-  onSuccessOk={() => {
-    setPopup(prev => ({ ...prev, isOpen: false }));
-    if (popup.onConfirm) popup.onConfirm();
-  }}
-/>
+        isOpen={popup.isOpen}
+        type={popup.type}
+        title={popup.title}
+        message={popup.message}
+        onConfirm={popup.onConfirm}
+        onCancel={() => setPopup(prev => ({ ...prev, isOpen: false }))}
+        onClose={() => setPopup(prev => ({ ...prev, isOpen: false }))}
+        onSuccessOk={() => {
+          setPopup(prev => ({ ...prev, isOpen: false }));
+          if (popup.onConfirm) popup.onConfirm();
+        }}
+      />
 
     </div>
   );
