@@ -249,13 +249,13 @@ const DocumentTemplatetofill = (props: any) => {
   {isFullScreen ? "Exit Full Screen" : "Full Screen"}
 </button>
           </div> */}
-<div className="mt-3 flex gap-2">
-  <button className="btn btn-success" onClick={handleSubmit}>
+<div className="mt-0 mb-2 d-flex justify-content-end  gap-2">
+  <button className="btn btn-success mt-0" onClick={handleSubmit}>
     Submit Edited File
   </button>
 
   <button
-    className="btn btn-primary"
+    className="btn btn-primary mt-0"
     onClick={() => setIsFullScreen(!isFullScreen)}
     style={{
       position: isFullScreen ? "fixed" : "static",
@@ -282,11 +282,11 @@ const DocumentTemplatetofill = (props: any) => {
             title="Editable Document"
           ></iframe>
           <div>
-            <table className="table table-bordered">
+            <table className="mtbalenew">
         <thead>
           <tr>
             <th>User</th>
-            <th>Level</th>
+            <th style={{minWidth:"50px",maxWidth:"50px"}}>Level</th>
             <th>Approval Type</th>
           </tr>
         </thead>
@@ -295,7 +295,7 @@ const DocumentTemplatetofill = (props: any) => {
     approvalhierachy.map((item: any) => (
       <tr key={item.Id}>
         <td>{item.CurrentUser}</td>
-        <td>{item.Level}</td>
+        <td style={{minWidth:"50px",maxWidth:"50px",textAlign:"center"}}>{item.Level}</td>
         <td>{getApprovalTypeText(item.ApprovalType)}</td>
       </tr>
     ))

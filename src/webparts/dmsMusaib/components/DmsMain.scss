@@ -1039,3 +1039,19 @@ text-align: center;}
      color: #ffffff !important;
      margin-right: 64px !important;
 }
+.btngridview {height: 38px !important;  padding: 5px 7px !important;
+  line-height: 30px; border-radius: 4px;} 
+.notactive,.newho,.btnlistview  {    background-color: #fff !important;
+  border-radius: 4px;
+  height: 38px !important;
+  color: #000;
+  padding: 5px 7px!important;
+  line-height: 30px;
+}
+.notactive:hover,.newho:hover,.btnlistview:hover{color: #fff;}
+.notactive:hover img,.newho:hover img,.btnlistview:hover img{
+  filter: brightness(0) invert(1);
+}
+#hidegidvewlistviewbutton .active img{
+  filter: brightness(0) invert(1);
+}

@@ -143,6 +143,7 @@ const bulkUpload = () => {
                             margin-top: 20px;
                             border-collapse: collapse;
                         }
+                            .newclassback{float:right;}
                         .bulk-upload-table th, .bulk-upload-table td {
                             border: 1px solid #ccc;
                             padding: 8px;
@@ -152,7 +153,7 @@ const bulkUpload = () => {
                             background-color: #f2f2f2;
                         }
                         .bulk-upload-table tbody tr:nth-child(even) {
-                            background-color: #fafafa;
+                            background-color: #fff;
                         }
                         .bulk-upload-table tbody tr:nth-child(odd) {
                             background-color: #fff;
