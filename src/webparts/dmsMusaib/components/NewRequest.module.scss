@@ -1,10 +1,24 @@
+@font-face {
+  font-family: 'Segoe MDL2 Assets';
+  src: url('https://static2.sharepointonline.com/files/fabric/assets/icons/segoe-mdl2-assets.woff2') format('woff2'),
+       url('https://static2.sharepointonline.com/files/fabric/assets/icons/segoe-mdl2-assets.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .newRequest {
-  max-width: 500px;
-  margin: 20px auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  // max-width: 500px;
+  // margin: 20px auto;
+  // padding: 20px;
+  // background: #fff;
+  // border-radius: 12px;
+  // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, .1);
+    /* margin: 20px auto; */
+    max-width: 1000px !important;
+    /* width: 70%; */
  
   h2 {
     margin-bottom: 16px;
@@ -27,8 +41,25 @@
 /* NewRequest.module.scss */
 .newRequest {
   padding: 20px;
+  max-width: 100% !important;
+    display: grid
+;
 }
- 
+.newRequest h2{
+  font-size: 16px;
+  font-weight: 700;
+ margin: 0px; display: flex;
+
+  margin-bottom: 15px !important;
+}
+.newRequest h3{
+  font-size: 14px;
+  font-weight: 700;
+ margin: 0px;
+
+  margin-bottom: 15px !important;
+}
+
 .section {
   margin-bottom: 30px;
 }
@@ -59,7 +90,7 @@
   gap: 20px; // spacing between columns
   margin-bottom: 15px;
 }
- 
+.ms-TextField-fieldGroup{border: 1px solid #efefef !important; padding: 6px 10px !important;}
 .section {
   margin-bottom: 30px;
 }
@@ -155,19 +186,21 @@ td {
 }
  
 .deleteButton {
-  color: red;
+  color: red; margin-top: 0px; background: transparent !important;
 }
- 
+.deleteButton:hover{
+  background: transparent !important;
+}
 .buttonRow {
   margin-top: 16px;
   display: flex;
-  gap: 12px;
+  gap: 12px; align-items: center; justify-content: end;
 }
  
 .submitButton {
   background-color: #28a745 !important; // green
   color: white !important;
-  border: none !important;
+  border: none !important; width: 100px !important; margin-top:0px !important;
  
   &:hover {
     background-color: #218838 !important;
@@ -178,11 +211,12 @@ td {
   background-color: #212529 !important; // dark/black
   color: white !important;
   border: none !important;
- 
+  width: 100px !important; margin-top:0px !important;
   &:hover {
     background-color: #000000 !important;
   }
 }
+
  
  
 // Popup Styles
@@ -529,3 +563,4 @@ td {
 .wrapText {
   white-space: normal !important;   /* wrap enable */
 }
+

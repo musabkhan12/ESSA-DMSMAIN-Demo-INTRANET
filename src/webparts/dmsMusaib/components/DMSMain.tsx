@@ -139,6 +139,9 @@ import { BaseWebPartContext } from "@microsoft/sp-webpart-base";
 import { GraphSearchHelper } from "../../../Shared/SearchHelper1";
 import { IDocumentDisplayFields } from "./DMSSearch/Interfaces";
 import { ISearchHitResource } from "../../../Shared/SearchHelperInterfaces";
+import NewRequest from "./NewRequest";
+import MyTask from "./MyTasks";
+import Dashboard from "./DashboardCode";
 // import Testfile from "../processcomponents/test";
 import Testfile from "./testfile"
 import Shownew from "../processcomponents/new";
@@ -157,6 +160,12 @@ let recyclebin = require('../assets/recycle-bin.png')
 let sharewithothericon = require('../assets/share.png')
 let starticon = require('../assets/star.png')
 let listicon = require('../assets/list.png')
+let listicon1 = require('../assets/list1.png')
+let listicon2 = require('../assets/list2.png')
+let listicon3 = require('../assets/list3.png')
+let listicon4 = require('../assets/list4.png')
+let listicon5 = require('../assets/list5.png')
+let listicon6 = require('../assets/list6.png')
 let downloadicon = require('../assets/download.png')
  let foldericon = require('../assets/foldericon.png')
 let Docicon = require("../assets/DOC.png");
@@ -17097,6 +17106,27 @@ const fileNotFound=(fileName:any)=>{
     wait.classList.add('hidemydatacards')
     setlistorgriddata('showListView');
   }
+  const Newrequestpw = (e:any)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    const wait = document.getElementById('files-container')
+    wait.classList.add('hidemydatacards')
+    setlistorgriddata('NewRequest');
+  }
+  const myallprojects = (e:any)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    const wait = document.getElementById('files-container')
+    wait.classList.add('hidemydatacards')
+    setlistorgriddata('myallprojects');
+  }
+  const myTask = (e:any)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    const wait = document.getElementById('files-container')
+    wait.classList.add('hidemydatacards')
+    setlistorgriddata('myTask');
+  }
   const mycreatedfolderListView = (componentName:any)=>{
     const wait = document.getElementById('files-container')
     wait.classList.add('hidemydatacards')
@@ -22259,7 +22289,7 @@ librarydiv.appendChild(mainContainer)
                     )}
                 {/* Start Code Update by Amjad */}
                     <div className="row">
-                             <div className="col-lg-4">
+                             <div className="col-lg-2">
                                 
                                 <h4 className="page-title fw-bold mb-1 font-20">Dossier</h4>
                                 <ol className="breadcrumb m-0">
@@ -22270,7 +22300,7 @@ librarydiv.appendChild(mainContainer)
                             </div>
 
                             
-                            <div style={{display:'flex', justifyContent:'end', gap:'5px'}} className="col-lg-8 newbutton">
+                            <div style={{display:'flex', justifyContent:'end', gap:'5px'}} className="col-lg-10 newbutton">
                               {/* <div>
                               <Dropdown as={ButtonGroup} style={{padding: '9.4px' , marginTop: '8px'}}>
         <Dropdown.Toggle variant="primary" id="dropdown-left">
@@ -22306,10 +22336,15 @@ librarydiv.appendChild(mainContainer)
         </Dropdown.Menu>
       </Dropdown>
                               </div> */}
-                               <button style={{marginTop:'8px'}}  type="button" className="btn me-1 btngridview grid-view active"    
+                               <button style={{marginTop:'8px'}}  type="button" className="btn  btngridview grid-view notactive"    
                                 onClick={()=>window.open('https://officeindia.sharepoint.com/sites/Intranetdemos/SitePages/CheckUrl.aspx' , "_blank") }>
-                                  <a className="listviewfonticon">          
-                                    <FontAwesomeIcon style={{color: "black"}} icon={faTableCells}/> </a>Check Missing Links
+                                         
+                                  <img className="sidebariconssmall" src={listicon1}></img> Check Missing Links
+                                </button>
+                               <button style={{marginTop:'8px'}}  type="button" className="btn  btngridview grid-view notactive"    
+                                onClick={(e)=>Newrequestpw(event) }>
+                                         
+                                  <img className="sidebariconssmall" src={listicon2}></img> New Request
                                 </button>
                                <div>
                                                         <Dropdown as={ButtonGroup} style={{ marginTop: '8px' }}>
@@ -22317,7 +22352,7 @@ librarydiv.appendChild(mainContainer)
                                                                   setshowBulkUpload(true);
                                                                 }}>
                                                             {/* Bulk Upload */}
-                                                            Document type bulk uplaod
+                                                            <img className="sidebariconssmall" src={listicon3}></img>     Document type bulk uplaod
                                                           </Dropdown.Toggle>
                               
                                                           {/* <Dropdown.Menu className="dropdown-menu-start newtheme font-14">
@@ -22340,7 +22375,7 @@ librarydiv.appendChild(mainContainer)
                         <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}} id="dropdown-left" className="mt-0 newho">
                           {/* Select Document Categoty
                            */}
-                           Select Template
+<img className="sidebariconssmall" src={listicon4}></img> Select Template
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu className="dropdown-menu-start newtheme font-14">
@@ -22356,16 +22391,14 @@ librarydiv.appendChild(mainContainer)
                       </Dropdown>
                     </div>
                               <div id="hidegidvewlistviewbutton" className="view-buttons mt-2">
-                                <button  type="button" className="btn me-1 btngridview mt-0 grid-view active"    
+                                <button  type="button" className="btn  btngridview mt-0 grid-view active"    
                                 onClick={(event: any = null, siteIdToUpdate: string = null)=>myRequest(event) }>
-                                  <a className="listviewfonticon">          
-                                    <FontAwesomeIcon style={{color: "black"}} icon={faTableCells}/> </a>Grid View
+                                          
+                                  <img className="sidebariconssmall" src={listicon5}></img> Grid View
                                 </button>
                                 <button type="button" className="btn btnlistview list-view mt-0" onClick={(event:any)=>MyrequestshowListView('ListViewComponent')}>
-                                  <a className="listviewfonticon">
-                                  <FontAwesomeIcon style={{color: "black"}} icon={faListSquares}/>&nbsp;
-                                  </a>
-                              List View
+                               
+                                  <img className="sidebariconssmall" src={listicon6}></img> &nbsp;List View
                                 </button>
                  
                           </div>
@@ -22489,7 +22522,32 @@ librarydiv.appendChild(mainContainer)
                           </span>
                           <span className="sidebarText">My Uploaded Files</span>
                         </button>
-
+ <button
+                         id="Myfavouritebutton"
+                          className={`sidebardmsButton ${
+                            activeButton === "MyFavourite" ? "active" : ""
+                          }`}
+                          onClick={(event) =>  myTask(event)}
+                        >
+                          <span className="sidebarIcon">
+                          <img className="sidebariconssmall" src={starticon}></img>
+                            {/* <FontAwesomeIcon icon={faStarRegular} /> */}
+                          </span>
+                          <span className="sidebarText">My Task</span>
+                        </button>
+ <button
+                         id="Myfavouritebutton"
+                          className={`sidebardmsButton ${
+                            activeButton === "MyFavourite" ? "active" : ""
+                          }`}
+                          onClick={(event) =>  myallprojects(event)}
+                        >
+                          <span className="sidebarIcon">
+                          <img className="sidebariconssmall" src={starticon}></img>
+                            {/* <FontAwesomeIcon icon={faStarRegular} /> */}
+                          </span>
+                          <span className="sidebarText">My Projects</span>
+                        </button>
                         <button
                          id="Myfavouritebutton"
                           className={`sidebardmsButton ${
@@ -22504,6 +22562,7 @@ librarydiv.appendChild(mainContainer)
                           </span>
                           <span className="sidebarText">My Favourites</span>
                         </button>
+                       
 
                         <button
                           id="Mycreatedfolderbutton"
@@ -22700,6 +22759,21 @@ librarydiv.appendChild(mainContainer)
         <Listing 
         userid={currentUserIDref.current}
          context={props.context}
+        />
+      )}
+      {listorgriddata === 'NewRequest' && (
+        <NewRequest
+        context={props.context}
+        />
+      )}
+      {listorgriddata === 'myallprojects' && (
+        <Dashboard
+        context={props.context}
+        />
+      )}
+      {listorgriddata === 'myTask' && (
+        <MyTask
+        context={props.context}
         />
       )}
       {navItems.some(item => item.DocumentCategory === listorgriddata) ? (

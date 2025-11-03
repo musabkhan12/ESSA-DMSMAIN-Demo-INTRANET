@@ -10,15 +10,14 @@ import "@pnp/sp/files";
 import "@pnp/sp/files/web";
 import CustomPopup from './CustomPopup';
 
-
 interface IMyTaskProps {
   context: WebPartContext;
-  description: string;
-  siteUrl: string;
-  userDisplayName: string;
-  isDarkTheme: boolean;
-  environmentMessage: string;
-  hasTeamsContext: boolean;
+  // description: string;
+  // siteUrl: string;
+  // userDisplayName: string;
+  // isDarkTheme: boolean;
+  // environmentMessage: string;
+  // hasTeamsContext: boolean;
 }
 
 interface Task {
@@ -63,7 +62,7 @@ interface DocumentComment {
 
 const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
   const [tasks, setTasks] = React.useState<Task[]>([]);
-  const [currentFilter, setCurrentFilter] = React.useState<string>("Pending"); // Set default to "Pending"
+  const [currentFilter, setCurrentFilter] = React.useState<string>("Pending");
   const [filteredTasks, setFilteredTasks] = React.useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = React.useState<Task | null>(null);
   const [showForm, setShowForm] = React.useState<boolean>(false);
@@ -74,13 +73,16 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
   const [documentControllerId, setDocumentControllerId] = React.useState<number | null>(null);
   const [uploadedFileName, setUploadedFileName] = React.useState<string>("");
   const [uploadedFileUrl, setUploadedFileUrl] = React.useState<string>("");
-  // Document Comments State
   const [documentComments, setDocumentComments] = React.useState<DocumentComment[]>([]);
   const [allDocumentComments, setAllDocumentComments] = React.useState<DocumentComment[]>([]);
   const [versionList, setVersionList] = React.useState<string[]>([]);
   const [selectedVersion, setSelectedVersion] = React.useState<string>("");
   const [showDocumentComments, setShowDocumentComments] = React.useState<boolean>(false);
-  // Popup state
+  const [existingDocument, setExistingDocument] = React.useState<{
+    name: string;
+    url: string;
+  } | null>(null);
+
   const [popup, setPopup] = React.useState<{
     isOpen: boolean;
     type: 'confirmation' | 'validation' | 'success' | 'error';
@@ -94,12 +96,8 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
     message: ''
   });
 
-
-
-  // Initialize SP
   const sp = spfi().using(SPFx(context));
 
-  // Function to get Document Controller from ProjectConfiguration list
   const getDocumentController = async (): Promise<number | null> => {
     try {
       const items = await sp.web.lists.getByTitle("ProjectConfiguration").items
@@ -110,7 +108,7 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
           "DocumentController/ID"
         )
         .expand("DocumentController")
-        .orderBy("Created", false)() // Order by Created desc
+        .orderBy("Created", false)()
 
       if (items.length > 0) {
         const documentControllerId = items[0].DocumentControllerId;
@@ -126,11 +124,8 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
 
   React.useEffect(() => {
     const initializeData = async () => {
-      // Get Document Controller first
       const docControllerId = await getDocumentController();
       setDocumentControllerId(docControllerId);
-
-      // Then fetch tasks
       await fetchTasks();
     };
 
@@ -140,7 +135,6 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
   const fetchTasks = async () => {
     const currentUserId = (await sp.web.currentUser()).Id;
     try {
-      // Fetch main deliverables items
       const items = await sp.web.lists.getByTitle("DeliverablesDetails").items.select(
         "*",
         "ProjectCreationListID/ID",
@@ -152,11 +146,9 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
         "AssignedTo"
       ).filter(`AssignedTo/Id eq ${currentUserId}`)();
 
-      // Transform items with additional data from ProjectCreationList
       const transformedTasks: Task[] = await Promise.all(
         items.map(async (item: any, index: number) => {
           try {
-            // Fetch additional project creation data with ProjectType lookup expanded
             const creationitem = await sp.web.lists.getByTitle("ProjectCreationList").items.getById(item.ProjectCreationListID.ID)
               .select(
                 "*",
@@ -184,7 +176,6 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
             };
           } catch (error) {
             console.error(`Error fetching creation item for project ${item.ProjectCreationListID?.ID}:`, error);
-            // Return a fallback task if creationitem fetch fails
             return {
               sno: index + 1,
               projectName: item.ProjectCreationListID?.ProjectName || "",
@@ -207,14 +198,13 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
       );
 
       setTasks(transformedTasks);
-      // Set filtered tasks to show only pending tasks by default
       const pendingTasks = transformedTasks.filter(task => task.status === "Pending");
       setFilteredTasks(pendingTasks);
     } catch (error) {
       console.error("Error loading tasks:", error);
     }
   };
-  // Get Document Comments
+
   const getDocumentComments = async (projectCreationID: number, deliverableDetailsID: number, revision: string) => {
     try {
       const items = await sp.web.lists.getByTitle("DocumentComments").items
@@ -233,11 +223,9 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
         setAllDocumentComments(comments);
         console.log("All Document Comments:", comments);
 
-        // Filter by current revision
         const filteredComments = comments.filter(comment => comment.revision === revision);
         setDocumentComments(filteredComments);
 
-        // Get unique versions
         const uniqueVersions = [...new Set(comments.map(comment => comment.revision))].sort();
         setVersionList(uniqueVersions);
         setSelectedVersion(revision);
@@ -255,6 +243,7 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
       setShowDocumentComments(false);
     }
   };
+
   const onVersionChange = (version: string) => {
     setSelectedVersion(version);
     if (!version) {
@@ -264,8 +253,8 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
       setDocumentComments(filteredComments);
     }
   };
+
   const exportCommentsToExcel = () => {
-    // Basic CSV export implementation
     const headers = ['Users', 'Comment Date', 'Page No.', 'Revision', 'Comments/Clarifications'];
     const csvContent = [
       headers.join(','),
@@ -287,13 +276,13 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
   };
+
   const refreshDocComment = () => {
     if (selectedTask) {
       getDocumentComments(selectedTask.projectId, selectedTask.deliverableId, selectedTask.revisionnumber);
     }
   };
 
-  // Count
   const pendingCount = tasks.filter(t => t.status === "Pending").length;
   const completedCount = tasks.filter(t => t.status === "Approved" || t.status === "In-Progress").length;
 
@@ -342,7 +331,6 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
 
       if (items.length > 0) {
         items.forEach((auditHistoryItem: any, index: number) => {
-          // Normalize status
           let status = auditHistoryItem.Status;
           if (status && status.toLowerCase() === 'pending') {
             status = 'Pending';
@@ -369,28 +357,32 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
     return auditHistoryArr;
   };
 
-  // const handleViewClick = async (task: Task) => {
-  //   setSelectedTask(task);
-  //   setShowForm(true);
-
-  //   try {
-  //     const history = await getAuditHistoryDeliverables(task, context);
-  //     setAuditHistory(history);
-  //     setShowNoAuditHistory(history.length === 0);
-  //   } catch (error) {
-  //     console.error("Error loading audit history:", error);
-  //     setAuditHistory([]);
-  //     setShowNoAuditHistory(true);
-  //   }
-  // };
   const handleViewClick = async (task: Task) => {
     setSelectedTask(task);
     setShowForm(true);
     setUploadedFileName("");
     setUploadedFileUrl("");
     setComment("");
+    setExistingDocument(null);
 
     try {
+      // Check if document already exists for this project and deliverable
+      const existingFiles = await sp.web.lists.getByTitle("DeliverablesDocument").items
+        .select("ID", "FileLeafRef", "File/ServerRelativeUrl")
+        .expand("File")
+        .filter(`ProjectID eq '${task.projectId}' and DeliverablesDetailsId eq '${task.deliverableId}'`).orderBy("ID", false)();
+
+      if (existingFiles.length > 0) {
+        const file = existingFiles[0];
+        const serverRelativeUrl = file.File.ServerRelativeUrl;
+        const fileUrl = `${context.pageContext.web.absoluteUrl}/_layouts/15/download.aspx?SourceUrl=${encodeURIComponent(serverRelativeUrl)}`;
+
+        setExistingDocument({
+          name: file.FileLeafRef,
+          url: fileUrl
+        });
+      }
+
       // Load Audit History
       const history = await getAuditHistoryDeliverables(task, context);
       setAuditHistory(history);
@@ -445,8 +437,8 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
     setShowNoAuditHistory(false);
     setShowDocumentComments(false);
     setDocumentComments([]);
+    setExistingDocument(null);
   };
-
 
   const handleSubmitClick = async () => {
     if (!selectedTask || !selectedFile) {
@@ -457,10 +449,8 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
         message: 'Please select a file before submitting.'
       });
       return;
-
     }
 
-    // Check if Document Controller ID is available
     if (!documentControllerId) {
       setPopup({
         isOpen: true,
@@ -469,10 +459,13 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
         message: 'Document Controller not configured. Please contact administrator.'
       });
       return;
-
     }
 
     try {
+      // Calculate new revision (current + 1)
+      const currentRevision = parseInt(selectedTask.revisionnumber || "0");
+      const newRevision = (currentRevision + 1).toString();
+
       // STEP 1: Upload file to DeliverablesDocument library
       const folder = sp.web.getFolderByServerRelativePath("DeliverablesDocument");
       const uploadResult = await folder.files.addUsingPath(selectedFile.name, selectedFile, { Overwrite: true });
@@ -482,12 +475,26 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
       const uploadedFileItemId = (fileItem as any).Id;
       console.log("Uploaded File Item ID:", uploadedFileItemId);
 
-      // STEP 2: Update DeliverablesDetails item
+      // Update the uploaded file's metadata in the document library
+      let deliverableIdStr = selectedTask.deliverableId.toString();
+      let projectIdStr = selectedTask.projectId.toString();
+
+      await sp.web.lists.getByTitle("DeliverablesDocument").items
+        .getById(uploadedFileItemId)
+        .update({
+          ProjectID: projectIdStr,
+          DeliverablesDetailsId: deliverableIdStr,
+          Revision: newRevision
+        });
+
+      console.log("File metadata updated successfully");
+
+      // STEP 2: Update DeliverablesDetails item with new revision
       await sp.web.lists.getByTitle("DeliverablesDetails").items
         .getById(selectedTask.deliverableId)
         .update({
           DocumentComments: comment,
-          RevisionNumber: "0",
+          RevisionNumber: newRevision,
           Status: "In-Progress",
           DeliverablesDocumentIDId: uploadedFileItemId
         });
@@ -512,7 +519,7 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
             "AssignedTo/EMail"
           )
           .expand("DeliverablesDetailsId", "ProjectCreationListID", "AssignedTo")
-          .orderBy("SerialNumber", true) // true = ascending order
+          .orderBy("SerialNumber", true)
           .filter(
             `ProjectCreationListID/ID eq ${projectId} and ` +
             `DeliverablesDetailsId/ID eq ${deliverableId} and ` +
@@ -525,7 +532,7 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
           const vendorTaskId = items[0].Id;
           await sp.web.lists.getByTitle("ProjectApprovals").items.getById(vendorTaskId).update({
             Status: "Completed",
-            Remarks: comment, // your user input
+            Remarks: comment,
             ApprovalDate: new Date()
           });
           console.log("Vendor task marked as completed");
@@ -536,11 +543,11 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
         console.error("Error updating ProjectApprovals:", error);
       }
 
-      // STEP 4: Create new ProjectApproval item for Document Controller
+      // STEP 4: Create new ProjectApproval item for Document Controller with new revision
       await sp.web.lists.getByTitle("ProjectApprovals").items.add({
         DeliverablesDetailsIdId: selectedTask.deliverableId,
         ProjectCreationListIDId: selectedTask.projectId,
-        AssignedToId: documentControllerId, // Use the Document Controller ID from ProjectConfiguration
+        AssignedToId: documentControllerId,
         DocumentType: selectedTask.docType,
         ApproverRole: "Document Controller",
         ProjectType: selectedTask.projectType,
@@ -551,7 +558,7 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
         RequestedDate: new Date(),
         IncomingDate: new Date(),
         RequestedRole: "Vendor",
-        RevisionNumber: "0",
+        RevisionNumber: newRevision,
         Status: "Pending"
       });
 
@@ -567,7 +574,6 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
         }
       });
 
-
     } catch (error) {
       console.error("Error in submission:", error);
       setPopup({
@@ -576,17 +582,14 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
         title: 'Error',
         message: 'An error occurred during submission. Please check console for details.'
       });
-
     }
   }
-
-
 
   return (
     <div className={styles.myTask}>
       {!showForm ? (
         <>
-          <h2>My Tasks</h2>
+          <h2 className='fw-bold text-dark header-title'>My Tasks</h2>
 
           {/* Tiles */}
           <div className={styles.tilesContainer}>
@@ -630,39 +633,42 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
           </div>
 
           {/* Table */}
-          <div className={styles.mainTableContainer}>
+          <div style={{clear:'both', marginTop:'15px'}} className='card mt-2'>
+
+            <div className='card-body'>
+            <div className={styles.mainTableContainer}>
             <div className={styles.tableCard}>
               <div className={styles.tableWrapper}>
                 <table className={styles.taskTable}>
                   <thead>
                     <tr>
-                      <th>S.No</th>
+                      <th style={{minWidth:'70px'}}>S.No</th>
                       <th>Project Name</th>
                       <th>Project Type</th>
                       <th>Deliverable</th>
                       <th>Document Type</th>
                       <th>Assigned To</th>
                       <th>Organization</th>
-                      <th>Status</th>
-                      <th>Action</th>
+                      <th style={{minWidth:'90px'}}>Status</th>
+                      <th style={{minWidth:'70px'}}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredTasks.map((task, index) => (
                       <tr key={task.sno}>
-                        <td>{index + 1}</td>
+                        <td style={{minWidth:'70px'}}>{index + 1}</td>
                         <td>{task.projectName}</td>
                         <td>{task.projectType}</td>
                         <td>{task.deliverable}</td>
                         <td>{task.docType}</td>
                         <td>{task.assignedTo}</td>
                         <td>{task.org}</td>
-                        <td>
+                        <td style={{minWidth:'90px'}}>
                           <span className={`${styles.statusBadge} ${getStatusClass(task.status)}`}>
                             {task.status}
                           </span>
                         </td>
-                        <td>
+                        <td style={{minWidth:'70px'}}>
                           <span
                             className={styles.actionIcon}
                             onClick={() => handleViewClick(task)}
@@ -679,13 +685,16 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
             </div>
             <div className={styles.scrollHint}><em>Scroll horizontally → to view all columns</em></div>
           </div>
+            </div>
+          </div>
+       
         </>
       ) : (
         <>
           {/* Form View */}
           <div className={styles.formContainer}>
             <div className={styles.formHeader}>
-              <h3>
+              <h3 style={{margin:'0px'}}>
                 My Task &gt;&gt; {selectedTask?.docNumber}
               </h3>
               <button className={styles.backButton} onClick={handleBackClick}>Back</button>
@@ -740,13 +749,37 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
                     </div>
                     <div>
                       <label>Revision Number</label>
-                      <input type="text" value="0" disabled />
+                      <input
+                        type="text"
+                        value={
+                          selectedTask?.status === "Pending" && existingDocument
+                            ? (parseInt(selectedTask?.revisionnumber || "0") + 1).toString()
+                            : selectedTask?.revisionnumber || "0"
+                        }
+                        disabled
+                      />
                     </div>
                   </div>
 
                   {/* Upload & Comment Section */}
+                  {/* Upload & Comment Section */}
                   <div className={styles.formActions}>
-                    {uploadedFileName ? (
+                    {/* For Pending tasks with existing document */}
+                    {selectedTask?.status === "Pending" && existingDocument && (
+                      <>
+                        <label>Uploaded Document:</label>
+                        <p>
+                          <a href={existingDocument.url} target="_blank" rel="noopener noreferrer">
+                            {existingDocument.name}
+                          </a>
+                        </p>
+                        <label>Upload Document*</label>
+                        <input type="file" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} />
+                      </>
+                    )}
+
+                    {/* For Completed/In-Progress tasks - show only uploaded file */}
+                    {(selectedTask?.status === "Approved" || selectedTask?.status === "In-Progress") && uploadedFileName && (
                       <>
                         <label>Uploaded Document:</label>
                         <p>
@@ -755,12 +788,16 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
                           </a>
                         </p>
                       </>
-                    ) : (
+                    )}
+
+                    {/* Show upload field only for Pending tasks without existing document */}
+                    {selectedTask?.status === "Pending" && !existingDocument && (
                       <>
                         <label>Upload Document*</label>
                         <input type="file" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} />
                       </>
                     )}
+
                     <label>Comment*</label>
                     <textarea
                       placeholder="Enter your comment"
@@ -770,7 +807,7 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
                     />
                   </div>
 
-                  {/* Document Comments Accordion - Added before Audit History */}
+                  {/* Document Comments Accordion */}
                   {showDocumentComments && (
                     <div className={styles.accordionItem}>
                       <h2 className={styles.accordionHeader}>
@@ -847,17 +884,16 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
                     </div>
                   )}
 
-
                   {/* Audit History */}
                   <div className={styles.auditHistory}>
                     <h4>Audit History</h4>
                     {showNoAuditHistory && auditHistory.length === 0 ? (
                       <p>No audit history available</p>
                     ) : (
-                      <table>
+                      <table className='mtablemyt'>
                         <thead>
                           <tr>
-                            <th>SNo</th>
+                            <th style={{minWidth:'70px',maxWidth:'70px'}}>SNo</th>
                             <th>Approval Level</th>
                             <th>Assigned To</th>
                             <th>Assigned To Role</th>
@@ -866,13 +902,13 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
                             <th>Action Taken By</th>
                             <th>Action Taken On</th>
                             <th>Remark</th>
-                            <th>Status</th>
+                            <th style={{minWidth:'110px',maxWidth:'110px'}}>Status</th>
                           </tr>
                         </thead>
                         <tbody>
                           {auditHistory.map((historyItem) => (
                             <tr key={historyItem.sno}>
-                              <td>{historyItem.sno}</td>
+                              <td style={{minWidth:'70px',maxWidth:'70px'}}>{historyItem.sno}</td>
                               <td>{historyItem.approvalLevel}</td>
                               <td>{historyItem.assignedTo}</td>
                               <td>{historyItem.assignedToRole}</td>
@@ -881,7 +917,7 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
                               <td>{historyItem.assignedTo}</td>
                               <td>{historyItem.actionTakenOn}</td>
                               <td>{historyItem.remark}</td>
-                              <td>
+                              <td style={{minWidth:'110px',maxWidth:'110px'}}>
                                 <span className={`${styles.statusBadge} ${getStatusClass(historyItem.status)}`}>
                                   {historyItem.status}
                                 </span>
@@ -923,7 +959,6 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
           if (popup.onConfirm) popup.onConfirm();
         }}
       />
-
     </div>
   );
 };

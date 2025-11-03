@@ -553,7 +553,7 @@ input::placeholder,select::placeholder,textarea::placeholder,#react-select-3-pla
     position: relative;
 }
 #renameForm button{margin-top: 0px !important;}
-.edit-popup,#rename-popup,#renamePopup ,#renamefile-popup {
+.edit-popup,#rename-popup,#renamePopup {
   position: fixed;
 
   width: 100%;
@@ -577,8 +577,8 @@ top: 0;
   right: 28px;
   font-size: 14px; background: #2c9942;
   margin-top: 0px;
-    right: 30px;
-    top: 26%;
+    right: 40px;
+    top: 27%;
 }
   #files-container button:hover{
     background: #008751;
@@ -1038,4 +1038,20 @@ text-align: center;}
      background-color: #2c9942 !important;
      color: #ffffff !important;
      margin-right: 64px !important;
+}
+.btngridview {height: 38px !important;  padding: 5px 7px !important;
+  line-height: 30px; border-radius: 4px;} 
+.notactive,.newho,.btnlistview  {    background-color: #fff !important;
+  border-radius: 4px;
+  height: 38px !important;
+  color: #000;
+  padding: 5px 7px!important;
+  line-height: 30px;
+}
+.notactive:hover,.newho:hover,.btnlistview:hover{color: #fff;}
+.notactive:hover img,.newho:hover img,.btnlistview:hover img{
+  filter: brightness(0) invert(1);
+}
+#hidegidvewlistviewbutton .active img{
+  filter: brightness(0) invert(1);
 }

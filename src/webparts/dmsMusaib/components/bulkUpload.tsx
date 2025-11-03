@@ -4,18 +4,11 @@ import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
 import { forEach } from "jszip";
 import { getSP } from "../loc/pnpjsConfig";
 import { SPFI } from "@pnp/sp/presets/all";
-import Swal from "sweetalert2";
 
 const bulkUpload = () => {
     const sp: SPFI = getSP();
 
     const [listItems, setItems] = React.useState<any[]>([]);
-
-    const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
-    const [selectedRow, setSelectedRow] = React.useState<number | null>(null);
-    const [selectedRowChecked, setSelectedRowChecked] = React.useState<number | null>(null);
-    const [editingRow, setEditingRow] = React.useState<number | null>(null);
-    const [editData, setEditData] = React.useState<any>({});
 
     React.useEffect(() => {
         // Any side effects or data fetching can go here
@@ -52,10 +45,9 @@ const bulkUpload = () => {
 
             if (documentTypeIndex === -1) {
                 console.error('DocumentType column not found');
-                Swal.fire('Error', 'Invalid file. DocumentType column is missing.', 'error');
                 return;
             }
-            let bulkArr = [];
+            let bulkArr =[];
 
             // Loop through all data rows except header
             for (let i = 1; i < jsonData.length; i++) {
@@ -111,124 +103,36 @@ const bulkUpload = () => {
 
                 // console.log('Item to save:', item);
 
-
+               
             }
-            saveItem(bulkArr);
+             saveItem(bulkArr);
 
         };
 
         reader.readAsArrayBuffer(file);
     };
 
-    const saveItem = async (bulkArr: any) => {
-        bulkArr.forEach(async (item: any) => {
+    const saveItem = async (bulkArr:any) => {
+        bulkArr.forEach(async (item:any) => {
             await sp.web.lists.getByTitle("DocumentBulkUpload").items.add(item);
         }
 
-
+       
         );
-
-        Swal.fire({
-            title: "Success!",
-            text: "Data added successfully.",
-            icon: "success"
-        });
 
         setTimeout(() => {
             fetchData();
         }, 1000);
-
+    
         // const addData = await sp.web.lists.getByTitle(currentList).items.add(item);
     }
-    // Function to handle saving the edited row
-    const handleSaveEdit = async (rowIndex: number) => {
-        if (editingRow === null) return;
-        const itemToEdit = listItems[editingRow];
-        try {
-            await sp.web.lists.getByTitle("DocumentBulkUpload").items.getById(itemToEdit.Id).update(editData);
-            Swal.fire({
-                title: "Success!",
-                text: "Row updated successfully.",
-                icon: "success"
-            });
-            setEditingRow(null);
-            setEditData({});
-            setSelectedRow(null); // Uncheck all checkboxes after save
-            fetchData();
-        } catch (error) {
-            Swal.fire("Error", "Failed to update row.", "error");
-        }
-    };
-
     return (
         <div>
 
             <div>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: "16px", marginBottom: "20px" }}>
-                    <div style={{ width: "25%" }}>
-                        <label htmlFor="file-upload">Attach Document:</label>
-                        <input
-                            type="file"
-                            id="file-upload"
-                            accept=".xlsx, .xls,.csv"
-                            onChange={e => {
-                                const file = e.target.files && e.target.files[0];
-                                setSelectedFile(file || null);
-                            }}
-                        />
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            handleFile((document.getElementById("file-upload") as HTMLInputElement).files![0]);
-                        }}
-                        style={{ height: "36px" }}
-                        disabled={!selectedFile}
-                    >
-                        Submit
-                    </button>
-                    <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-                        {/* <button
-                            type="button"
-                            style={{ height: "36px" }}
-                            disabled={selectedRow === null}
-                            onClick={() => {
-                                if (selectedRow !== null) {
-                                    setEditingRow(selectedRow);
-                                    setEditData(listItems[selectedRow]);
-                                }
-                            }}
-                        >
-                            Edit Selected Row
-                        </button> */}
-                        <button
-                            type="button"
-                            style={{ height: "36px" }}
-                            onClick={async () => {
-                                // Download the first file from BulkUploadTemplate library
-                                try {
-                                    const files = await sp.web.lists.getByTitle("BulkUploadTemplate").items.select("FileRef", "FileLeafRef").top(1).getAll();
-                                    if (files.length > 0) {
-                                        const fileUrl = files[0].FileRef;
-                                        const fileName = files[0].FileLeafRef;
-                                        // Create a temporary link to download
-                                        const link = document.createElement("a");
-                                        link.href = fileUrl;
-                                        link.download = fileName;
-                                        document.body.appendChild(link);
-                                        link.click();
-                                        document.body.removeChild(link);
-                                    } else {
-                                        Swal.fire("Error", "No template file found in BulkUploadTemplate library.", "error");
-                                    }
-                                } catch (err) {
-                                    Swal.fire("Error", "Failed to download template file.", "error");
-                                }
-                            }}
-                        >
-                            Download Template
-                        </button>
-                    </div>
+                <div style={{ width: "25%" }}>
+                    <label htmlFor="file-upload">Attach Document:</label>
+                    <input type="file" id="file-upload" onChange={(e) => handleFile(e.target.files[0])} />
                 </div>
 
 
@@ -239,6 +143,7 @@ const bulkUpload = () => {
                             margin-top: 20px;
                             border-collapse: collapse;
                         }
+                            .newclassback{float:right;}
                         .bulk-upload-table th, .bulk-upload-table td {
                             border: 1px solid #ccc;
                             padding: 8px;
@@ -248,304 +153,45 @@ const bulkUpload = () => {
                             background-color: #f2f2f2;
                         }
                         .bulk-upload-table tbody tr:nth-child(even) {
-                            background-color: #fafafa;
+                            background-color: #fff;
                         }
                         .bulk-upload-table tbody tr:nth-child(odd) {
                             background-color: #fff;
                         }
                     `}
                 </style>
-                <div style={{ overflowX: "auto" }}>
-                    <table
-                        className="bulk-upload-table"
-                        style={{
-                            minWidth: "1200px",
-                            border: "none",
-                            borderCollapse: "separate",
-                            borderSpacing: "0",
-                            // boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                            // background: "#fff",
-                        }}
-                    >
-                        <thead>
-                            <tr>
-                                <th style={{
-                                    minWidth: 140,
-                                    background: "#43a047", // Green color
-                                    color: "#fff",
-                                    fontWeight: 600,
-                                    borderBottom: "2px solid #e0e0e0"
-                                }}>DocumentType</th>
-                                <th style={{
-                                    minWidth: 140,
-                                    background: "#43a047",
-                                    color: "#fff",
-                                    fontWeight: 600,
-                                    borderBottom: "2px solid #e0e0e0"
-                                }}>Template</th>
-                                <th style={{
-                                    minWidth: 140,
-                                    background: "#43a047",
-                                    color: "#fff",
-                                    fontWeight: 600,
-                                    borderBottom: "2px solid #e0e0e0"
-                                }}>External Party</th>
-                                <th style={{
-                                    minWidth: 140,
-                                    background: "#43a047",
-                                    color: "#fff",
-                                    fontWeight: 600,
-                                    borderBottom: "2px solid #e0e0e0"
-                                }}>From</th>
-                                <th style={{
-                                    minWidth: 140,
-                                    background: "#43a047",
-                                    color: "#fff",
-                                    fontWeight: 600,
-                                    borderBottom: "2px solid #e0e0e0"
-                                }}>Issued Date</th>
-                                <th style={{
-                                    minWidth: 140,
-                                    background: "#43a047",
-                                    color: "#fff",
-                                    fontWeight: 600,
-                                    borderBottom: "2px solid #e0e0e0"
-                                }}>Year</th>
-                                <th style={{
-                                    minWidth: 140,
-                                    background: "#43a047",
-                                    color: "#fff",
-                                    fontWeight: 600,
-                                    borderBottom: "2px solid #e0e0e0"
-                                }}>Subject</th>
-                                <th style={{
-                                    minWidth: 140,
-                                    background: "#43a047",
-                                    color: "#fff",
-                                    fontWeight: 600,
-                                    borderBottom: "2px solid #e0e0e0"
-                                }}>Project</th>
-                                <th style={{
-                                    minWidth: 140,
-                                    background: "#43a047",
-                                    color: "#fff",
-                                    fontWeight: 600,
-                                    borderBottom: "2px solid #e0e0e0"
-                                }}>TagNumber</th>
-                                <th style={{
-                                    minWidth: 140,
-                                    background: "#43a047",
-                                    color: "#fff",
-                                    fontWeight: 600,
-                                    borderBottom: "2px solid #e0e0e0"
-                                }}>Area</th>
-                                {/* {selectedRow !== null && (
-                                    <th
-                                        style={{
-                                            minWidth: 120,
-                                            background: "#43a047",
-                                            color: "#fff",
-                                            borderBottom: "2px solid #e0e0e0"
-                                        }}
-                                    ></th>
-                                )} */}
+                <table className="bulk-upload-table" style={{ border: "1px solid #888", borderCollapse: "collapse" }}>
+                    <thead>
+                        <tr>
+                            <th>DocumentType</th>
+                            <th>Template</th>
+                            <th>External Party</th>
+                            <th>From</th>
+                            <th>Issued Date</th>
+                            <th>Year</th>
+                            <th>Subject</th>
+                            <th>Project</th>
+                            <th>TagNumber</th>
+                            <th>Area</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {listItems.map((item, index) => (
+                            <tr key={index}>
+                                <td>{item.DocumentType}</td>
+                                <td>{item.Template}</td>
+                                <td>{item.ExternalParty}</td>
+                                <td>{item.From ? new Date(item.From).toLocaleDateString('en-GB') : ''}</td>
+                                <td>{item.IssuedDate ? new Date(item.IssuedDate).toLocaleDateString('en-GB') : ''}</td>
+                                <td>{item.Year}</td>
+                                <td>{item.Subject}</td>
+                                <td>{item.Project}</td>
+                                <td>{item.TagNo}</td>
+                                <td>{item.Area}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {listItems.map((item, index) => (
-                                <tr key={index} style={{ borderBottom: "1px solid #e0e0e0", transition: "background 0.2s" }}>
-                                    {editingRow === index ? (
-                                        <>
-                                            <td style={{ minWidth: 140 }}>
-                                                <input
-                                                    type="text"
-                                                    value={editData.DocumentType}
-                                                    onChange={e => setEditData({ ...editData, DocumentType: e.target.value })}
-                                                    style={{ width: "90%", padding: "6px", borderRadius: 4, border: "1px solid #d0d0d0" }}
-                                                />
-                                            </td>
-                                            <td style={{ minWidth: 140 }}>
-                                                <input
-                                                    type="text"
-                                                    value={editData.Template}
-                                                    onChange={e => setEditData({ ...editData, Template: e.target.value })}
-                                                    style={{ width: "90%", padding: "6px", borderRadius: 4, border: "1px solid #d0d0d0" }}
-                                                />
-                                            </td>
-                                            <td style={{ minWidth: 140 }}>
-                                                <input
-                                                    type="text"
-                                                    value={editData.ExternalParty}
-                                                    onChange={e => setEditData({ ...editData, ExternalParty: e.target.value })}
-                                                    style={{ width: "90%", padding: "6px", borderRadius: 4, border: "1px solid #d0d0d0" }}
-                                                />
-                                            </td>
-                                            <td style={{ minWidth: 140 }}>
-                                                <input
-                                                    type="date"
-                                                    value={editData.From ? new Date(editData.From).toISOString().split('T')[0] : ''}
-                                                    onChange={e => setEditData({ ...editData, From: e.target.value })}
-                                                    style={{ width: "90%", padding: "6px", borderRadius: 4, border: "1px solid #d0d0d0" }}
-                                                />
-                                            </td>
-                                            <td style={{ minWidth: 140 }}>
-                                                <input
-                                                    type="date"
-                                                    value={editData.IssuedDate ? new Date(editData.IssuedDate).toISOString().split('T')[0] : ''}
-                                                    onChange={e => setEditData({ ...editData, IssuedDate: e.target.value })}
-                                                    style={{ width: "90%", padding: "6px", borderRadius: 4, border: "1px solid #d0d0d0" }}
-                                                />
-                                            </td>
-                                            <td style={{ minWidth: 140 }}>
-                                                <input
-                                                    type="text"
-                                                    value={editData.Year}
-                                                    onChange={e => setEditData({ ...editData, Year: e.target.value })}
-                                                    style={{ width: "90%", padding: "6px", borderRadius: 4, border: "1px solid #d0d0d0" }}
-                                                />
-                                            </td>
-                                            <td style={{ minWidth: 140 }}>
-                                                <input
-                                                    type="text"
-                                                    value={editData.Subject}
-                                                    onChange={e => setEditData({ ...editData, Subject: e.target.value })}
-                                                    style={{ width: "90%", padding: "6px", borderRadius: 4, border: "1px solid #d0d0d0" }}
-                                                />
-                                            </td>
-                                            <td style={{ minWidth: 140 }}>
-                                                <input
-                                                    type="text"
-                                                    value={editData.Project}
-                                                    onChange={e => setEditData({ ...editData, Project: e.target.value })}
-                                                    style={{ width: "90%", padding: "6px", borderRadius: 4, border: "1px solid #d0d0d0" }}
-                                                />
-                                            </td>
-                                            <td style={{ minWidth: 140 }}>
-                                                <input
-                                                    type="text"
-                                                    value={editData.TagNo}
-                                                    onChange={e => setEditData({ ...editData, TagNo: e.target.value })}
-                                                    style={{ width: "90%", padding: "6px", borderRadius: 4, border: "1px solid #d0d0d0" }}
-                                                />
-                                            </td>
-                                            <td style={{ minWidth: 140 }}>
-                                                <input
-                                                    type="text"
-                                                    value={editData.Area}
-                                                    onChange={e => setEditData({ ...editData, Area: e.target.value })}
-                                                    style={{ width: "90%", padding: "6px", borderRadius: 4, border: "1px solid #d0d0d0" }}
-                                                />
-                                            </td>
-                                            <td style={{ minWidth: 120, visibility: selectedRow === index ? "visible" : "hidden" }}>
-                                                {selectedRow === index && (
-                                                    <>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleSaveEdit(index)}
-                                                            style={{
-                                                                background: "#1976d2",
-                                                                color: "#fff",
-                                                                border: "none",
-                                                                borderRadius: 4,
-                                                                padding: "6px 12px",
-                                                                marginRight: 8,
-                                                                cursor: "pointer",
-                                                            }}
-                                                        >
-                                                            Save
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setEditingRow(null)}
-                                                            style={{
-                                                                background: "#e0e0e0",
-                                                                color: "#333",
-                                                                border: "none",
-                                                                borderRadius: 4,
-                                                                padding: "6px 12px",
-                                                                cursor: "pointer",
-                                                            }}
-                                                        >
-                                                            Cancel
-                                                        </button>
-                                                    </>
-                                                )}
-                                            </td>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <td
-                                                style={{
-                                                    minWidth: 140,
-                                                    background: selectedRow === index ? "#e3f2fd" : undefined,
-                                                    padding: "8px",
-                                                }}
-                                                className="bulk-upload-checkbox-cell"
-                                                onMouseEnter={() => setSelectedRowChecked(index)}
-                                                onMouseLeave={() => setSelectedRowChecked(null)}
-                                            >
-                                                <div style={{
-                                                    display: "flex",
-                                                    alignItems: "center"
-                                                }}>
-                                                    <input
-                                                        type="checkbox"
-                                                        style={{
-                                                            accentColor: "#1976d2",
-                                                            borderRadius: "50%",
-                                                            marginRight: 8,
-                                                            opacity: selectedRowChecked === index || selectedRow === index ? 1 : 0,
-                                                            transition: "opacity 0.2s ease"
-                                                        }}
-                                                        checked={selectedRow === index}
-                                                        onChange={e => {
-                                                            setSelectedRow(e.target.checked ? index : null);
-                                                        }}
-                                                        className="bulk-upload-checkbox"
-                                                    />
-                                                    <span>{item.DocumentType}</span>
-                                                </div>
-                                            </td>
-
-
-
-                                            <td style={{ minWidth: 140 }}>{item.Template}</td>
-                                            <td style={{ minWidth: 140 }}>{item.ExternalParty}</td>
-                                            <td style={{ minWidth: 140 }}>{item.From ? new Date(item.From).toLocaleDateString('en-GB') : ''}</td>
-                                            <td style={{ minWidth: 140 }}>{item.IssuedDate ? new Date(item.IssuedDate).toLocaleDateString('en-GB') : ''}</td>
-                                            <td style={{ minWidth: 140 }}>{item.Year}</td>
-                                            <td style={{ minWidth: 140 }}>{item.Subject}</td>
-                                            <td style={{ minWidth: 140 }}>{item.Project}</td>
-                                            <td style={{ minWidth: 140 }}>{item.TagNo}</td>
-                                            <td style={{ minWidth: 140 }}>{item.Area}</td>
-                                            <td style={{ minWidth: 120, visibility: selectedRow === index ? "visible" : "hidden" }}>
-                                                {selectedRow === index && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setEditingRow(index);
-                                                            setEditData(item);
-                                                        }}
-                                                        style={{
-                                                            background: "#1976d2",
-                                                            color: "#fff",
-                                                            border: "none",
-                                                            borderRadius: 4,
-                                                            padding: "6px 12px",
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        Edit Row
-                                                    </button>
-                                                )}
-                                            </td>
-                                        </>
-                                    )}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                        ))}
+                    </tbody>
+                </table>
             </div>
 
         </div>

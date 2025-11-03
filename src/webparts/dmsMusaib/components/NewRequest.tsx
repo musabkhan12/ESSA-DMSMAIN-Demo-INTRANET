@@ -1,5 +1,9 @@
 import * as React from 'react';
+import { initializeIcons } from '@fluentui/react/lib/Icons';
 import styles from './NewRequest.module.scss';
+
+initializeIcons();
+
 import {
     TextField,
     Dropdown,
@@ -19,15 +23,15 @@ import "@pnp/sp/site-users/web";
 import Select from "react-select";
 //import { useHistory } from 'react-router-dom';
 import CustomPopup from './CustomPopup';
-
+import './Newreg.css'
 interface INewRequestProps {
     context: WebPartContext;
-    description: string;
-    siteUrl: string;
-    userDisplayName: string;
-    isDarkTheme: boolean;
-    environmentMessage: string;
-    hasTeamsContext: boolean;
+    // description: string;
+    // siteUrl: string;
+    // userDisplayName: string;
+    // isDarkTheme: boolean;
+    // environmentMessage: string;
+    // hasTeamsContext: boolean;
 }
 
 interface UserOption {
@@ -720,7 +724,7 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
 
             {/* Project Information Section */}
             <div className={styles.section}>
-                <h3>Project Information</h3>
+                <h3 >Project Information</h3>
                 {alertMessage && (
                     <div className={styles.customAlert}>
                         <span>{alertMessage}</span>
@@ -735,6 +739,7 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
                         value={projectInfo.projectName}
                         onChange={(_, val) => handleProjectChange('projectName', val)}
                         className={fieldErrors.projectName ? styles.textFieldError : ''}
+                        
                     />
                     <TextField
                         label="Client Name"
@@ -812,9 +817,8 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
             </div>
 
             {/* Deliverables Section */}
-            <div className={styles.tableWrapper}>
-                <div className={styles.tableHeader}>
-                    <h3>Deliverables</h3>
+            <div className='d-flex align-items-center  justify-content-between mb-2'>
+                    <h4 style={{margin:'0px'}} className='font-16 fw-bold text-dark mb-0'>Deliverables</h4>
                     <IconButton
                         iconProps={{ iconName: 'Add' }}
                         title="Add Row"
@@ -823,10 +827,12 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
                         className={styles.addButton}
                     />
                 </div>
+            <div className={styles.tableWrapper}>
+               
                 <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th>SNo</th>
+                            <th style={{minWidth:'70px'}}>SNo</th>
                             <th>Deliverables</th>
                             <th>Area</th>
                             <th>Organisation</th>
@@ -835,13 +841,13 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
                             <th className={styles.wrapText}>Doc. No</th>
                             <th>Due Date*</th>
                             <th>Assigned To*</th>
-                            <th>Action</th>
+                            <th style={{minWidth:'80px'}}>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {deliverables.map((row, index) => (
                             <tr key={index}>
-                                <td>{index + 1}</td>
+                                <td style={{minWidth:'70px'}}>{index + 1}</td>
                                 <td>
                                     <Dropdown
                                         options={DeliverablesOptions}
@@ -916,7 +922,7 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
                                         />
                                     </div>
                                 </td>
-                                <td>
+                                <td style={{minWidth:'80px'}}>
                                     <IconButton
                                         iconProps={{ iconName: 'Delete' }}
                                         title="Delete Row"

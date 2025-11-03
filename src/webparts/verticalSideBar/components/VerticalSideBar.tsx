@@ -11,7 +11,7 @@ import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/webs";
 import "../../../Assets/Figtree/Figtree-VariableFont_wght.ttf"
-import {FileText, Airplay, Calendar, File, Image, Clipboard, Bell, Users, Activity, Sun, Moon, Cpu, Rss, Maximize, Settings, Search, ChevronsDown, ChevronDown, Menu, User, Codepen, List, Command, BookOpen, BellOff, Database, Globe, Folder ,Home} from 'react-feather';
+import { Airplay, Calendar, File, Image, Clipboard, Bell, Users, Activity, Sun, Moon, Cpu, Rss, Maximize, Settings, Search, ChevronsDown, ChevronDown, Menu, User, Codepen, List, Command, BookOpen, BellOff, Database, Globe, Folder } from 'react-feather';
 import classNames from 'classnames'; // Assuming you use this for class management
 import { getCurrentUserName } from '../../../APISearvice/CustomService';
 import { graphfi } from "@pnp/graph";
@@ -683,7 +683,6 @@ console.log("Small Logo URL:", smallLogoUrl);
   const getIcon = (iconName: string) => {
 
     const iconMap: { [key: string]: any } = {
-      filetext: FileText,
       home: Airplay,
       calendar: Calendar,
       file: File,

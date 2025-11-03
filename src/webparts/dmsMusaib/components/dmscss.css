@@ -509,11 +509,9 @@ a:hover
     text-align: center;
 }
 #rename-popup h3, #renamePopup h3{ font-weight: 600 !important; text-align: left !important;  font-size: 18px !important;}
-#renamefile-popup h3, #renamePopup h3{ font-weight: 600 !important; text-align: left !important;  font-size: 18px !important;}
-
 .setApprover{margin-left: 0px !important; justify-content: center;}
 #showfolderpermission .modal-dialog, #workflowdiv .modal-dialog {min-width: 70% !important;}
-#files-container iframe{width: 100% !important; margin-top: 77px;}
+#files-container iframe{width: 100% !important; margin-top: 35px;}
 #showfolderpermission .modal-dialog .modal-content, #workflowdiv .modal-dialog .modal-content{
   width: 100% !important; padding: 15px !important;
 }
@@ -841,7 +839,7 @@ top: 0;
 .btngridview.active svg{color: #fff !important;}
 
 .btnlistview {
-  color: #000;  border: 1px solid #2c9942 !important;
+  color: #000;  border: 0px solid #2c9942 !important;
   font-weight: 500; background: #fff ;
   border: 1px solid #2c9942 !important;
 }
@@ -919,7 +917,7 @@ top: 0;
   
   text-overflow: ellipsis;
 }
-   .newbutton button{height: 40px; font-size: 14px; padding: 6px 10px;}
+   .newbutton button{height: 34px; font-size: 14px; padding: 6px 7px;}
 .filestatus {
   font-size: 11px;
   line-height: 19px;
