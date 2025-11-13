@@ -16620,6 +16620,10 @@ window.RenameFile = async (FileName:any,CurrentFolderPath:any,SiteID:any,myreque
      const popup = document.createElement("div");
      popup.id = "renamefile-popup";
      popup.style.position = "fixed";
+       popup.style.left = "45%";
+         popup.style.top = "213px";
+      
+    
     
 
      // Create a wrapper div
@@ -22301,42 +22305,8 @@ librarydiv.appendChild(mainContainer)
 
                             
                             <div style={{display:'flex', justifyContent:'end', gap:'5px'}} className="col-lg-10 newbutton">
-                              {/* <div>
-                              <Dropdown as={ButtonGroup} style={{padding: '9.4px' , marginTop: '8px'}}>
-        <Dropdown.Toggle variant="primary" id="dropdown-left">
-        
-        </Dropdown.Toggle>
-
-        <Dropdown.Menu className="dropdown-menu-start">
-          <Dropdown.Item href="#/changerequest" onClick={handleDropdownItemClick}>change request Form</Dropdown.Item>
-          <Dropdown.Item href="#/cancellationrequest"     
-          onClick={(event) => {
-            testProess2(event as any);
-            handleShowContent(event as any);
-          }}
-          >Change Request list view</Dropdown.Item>
-          <Dropdown.Item href="#/annualauditprogram"
-           onClick={(event) => {
-            testProess3(event as any);
-            handleShowContent(event as any);
-          }}
-          >Change Request view</Dropdown.Item>
-          <Dropdown.Item href="#/auditplan"
-           onClick={(event) => {
-            testProess4(event as any);
-            handleShowContent(event as any);
-          }}
-          >audit plan</Dropdown.Item>
-          <Dropdown.Item href="#/nc"
-           onClick={(event) => {
-            testProess5(event as any);
-            handleShowContent(event as any);
-          }}
-          >Change Request edit</Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
-                              </div> */}
-                               <button style={{marginTop:'8px'}}  type="button" className="btn  btngridview grid-view notactive"    
+                              
+                               {/* <button style={{marginTop:'8px'}}  type="button" className="btn  btngridview grid-view notactive"    
                                 onClick={()=>window.open('https://officeindia.sharepoint.com/sites/Intranetdemos/SitePages/CheckUrl.aspx' , "_blank") }>
                                          
                                   <img className="sidebariconssmall" src={listicon1}></img> Check Missing Links
@@ -22351,30 +22321,18 @@ librarydiv.appendChild(mainContainer)
                                                           <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}}  id="dropdown-left" className="mt-0 newho" onClick={() => {
                                                                   setshowBulkUpload(true);
                                                                 }}>
-                                                            {/* Bulk Upload */}
+                                                         
                                                             <img className="sidebariconssmall" src={listicon3}></img>     Document type bulk uplaod
                                                           </Dropdown.Toggle>
                               
-                                                          {/* <Dropdown.Menu className="dropdown-menu-start newtheme font-14">
-                                                            {docTypes.map(type => (
-                                                              <Dropdown.Item
-                                                                onClick={() => {
-                                                                  setshowBulkUpload(true);
-                                                                }}
-                                                              >
-                                                                {type}
-                                                              </Dropdown.Item>
-                                                            ))}
-                              
-                                                          </Dropdown.Menu> */}
+                                                     
                                                         </Dropdown>
                               
                                                       </div>
                                <div>
                       <Dropdown as={ButtonGroup} style={{  marginTop: '8px' }}>
                         <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}} id="dropdown-left" className="mt-0 newho">
-                          {/* Select Document Categoty
-                           */}
+                        
 <img className="sidebariconssmall" src={listicon4}></img> Select Template
                         </Dropdown.Toggle>
 
@@ -22389,7 +22347,9 @@ librarydiv.appendChild(mainContainer)
                       
                         </Dropdown.Menu>
                       </Dropdown>
-                    </div>
+                                </div> */}
+{/* till here is intranet demo ESSA */}
+
                               <div id="hidegidvewlistviewbutton" className="view-buttons mt-2">
                                 <button  type="button" className="btn  btngridview mt-0 grid-view active"    
                                 onClick={(event: any = null, siteIdToUpdate: string = null)=>myRequest(event) }>
@@ -22522,7 +22482,7 @@ librarydiv.appendChild(mainContainer)
                           </span>
                           <span className="sidebarText">My Uploaded Files</span>
                         </button>
- <button
+ {/* <button
                          id="Myfavouritebutton"
                           className={`sidebardmsButton ${
                             activeButton === "MyFavourite" ? "active" : ""
@@ -22531,7 +22491,7 @@ librarydiv.appendChild(mainContainer)
                         >
                           <span className="sidebarIcon">
                           <img className="sidebariconssmall" src={starticon}></img>
-                            {/* <FontAwesomeIcon icon={faStarRegular} /> */}
+                      
                           </span>
                           <span className="sidebarText">My Task</span>
                         </button>
@@ -22544,10 +22504,10 @@ librarydiv.appendChild(mainContainer)
                         >
                           <span className="sidebarIcon">
                           <img className="sidebariconssmall" src={starticon}></img>
-                            {/* <FontAwesomeIcon icon={faStarRegular} /> */}
+                           
                           </span>
                           <span className="sidebarText">My Projects</span>
-                        </button>
+                        </button> */}
                         <button
                          id="Myfavouritebutton"
                           className={`sidebardmsButton ${
