@@ -22306,7 +22306,7 @@ librarydiv.appendChild(mainContainer)
                             
                             <div style={{display:'flex', justifyContent:'end', gap:'5px'}} className="col-lg-10 newbutton">
                               
-                               {/* <button style={{marginTop:'8px'}}  type="button" className="btn  btngridview grid-view notactive"    
+                               <button style={{marginTop:'8px'}}  type="button" className="btn  btngridview grid-view notactive"    
                                 onClick={()=>window.open('https://officeindia.sharepoint.com/sites/Intranetdemos/SitePages/CheckUrl.aspx' , "_blank") }>
                                          
                                   <img className="sidebariconssmall" src={listicon1}></img> Check Missing Links
@@ -22347,7 +22347,7 @@ librarydiv.appendChild(mainContainer)
                       
                         </Dropdown.Menu>
                       </Dropdown>
-                                </div> */}
+                                </div>
 {/* till here is intranet demo ESSA */}
 
                               <div id="hidegidvewlistviewbutton" className="view-buttons mt-2">
@@ -22482,7 +22482,7 @@ librarydiv.appendChild(mainContainer)
                           </span>
                           <span className="sidebarText">My Uploaded Files</span>
                         </button>
- {/* <button
+  <button
                          id="Myfavouritebutton"
                           className={`sidebardmsButton ${
                             activeButton === "MyFavourite" ? "active" : ""
@@ -22507,7 +22507,7 @@ librarydiv.appendChild(mainContainer)
                            
                           </span>
                           <span className="sidebarText">My Projects</span>
-                        </button> */}
+                        </button> 
                         <button
                          id="Myfavouritebutton"
                           className={`sidebardmsButton ${

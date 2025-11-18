@@ -464,8 +464,14 @@ const MyTask: React.FC<IMyTaskProps> = ({ context }) => {
     try {
       // Calculate new revision (current + 1)
       const currentRevision = parseInt(selectedTask.revisionnumber || "0");
-      const newRevision = (currentRevision + 1).toString();
 
+      //  this was used before and it was working
+      // const newRevision = (currentRevision + 1).toString();
+
+      const newRevision =
+        existingDocument && selectedTask?.status === "Pending"
+          ? (currentRevision + 1).toString()
+          : currentRevision.toString();
       // STEP 1: Upload file to DeliverablesDocument library
       const folder = sp.web.getFolderByServerRelativePath("DeliverablesDocument");
       const uploadResult = await folder.files.addUsingPath(selectedFile.name, selectedFile, { Overwrite: true });

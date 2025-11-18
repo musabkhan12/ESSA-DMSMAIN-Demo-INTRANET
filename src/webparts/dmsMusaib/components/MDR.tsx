@@ -71,32 +71,65 @@ const MDR: React.FC<IMDRProps> = ({ context }) => {
     const [submissions, setSubmissions] = React.useState<number[]>([]);
     //   const [revisionNumber, setRevisionNumber] = React.useState<number>(0);
     const [loading, setLoading] = React.useState<boolean>(true);
+     
+    // this was old working
+    // React.useEffect(() => {
+    //     const getCreationIdFromUrl = () => {
+    //         try {
+    //             const hash = window.location.hash;
+    //             if (hash) {
+    //                 const params = new URLSearchParams(hash.split('#')[2] || hash.split('?')[1]);
+    //                 const creationIdParam = params.get('CreationId');
+    //                 console.log('CreationId:', creationIdParam);
+    //                 return creationIdParam ? parseInt(creationIdParam, 10) : null;
+    //             }
+    //         } catch (error) {
+    //             console.error('Error parsing URL:', error);
+    //         }
+    //         return null;
+    //     };
  
-    React.useEffect(() => {
+    //     const creationIdFromUrl = getCreationIdFromUrl();
+    //     if (creationIdFromUrl) {
+    //         //   setCreationId(creationIdFromUrl);
+    //         getCreationDetails(creationIdFromUrl);
+    //     } else {
+    //         setLoading(false);
+    //     }
+    // }, []);
+  React.useEffect(() => {
         const getCreationIdFromUrl = () => {
             try {
-                const hash = window.location.hash;
-                if (hash) {
-                    const params = new URLSearchParams(hash.split('#')[2] || hash.split('?')[1]);
-                    const creationIdParam = params.get('CreationId');
-                    console.log('CreationId:', creationIdParam);
-                    return creationIdParam ? parseInt(creationIdParam, 10) : null;
+                let params: URLSearchParams;
+ 
+                if (window.location.search) {
+                    params = new URLSearchParams(window.location.search);
                 }
+                // Fallback for hash-style URLs (#/?CreationId=)
+                else if (window.location.hash) {
+                    const hash = window.location.hash;
+                    params = new URLSearchParams(hash.split('?')[1] || '');
+                } else {
+                    return null;
+                }
+ 
+                const creationIdParam = params.get('CreationId');
+                console.log('CreationId:', creationIdParam);
+                return creationIdParam ? parseInt(creationIdParam, 10) : null;
             } catch (error) {
                 console.error('Error parsing URL:', error);
+                return null;
             }
-            return null;
         };
  
         const creationIdFromUrl = getCreationIdFromUrl();
         if (creationIdFromUrl) {
-            //   setCreationId(creationIdFromUrl);
+            // setCreationId(creationIdFromUrl);
             getCreationDetails(creationIdFromUrl);
         } else {
             setLoading(false);
         }
     }, []);
- 
     const getCreationDetails = async (creationId: number) => {
         setLoading(true);
         try {
