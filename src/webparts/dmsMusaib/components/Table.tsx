@@ -554,7 +554,11 @@ const Pagination = ( { currentPage, totalPages, handlePageChange }: PaginationPr
                                           hour12: true
                                         })}
                                 </td>
-                                <td style={{ minWidth: '80px', maxWidth: '80px' }}>{item.Status} </td>
+                                <td style={{ minWidth: '80px', maxWidth: '80px' }}>
+                                  {/* Pending Color <div style={{background:'#fdedc8', color:'#fac61d',width:'auto', float:'none'}} className="filestatus">
+                                  {item.Status} </div>  */}
+                                  <div style={{background:'#d5efd6', color:'#5fc360', width:'auto', float:'none'}} className="filestatus">
+                                  {item.Status} </div></td>
                                  <td style={{ minWidth: '80px', maxWidth: '80px' }} className="ng-binding">
                                   {/* <div>
                                   this was action column 

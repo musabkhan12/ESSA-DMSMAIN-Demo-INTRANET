@@ -1,3 +1,10 @@
+:root {
+  --primary-color: #1e63ad;
+  --secondary-color: #fa901d;
+  --light-color: #f6f7fb;
+  --bg-color:#ededed;
+
+}
 
 .sidebar {
   background-color: var(--white-color);
@@ -47,7 +54,7 @@
   margin-top: 2px;
   margin-right: 5px;}
 .paddb {
-  min-height: 100vh;
+  max-height: 100vh;
 // padding: 50px 34px 30px 18px;min-height: 100vh;
 }
 .card .card-body .quill{max-height: 300px !important; height: 300px !important; overflow-y: auto !important;}
@@ -1052,8 +1059,8 @@ background-color: rgb(167, 30, 132);
 }
 .btn-primary{height: auto !important;}
 .btn-primary:hover{
-  background: #008751 !important;
-  border-color: #008751 !important; color: #fff !important;
+  background: var(--primary-color) !important;
+  border-color:var(--primary-color) !important; color: #fff !important;
 }
 .heightcard {
   height: 160px !important;

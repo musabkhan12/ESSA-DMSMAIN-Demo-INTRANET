@@ -1,14 +1,12 @@
 
+:root {
+  --primary-color: #1e63ad;
+  --secondary-color: #fa901d;
+  --light-color: #f6f7fb;
+  --bg-color:#ededed;
 
-/* this was added to hide navbar from modern sharepoint page */
-/* #SuiteNavWrapper {
-  display: none !important; 
 }
-.ms-compositeHeader {
-  display: none !important; 
-} */
 
-/*  */
 .greater{
   padding-right: 10px;
 }
@@ -16,12 +14,7 @@
   display: inline-flex;
   padding-left: 0px;
 }
-.mainsidebardms{
-  width: 19%;
-  float: left;
-  padding: 0 0px 20px 0px;
-  position: relative; margin-top: 20px;
-}
+
 .newhe{overflow: auto; max-height: 350px;}
 
 /* #folderContainer2{
@@ -71,7 +64,7 @@
 }
 p.folder {font-size: 14px; font-weight: 600; margin-bottom: 7px; }
 .p3rd{
-  width: 50%; float: left;
+  width: 47%; float: left;
 }
 .share-popup-header h4{    font-size: 1.25rem !important;}
 .filestatus,.filestatus2{float:right;    width: 70px;
@@ -90,16 +83,7 @@ p.folder {font-size: 14px; font-weight: 600; margin-bottom: 7px; }
 
 }
 
-.librarydata{
-  /* margin-top: 3rem; */
-  /* padding: 20px; */
 
-  padding-left: 25px;
- overflow: initial !important;
-  width: 81%;
-  float: left;
-
-}
 
 .font-18{font-size:18px;}
 .Home{
@@ -133,7 +117,7 @@ p.folder {font-size: 14px; font-weight: 600; margin-bottom: 7px; }
         color: #333;
     }
     .btn-primary{
-      background:#2c9942; border-color:#2c9942;
+      background:var(--primary-color);; border-color:var(--primary-color);;
     }
  
 .btn-secondary {
@@ -572,7 +556,18 @@ a:hover
 .popup-footer button:hover {
   background-color: #66AEE0;
 }
- 
+.newbutton img{
+  filter: brightness(0);
+}
+.btngridview {
+  margin-right: -8px;
+  z-index: 1;
+  margin-left: 10px;
+
+}
+.newbutton button:hover img{
+  filter: brightness(0) invert(1);
+}
 #userSelect {
     width: 100%;
     height: auto;
@@ -790,11 +785,11 @@ top: 0;
   color: #008751;
 }
 .sidebardmsButton {
-  background: #f7fbfc;
-    color: #6b6b6b;
+  background: #f9f9f9;
+    color: #2f2f2f;
     display: flex
 ;
-    font-size: 15px;
+    font-size: 14px;
     padding: 9px 19px;
 
   line-height: 19px;
@@ -807,8 +802,8 @@ top: 0;
 }
 .sidebardmsButton{    gap: 6px;
     vertical-align: text-bottom;
-    border-radius: 30px;
-    margin-top: 10px;
+    border-radius: 5px;
+    margin-top: 5px;
 }
 .sidebardmsButton :hover{ color: #fff !important; }
 #files-container .popup-menu{display: none;}
@@ -834,22 +829,22 @@ top: 0;
 .popup-menu ul li:hover img{filter: sepia(100%) hue-rotate(190deg) saturate(500%);}
 #hidegidvewlistviewbutton, #hidegidvewlistviewbutton2{justify-content: end; display: flex; gap: 5px;}
 .btngridview.active {
-  background: #2c9942 ; color: #fff; border-color: #2c9942;
+  background:var(--secondary-color); ; color: #fff; border-color:var(--secondary-color);
 }
 .btngridview.active svg{color: #fff !important;}
 
 .btnlistview {
-  color: #000;  border: 0px solid #2c9942 !important;
+  color: #000;  border: 1px solid #efefef !important;
   font-weight: 500; background: #fff ;
-  border: 1px solid #2c9942 !important;
+
 }
 #hidegidvewlistviewbutton button:hover, #hidegidvewlistviewbutton2 button:hover,#createuploadfilecont button:hover {
-  background: #008751 !important; border-color: #008751 !important; color: #fff !important;
+  background: var(--secondary-color) !important; border-color: var(--secondary-color) !important; color: #fff !important;
 }
 #hidegidvewlistviewbutton button:hover svg, #hidegidvewlistviewbutton2 button:hover svg, #createuploadfilecont button:hover svg{color: #fff !important ;}
 .search-container input{padding: 10px 14px;
   background: #fff !important;
-  border-radius: 30px;}
+  border-radius: 5px;}
   .searchbutton{
     position: absolute;
     right: 15px;
@@ -862,8 +857,8 @@ top: 0;
     width: 32.1%; margin: 5px; float: left;
   } 
  #files-container .card {
-    border: 1px solid #2c9942 !important;
-    border-radius: 6px !important;
+    border: 2.2px dotted #c9c9c9 !important;
+    border-radius: 0px !important;
     height: 94px; padding: 0.75rem; position: relative !important;
 }
 .three-dots{position: absolute;
@@ -904,7 +899,7 @@ top: 0;
   line-height: 20px !important;
   padding-right: 35px;
   text-overflow: ellipsis;
-
+   color: #000;
   margin-bottom: 5px !important;
   height: 20px;
 }
@@ -917,7 +912,10 @@ top: 0;
   
   text-overflow: ellipsis;
 }
-   .newbutton button{height: 34px; font-size: 14px; padding: 6px 7px;}
+   .newbutton button{height: 38px; font-size: 14px; padding: 9px 7px !important;
+  color: #000; border-radius: 4px;
+  background: var(--light-color);
+  }
 .filestatus {
   font-size: 11px;
   line-height: 19px;
@@ -925,7 +923,7 @@ top: 0;
   display: inline-block;
   border-radius: 5px;
 
-  font-weight: 500;
+  font-weight: bold;
   height: 22px;
 }
 .form-check-label{

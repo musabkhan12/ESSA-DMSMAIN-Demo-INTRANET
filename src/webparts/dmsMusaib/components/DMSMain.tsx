@@ -7973,8 +7973,9 @@ const ShareWithOther = async (
 
       const pageInfo = document.createElement("span");
       pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-      pageInfo.style.margin = "0px 30px 0px 0px";
+      pageInfo.style.margin = "16px 64px 0px 0px";
       pageInfo.style.lineHeight = "30px";
+      pageInfo.style.fontSize = "14px";
 
       creatediv.appendChild(prevButton);
       creatediv.appendChild(nextButton);
@@ -9053,8 +9054,9 @@ const ShareWithMe = async (event: React.MouseEvent<HTMLButtonElement> = null, se
 
   const pageInfo = document.createElement("span");
   pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-  pageInfo.style.margin = "0px 30px 0px 0px";
+  pageInfo.style.margin = "16px 64px 0px 0px";
   pageInfo.style.lineHeight = "30px";
+  pageInfo.style.fontSize = "14";
 
   // Disable/enable buttons with styles
   const styleButton = (button: HTMLButtonElement, disabled: boolean) => {
@@ -10047,8 +10049,8 @@ const Recyclebin = async (
       // Page info
       const pageInfo = document.createElement("span");
       pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-      pageInfo.style.margin = "0px 30px 0px 0px";
-      pageInfo.style.lineHeight = "30px";
+      pageInfo.style.margin = "16px 64px 0px 0px";
+  pageInfo.style.lineHeight = "30px";
 
       // Apply disabled styles
       if (prevButton.disabled) {
@@ -12900,8 +12902,8 @@ if (disableNext) {
             const pageInfo = document.createElement("span");
             // pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
            pageInfo.textContent = `Page ${currentPage} of ${Math.max(totalPages, 1)}`;
-            pageInfo.style.margin = "0px 30px 0px 0px";
-            pageInfo.style.lineHeight = "30px";
+           pageInfo.style.margin = "16px 64px 0px 0px";
+           pageInfo.style.lineHeight = "30px";
   
             // Add controls to container
                   paginationContainer.appendChild(creatediv); 
@@ -16917,25 +16919,25 @@ const myRequest = async (
       const fileStatusElement = card.querySelector(".filestatus") as HTMLElement;
       switch (file.Status) {
         case "Approved":
-          fileStatusElement.style.backgroundColor = "#b5e7d3";
-          fileStatusElement.style.color = "#008751";
+          fileStatusElement.style.backgroundColor = "#d5efd6";
+          fileStatusElement.style.color = "#5fc360";
           break;
         case "Auto Approved":
-          fileStatusElement.style.backgroundColor = "#b5e7d3";
-          fileStatusElement.style.color = "#008751";
+          fileStatusElement.style.backgroundColor = "#d5efd6";
+          fileStatusElement.style.color = "#5fc360";
           fileStatusElement.style.width = "96px";
           break;
         case "Rejected":
-          fileStatusElement.style.backgroundColor = "rgba(241, 85, 108, 0.1)";
-          fileStatusElement.style.color = "#f1556c";
+          fileStatusElement.style.backgroundColor = "#f8d2d1";
+          fileStatusElement.style.color = "#e3514d";
           break;
         case "Rework":
-          fileStatusElement.style.backgroundColor = "#ffecc4";
-          fileStatusElement.style.color = "rgba(247, 184, 75)";
+          fileStatusElement.style.backgroundColor = "#d5e2ef";
+          fileStatusElement.style.color = "#008bf5";
           break;
         case "Pending":
-          fileStatusElement.style.backgroundColor = "rgb(91 156 187 / 25%)";
-          fileStatusElement.style.color = "#000b56";
+          fileStatusElement.style.backgroundColor = "#fdedc8";
+          fileStatusElement.style.color = "#fac61d";
           break;
         default:
           break;
@@ -17004,8 +17006,9 @@ const myRequest = async (
     // Page info
     const pageInfo = document.createElement("span");
     pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-    pageInfo.style.margin = "0px 30px 0px 0px";
+    pageInfo.style.margin = "16px 64px 0px 0px";
     pageInfo.style.lineHeight = "30px";
+    pageInfo.style.fontSize = "14px";
 
     // Add elements to container
     buttonsContainer.appendChild(prevButton);
@@ -17755,37 +17758,37 @@ const fileNotFound=(fileName:any)=>{
       switch (text) {
         case 'My Uploaded Files':
           setDynamicContent('Mentioned below are the documents submitted by logged in user.');
-          button.style.backgroundColor = "#959b95";
+          button.style.backgroundColor = "#fa901d";
           button.style.color = "white";
           // document.getElementById('Myrequestbutton').style.backgroundColor = "#959b95";
           break;
         case 'My Favourites':
           setDynamicContent('All the files and folder which is marked as Favourite.');
-          button.style.backgroundColor = "#959b95";
+          button.style.backgroundColor = "#fa901d";
           button.style.color = "white";
           // document.getElementById('Myfavouritebutton').style.backgroundColor = "#959b95";
           break;
         case 'My Folders':
           setDynamicContent('Manage All Folder Created By Me.');
-          button.style.backgroundColor = "#959b95";
+          button.style.backgroundColor = "#fa901d";
           button.style.color = "white";
           // document.getElementById('Mycreatedfolderbutton').style.backgroundColor = "#959b95";
           break;
         case 'Shared with Others':
           setDynamicContent('My files shared with other users.');
-          button.style.backgroundColor = "#959b95";
+          button.style.backgroundColor = "#fa901d";
           button.style.color = "white";
           // document.getElementById('sharedwithotherbutton').style.backgroundColor = "#959b95";
           break;
         case 'Shared with me':
           setDynamicContent('File upload by other team members and shared with me.');
-          button.style.backgroundColor = "#959b95";
+          button.style.backgroundColor = "#fa901d";
           button.style.color = "white";
           // document.getElementById('sharedwithmebutton').style.backgroundColor = "#959b95";
           break;
         case 'Recycle Bin':
           setDynamicContent('below are the documents Deleted by logged in use.');
-          button.style.backgroundColor = "#959b95";
+          button.style.backgroundColor = "#fa901d";
           button.style.color = "white";
           // document.getElementById('recyclebinbutton').style.backgroundColor = "#959b95";
           break;
@@ -22246,7 +22249,7 @@ librarydiv.appendChild(mainContainer)
   </div>
 ) :
  (
-      <div className="content" style={{marginLeft: `${!useHide ? '240px' : '80px'}`,marginTop:'2.8rem'}}>
+      <div className="content" style={{marginLeft: `${!useHide ? '240px' : '80px'}`,marginTop:'1.5rem'}}>
        
       <div className="container-fluid  paddb">
          {showBulkUpload ?<><button type="button"  onClick={() => {
@@ -22292,10 +22295,11 @@ librarydiv.appendChild(mainContainer)
                      
                     )}
                 {/* Start Code Update by Amjad */}
+                  <div className="card card-body1">
                     <div className="row">
                              <div className="col-lg-2">
                                 
-                                <h4 className="page-title fw-bold mb-1 font-20">Dossier</h4>
+                                <h4 className="page-title fw-bold mb-0 font-20">Dossier</h4>
                                 <ol className="breadcrumb m-0">
                     {" "}
                     <li className="breadcrumb-item">Home</li>
@@ -22306,19 +22310,19 @@ librarydiv.appendChild(mainContainer)
                             
                             <div style={{display:'flex', justifyContent:'end', gap:'5px'}} className="col-lg-10 newbutton">
                               
-                               <button style={{marginTop:'8px'}}  type="button" className="btn  btngridview grid-view notactive"    
+                               <button style={{marginTop:'8px'}}  type="button" className="btn  grid-view notactive"    
                                 onClick={()=>window.open('https://officeindia.sharepoint.com/sites/Intranetdemos/SitePages/CheckUrl.aspx' , "_blank") }>
                                          
                                   <img className="sidebariconssmall" src={listicon1}></img> Check Missing Links
                                 </button>
-                               <button style={{marginTop:'8px'}}  type="button" className="btn  btngridview grid-view notactive"    
+                               <button style={{marginTop:'8px'}}  type="button" className="btn   grid-view notactive"    
                                 onClick={(e)=>Newrequestpw(event) }>
                                          
                                   <img className="sidebariconssmall" src={listicon2}></img> New Request
                                 </button>
                                <div>
                                                         <Dropdown as={ButtonGroup} style={{ marginTop: '8px' }}>
-                                                          <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}}  id="dropdown-left" className="mt-0 newho" onClick={() => {
+                                                          <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}}  id="dropdown-left" className="mt-0" onClick={() => {
                                                                   setshowBulkUpload(true);
                                                                 }}>
                                                          
@@ -22331,7 +22335,7 @@ librarydiv.appendChild(mainContainer)
                                                       </div>
                                <div>
                       <Dropdown as={ButtonGroup} style={{  marginTop: '8px' }}>
-                        <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}} id="dropdown-left" className="mt-0 newho">
+                        <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}} id="dropdown-left" className="mt-0">
                         
 <img className="sidebariconssmall" src={listicon4}></img> Select Template
                         </Dropdown.Toggle>
@@ -22351,7 +22355,7 @@ librarydiv.appendChild(mainContainer)
 {/* till here is intranet demo ESSA */}
 
                               <div id="hidegidvewlistviewbutton" className="view-buttons mt-2">
-                                <button  type="button" className="btn  btngridview mt-0 grid-view active"    
+                                <button  type="button" className="btn  btngridview mt-0 grid-view newl active"    
                                 onClick={(event: any = null, siteIdToUpdate: string = null)=>myRequest(event) }>
                                           
                                   <img className="sidebariconssmall" src={listicon5}></img> Grid View
@@ -22432,6 +22436,7 @@ librarydiv.appendChild(mainContainer)
                           } */}
                           </div>
 
+                          </div>
                           </div>
                            {/* End Code Update by Amjad */}
                     <div className="mainsidebardms">
@@ -22590,6 +22595,10 @@ librarydiv.appendChild(mainContainer)
                       <div id="loader" style={{display: "none"  }}>
                             <img style={{width :'116px'  ,margin: '31px'}} src={require("../assets/ESSAROLLER.gif")} alt="Loading..." />
                       </div>
+
+           
+
+
                          <div   id="folderContainer2"></div>
                       
                       </div>
