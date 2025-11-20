@@ -6917,6 +6917,7 @@ window.PreviewFile = function(path :any , SiteID:any , docLibName:any, status:st
   const createbutton = document.createElement('button')
   createbutton.textContent = 'Close File preivew';
   console.log("enter here in preview : ",path)
+  
   const encodedFilePath = encodeURIComponent(path);
   console.log(encodedFilePath, "encodedFilePath");
    
@@ -7973,7 +7974,7 @@ const ShareWithOther = async (
 
       const pageInfo = document.createElement("span");
       pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-      pageInfo.style.margin = "16px 64px 0px 0px";
+      pageInfo.style.margin = "12px 103px 0px 0px";
       pageInfo.style.lineHeight = "30px";
       pageInfo.style.fontSize = "14px";
 
@@ -9054,7 +9055,7 @@ const ShareWithMe = async (event: React.MouseEvent<HTMLButtonElement> = null, se
 
   const pageInfo = document.createElement("span");
   pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-  pageInfo.style.margin = "16px 64px 0px 0px";
+  pageInfo.style.margin = "12px 103px 0px 0px";
   pageInfo.style.lineHeight = "30px";
   pageInfo.style.fontSize = "14";
 
@@ -10049,7 +10050,7 @@ const Recyclebin = async (
       // Page info
       const pageInfo = document.createElement("span");
       pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-      pageInfo.style.margin = "16px 64px 0px 0px";
+      pageInfo.style.margin = "12px 103px 0px 0px";
   pageInfo.style.lineHeight = "30px";
 
       // Apply disabled styles
@@ -12902,7 +12903,7 @@ if (disableNext) {
             const pageInfo = document.createElement("span");
             // pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
            pageInfo.textContent = `Page ${currentPage} of ${Math.max(totalPages, 1)}`;
-           pageInfo.style.margin = "16px 64px 0px 0px";
+           pageInfo.style.margin = "12px 103px 0px 0px";
            pageInfo.style.lineHeight = "30px";
   
             // Add controls to container
@@ -17006,7 +17007,7 @@ const myRequest = async (
     // Page info
     const pageInfo = document.createElement("span");
     pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-    pageInfo.style.margin = "16px 64px 0px 0px";
+    pageInfo.style.margin = "12px 103px 0px 0px";
     pageInfo.style.lineHeight = "30px";
     pageInfo.style.fontSize = "14px";
 
@@ -17758,25 +17759,25 @@ const fileNotFound=(fileName:any)=>{
       switch (text) {
         case 'My Uploaded Files':
           setDynamicContent('Mentioned below are the documents submitted by logged in user.');
-          button.style.backgroundColor = "#fa901d";
+          button.style.backgroundColor = "#6a6a6a";
           button.style.color = "white";
           // document.getElementById('Myrequestbutton').style.backgroundColor = "#959b95";
           break;
         case 'My Favourites':
           setDynamicContent('All the files and folder which is marked as Favourite.');
-          button.style.backgroundColor = "#fa901d";
+          button.style.backgroundColor = "#6a6a6a";
           button.style.color = "white";
           // document.getElementById('Myfavouritebutton').style.backgroundColor = "#959b95";
           break;
         case 'My Folders':
           setDynamicContent('Manage All Folder Created By Me.');
-          button.style.backgroundColor = "#fa901d";
+          button.style.backgroundColor = "#6a6a6a";
           button.style.color = "white";
           // document.getElementById('Mycreatedfolderbutton').style.backgroundColor = "#959b95";
           break;
         case 'Shared with Others':
           setDynamicContent('My files shared with other users.');
-          button.style.backgroundColor = "#fa901d";
+          button.style.backgroundColor = "#6a6a6a";
           button.style.color = "white";
           // document.getElementById('sharedwithotherbutton').style.backgroundColor = "#959b95";
           break;
@@ -17788,7 +17789,7 @@ const fileNotFound=(fileName:any)=>{
           break;
         case 'Recycle Bin':
           setDynamicContent('below are the documents Deleted by logged in use.');
-          button.style.backgroundColor = "#fa901d";
+          button.style.backgroundColor = "#6a6a6a";
           button.style.color = "white";
           // document.getElementById('recyclebinbutton').style.backgroundColor = "#959b95";
           break;
@@ -20541,7 +20542,7 @@ approverDetailsArray.forEach((approver) => {
       background: white;
       border: 1px solid #ccc;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      z-index: 1000;
+      z-index: 9999;
       width: 90%;
       max-width: 1200px;
       max-height: auto !important;
@@ -22487,7 +22488,7 @@ librarydiv.appendChild(mainContainer)
                           </span>
                           <span className="sidebarText">My Uploaded Files</span>
                         </button>
-  <button
+  {/*<button
                          id="Myfavouritebutton"
                           className={`sidebardmsButton ${
                             activeButton === "MyFavourite" ? "active" : ""
@@ -22513,6 +22514,7 @@ librarydiv.appendChild(mainContainer)
                           </span>
                           <span className="sidebarText">My Projects</span>
                         </button> 
+                        */}
                         <button
                          id="Myfavouritebutton"
                           className={`sidebardmsButton ${
@@ -22597,7 +22599,9 @@ librarydiv.appendChild(mainContainer)
                       </div>
 
            
-
+                     
+                                    <div id="jstree-4"></div>
+                               
 
                          <div   id="folderContainer2"></div>
                       
@@ -22671,7 +22675,7 @@ librarydiv.appendChild(mainContainer)
   </div>
                    {/* End Code Update by Amjad */} 
 
-                       <div id="files-container"></div>
+                       <div id="files-container" className="buttonalignment"></div>
                        <div id="loader2" style={{
                             display: "none",
                             textAlign: "center",
@@ -22694,7 +22698,7 @@ librarydiv.appendChild(mainContainer)
                      } */}
                      {
   listorgriddata === '' ? (
-    <div id="files-container"></div>
+    <div id="files-container" className="buttonaligm"></div>
   ) : (
     <>
       {listorgriddata === 'showListView' && (
