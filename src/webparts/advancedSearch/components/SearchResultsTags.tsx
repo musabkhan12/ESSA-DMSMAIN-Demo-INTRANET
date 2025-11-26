@@ -24,7 +24,7 @@ const TagsComponent = (props:ITagsProps) => {
 //   };
 
   return (
-    <div className="container my-0 newbutton">
+    <div className="container my-0 newbutton p-0">
       <div className="d-flex flex-wrap gap-2 mb-3">
         {props.tags.map((tag, index) => (
           <span style={{fontSize:'12px'}}

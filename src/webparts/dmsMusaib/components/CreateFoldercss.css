@@ -43,7 +43,7 @@ overflow-y: inherit !important;
 }
 .sub-header {
     font-size: .875rem;
-    margin-bottom: 24px;
+    margin-bottom: 0px;
     color: #6b6b6b;
 }
 .multilinetextWidth {

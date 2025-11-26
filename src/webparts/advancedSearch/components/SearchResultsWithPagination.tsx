@@ -107,14 +107,30 @@ export const SearchResultsWithPagination: React.FC<SearchResultsWithPaginationPr
             <div className="row p-2 pt-0">
                 {currentItems.map((res, index) => (
                     <div key={index} className="col-sm-12 mt-0 mb-2 search-result">
-                        <div style={{borderRadius:'5px'}}  className="card h-100">
+                        <div style={{borderRadius:'0px'}}  className="card h-100 newheightlight">
                             <div className="card-body">
-                                <a href={res.Path} target='_blank'><h5   className="card-title text-dark hover fw-bold">{res.Title}</h5></a>
+                                <div className='row'>
+                                <div className='col-lg-1'>
+                                    <div className='newcard'>
+
+                                    {/* <img src={require("assets/doc.png")}/> */}
+
+                                        </div>
+
+                                    </div>
+
+                                    <div className='col-lg-10 newpaddl15'>
+
+<a href={res.Path} target='_blank'>
+                                    <h5 className="card-title text-dark hover fw-bold">{res.Title}</h5></a>
                                 {/* <p className="card-text">{res.Summary}</p> */}
                                 <p style={{fontSize:'14px', color:'#666'}} className="card-text font-14"><span dangerouslySetInnerHTML={{ __html:`${res.Summary.replace(/<c0>/g, "<strong>").replace(/<\/c0>/g, "</strong>")}` }} /></p>
-                            </div>
+                            
                             {/* <TagsComponent tags={Object.entries(res.Properties).map(([key, value]) => `${fieldnamesmapping[key] ? fieldnamesmapping[key] : key}: ${value}`)} /> */}
                             <TagsComponent tags={Object.entries(res.Properties).map(([key, value]) => `${GetFieldName(key)}: ${GetFieldValue(fieldtypemappings,key,value)}`)} />
+                            </div>
+                                    </div></div>
+                                
                         </div>
                     </div>
                 ))}

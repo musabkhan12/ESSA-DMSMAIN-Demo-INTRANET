@@ -28,7 +28,7 @@ import { DMSSearchFilterCheckedDropDown } from './DMSSearchFilterCheckedDropDown
 import { fieldnamesmapping, GetFieldName, removeDuplicates } from './Common';
 import {SearchResultsWithPagination,SearchResult} from './SearchResultsWithPagination';
 // import { AnyPtrRecord } from 'dns';
-
+let listicon5 = require('../assets/search-white.png')
 export const getUrlParameter = (name: string) => {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(name);
@@ -377,21 +377,40 @@ const AdvancedSearch: React.FC<IAdvancedSearchProps> = (props) => {
                 <div className="content" style={{ marginLeft: `${!useHide ? '80px' : '230px'}`, marginTop: '1.5rem' }}>
                     <section className='container-fluid'>
                         <div className='row'>
-                            <header className="p-3 pb-0 col-12">
+                            <header className="p-3 pb-0 pt-0 col-12 Paddright">
                                 {/* <h1 style={{fontSize:'20px', fontWeight:'600'}} className='text-dark'>Search</h1> */}
-                                <form>
-                                    <div className="input-group">
-                                        <input style={{ padding: '.75rem .75rem' }} type="text" className="form-control" placeholder="Search Files.." onChange={searchTextChangeHandler} onKeyDown={handleKeyPress} value={searchText}/>
-                                        <button style={{ fontSize: '1rem' }} className="btn btn-primary" type="button" onClick={searchClickHandler}>Advance Search</button>
+                                
+                                <div className='card mt-0'>
+                                    <div className='card-body'>
+                                        <div className='row'>
+                                        <div className="col-lg-3">
+                                            <h4 className="page-title fw-bold mb-0 font-20">Dossier</h4>
+                                            <ol className="breadcrumb m-0"> <li className="breadcrumb-item">Home</li>
+                                            <li className="breadcrumb-item active">Dossier</li></ol>
+                                        </div>
+                                        <div className="col-lg-9">
+                                        <form>
+                                    <div style={{marginTop:'2px'}} className="input-group">
+                                        <input style={{ padding: '.75rem .75rem', marginRight:'0.8rem' }} type="text" className="form-control" placeholder="Search Files.." onChange={searchTextChangeHandler} onKeyDown={handleKeyPress} value={searchText}/>
+                                        <button style={{ fontSize: '1rem', minWidth:'auto', padding:'6px 17px' }} className="btn btn-primary" type="button" onClick={searchClickHandler}>
+                                        <img  src={listicon5}></img>
+                                        </button>
                                     </div>
                                 </form>
+                                        </div>
+
+                                        </div>
+                                </div>
+                                </div>
+                               
                             </header>
 
                             <main className="mt-3 p-0 pb-3 col-12">
                                 <div className='row mt-0 p-0'>
                                     <section style={{paddingLeft:'25px'}}className='col-sm-3 nwsera'>
-                                        <div  style={{background:'transparent', border:'0px solid #ccc',width:'95%',}}  className='card'>
-                                        <h5 style={{textAlign:'left', fontSize:'18px',borderBottom:'1px solid #ccc',  margin:'inherit'}} className='text-dark p-0 pt-0 mb-2 fw-bold'>Filter</h5> 
+                                        <div   className='card'>
+                                        <div   className='card-body'>
+                                        <h5 style={{textAlign:'left', fontSize:'18px',borderBottom:'1px solid #ccc', paddingBottom:'5px', margin:'inherit'}} className='text-dark pt-0 mb-2 fw-bold'>Filter</h5> 
                                         <DMSSearchFilterCheckedDropDown context={props.context} 
                                         
                                         onMultiFieldSelect={selfields => {
@@ -493,14 +512,15 @@ const AdvancedSearch: React.FC<IAdvancedSearchProps> = (props) => {
 
                                         }}/>
                                         </div>
-                                        <div style={{width:'95%'}}>
-                                            <h5 style={{textAlign:'left', fontSize:'18px',borderBottom:'1px solid #ccc'}} className='text-dark  mb-2 fw-bold'>Refiners</h5>
+                                        
+                                         <div style={{width:'90%', margin:'auto'}}>
+                                            {/* <h5 style={{textAlign:'left', fontSize:'18px',borderBottom:'1px solid #ccc'}} className='text-dark  mb-2 pt-1 fw-bold'>Refiners</h5> */}
                                             <div className='row p-0'>
                                                 {searchRefiners?.map(refiner => (
                                                     <div  style={{border:'0px solid #2c9942', borderRadius:'0px', background:'transparent'}} key={refiner.field} className="card col-12 mb-3 pt-2">
-                                                        <h6 style={{textAlign:'left', fontSize:'16px', margin:'inherit'}} className='mt-0 mb-1'>{GetFieldName(refiner.field)}</h6>
+                                                       <h5 style={{textAlign:'left', fontSize:'18px',borderBottom:'1px solid #ccc', paddingBottom:'5px', margin:'inherit'}} className='text-dark  mb-2 pt-1 fw-bold'>{GetFieldName(refiner.field)}</h5>
 
-                                                        <div className="form-check">
+                                                        <div className="form-check mt-2">
                                                             {
                                                                 (GetFieldType(refiner.field) == enumfieldtype.DateTime) ?
                                                                     (<div className='col-12'>
@@ -509,7 +529,7 @@ const AdvancedSearch: React.FC<IAdvancedSearchProps> = (props) => {
                                                                         <input
                                                                             type="date"
                                                                             id="startDate"
-                                                                            className="form-control"
+                                                                            className="form-control mb-2"
                                                                             value={startDate.get(refiner.field) || ""}
                                                                             onChange={(e) => {
                                                                                 // Create a new Map to ensure immutability
@@ -557,7 +577,7 @@ const AdvancedSearch: React.FC<IAdvancedSearchProps> = (props) => {
                                                                     <>
                                                                     <FilterCheckBox refiner={refiner} handleCheckboxChange={handleCheckboxChange} searchRefinerFilters={searchRefinerFilters} />
                                                                     <div style={{clear:'both', position:'relative'}} className="col mt-1 mb-3">
-                                                                        <button type='button' className="btn btn-secondary newbuttons float-end mt-2 mb-3 me-2" onClick={() => ClearRefinerFilter(refiner.field)}>
+                                                                        <button type='button' className="btn btn-secondary newbuttons text-white float-end mt-2 mb-3 me-2" onClick={() => ClearRefinerFilter(refiner.field)}>
                                                                             Clear
                                                                         </button>
                                                                     </div>
@@ -568,13 +588,14 @@ const AdvancedSearch: React.FC<IAdvancedSearchProps> = (props) => {
                                                         </div>
                                                     </div>
                                                 ))}
-                                                {(searchRefiners && searchRefiners.length>0)?<div className="col">
-                                                    <button type='button' className="btn btn-success neewd" onClick={() => handleApplyFilters()}>
+                                                {(searchRefiners && searchRefiners.length>0)?<div className="col mb-3">
+                                                    <button type='button' className="btn btn-primary text-white neewd" onClick={() => handleApplyFilters()}>
                                                         Apply Filters
                                                     </button>
                                                 </div>:<></>}
                                             </div>
-                                        </div>
+                                        </div></div>
+                                        
                                     </section>
                                     <section className="col-sm-9">
                                         {/* {searchResult.map(res => (

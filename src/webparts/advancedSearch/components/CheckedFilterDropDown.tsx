@@ -60,7 +60,7 @@ const CheckedFilterDropDown: React.FC<ICheckedFilterDropDownProps> = ({options, 
                     </div>
                     <Button variant="link" style={{textAlign:'left'}} onClick={handleShowList} className='p-0 mb-2'>Show List</Button>
                     {showList && (
-                        <div className="position-absolute bg-white p-2 border shadow-sm" style={{zIndex:1000}}>
+                        <div className="position-absolute new-aligncard bg-white p-2 border shadow-sm" style={{zIndex:1000}}>
                             <div className="d-flex justify-content-between mb-2">
                                 <span>Selected: {selected.length}</span>
                                 <Button variant="link" size="sm" onClick={handleClear}>Clear</Button>

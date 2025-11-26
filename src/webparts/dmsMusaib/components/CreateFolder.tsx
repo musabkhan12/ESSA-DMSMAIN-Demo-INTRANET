@@ -11,6 +11,7 @@ import "@pnp/sp/webs";
 import "./CreateFoldercss";
 import Select from "react-select";
 import Swal from "sweetalert2";
+let backnew = require('../assets/backnew.png')
 // import Form from "react-bootstrap/Form";
 
 // let selectedArrayForUserPermission:{
@@ -1342,12 +1343,22 @@ const validateFields = () => {
 
   return (
     <>
-      <button className="BackButton me-0 mb-3"
+     
+      <div className="mt-3 newsmart">
+     
+        <div className="card">
+        <div className="card-body">
+          <div className="d-flex align-items-center justify-content-between">
+          <p id="breadCrumb" className="fw-bold font-16"></p>
+        <div className="BackButton1 p-0 me-0 mb-3"
          onClick={()=>{location.reload() ;onReturnToMain()}}
       >
  
-        Back
-      </button>
+ <span className="mb-1" data-tooltip='Back'>
+
+<img className="" src={backnew}></img> &nbsp;</span>
+      </div>
+      </div>
       {isLoading && (
       <div className='loaderOverlay'>
         <div className='loader'>
@@ -1355,14 +1366,9 @@ const validateFields = () => {
         </div>
       </div>
     )}
-      <div className="mt-3">
-      <p id="breadCrumb"></p>
-        <div className="card cardborder p-31" style={{
-          
-        }}>
           <form>
             <div className="row mt-0">
-              <h3 className="header-title text-dark font-16 mb-1">Basic Information</h3>
+              <h3 className="header-title text-dark font-16 mb-1 fw-bold">Basic Information</h3>
               <p className="subheader font-14 mb-3">Specify Basic Information and create folder  </p>
               <div className="col-12 col-md-6 mb-3">
                 <div className="form-group">
@@ -1507,18 +1513,18 @@ const validateFields = () => {
         
           </form>
         </div>
-    
+        </div>
 
        
       </div>
       {/* this is meta column fields */}
       {OthProps.DocumentLibrary === "" && (
-        <div className="card cardborder p-31 mt-3">
-        <div className="">
+        <div className="card newsmart">
+        <div className="card-body">
         {toggleaddFieldsButton && ( 
               <div className="row mt-0" id="addFieldsButton">
                 <div className="col-md-10  w90">
-                <h3 className="header-title text-dark font-16 mb-1">List of tags</h3>
+                <h3 className="header-title text-dark font-16 mb-1 fw-bold">List of tags</h3>
                 <p className="subheader font-14 mb-3">Specify sub folder and create list of tags to be prepared and submitted by team members.</p>
                 </div>
                
@@ -1528,9 +1534,9 @@ const validateFields = () => {
                       <a onClick={handleAddFields}>
                       <img 
                             className="bi bi-plus"
-                            src={require("../assets/plus.png")}
+                            src={require("../assets/addnew.png")}
                             alt="add"
-                            style={{ width: "50px", top:'5px', left:'auto', right:'0px', marginLeft:'16px', position:'absolute', height: "50px" }}
+                            style={{ width: "auto", top:'5px', left:'auto', right:'5px', marginLeft:'16px', position:'absolute', height: "auto" }}
                           />
                      
                       </a>
@@ -1637,8 +1643,8 @@ const validateFields = () => {
        
       
       {toggleApproval ? (
-        <div className="card cardborder p-31 mt-3">
-          <div className="" style={{
+        <div className="card newsmart">
+          <div className="card-body" style={{
             
         }}>
             {/* <h5 className="mb-1 Permissionsectionstyle">
@@ -1646,7 +1652,7 @@ const validateFields = () => {
             </h5> */}
             <div className="row">
               <div className="col-sm-10 w90">
-              <h3 className="header-title text-dark font-16 mb-1">Approval Hierarchy</h3>
+              <h3 className="header-title text-dark font-16 mb-1 fw-bold">Approval Hierarchy</h3>
      
      <p className="subheader font-14 mb-3">
        Define approval hierarchy for the documents submitted by Team
@@ -1661,9 +1667,9 @@ const validateFields = () => {
                 <a onClick={handleAddRow}>
                   <img
                     className="bi bi-plus"
-                    src={require("../assets/plus.png")}
+                    src={require("../assets/addnew.png")}
                     alt="add"
-                    style={{ width: "50px", top:'0px', position:'absolute', right:'0px', left:'auto', height: "50px" }}
+                    style={{ width: "auto", top:'0px', position:'absolute', right:'5px', left:'auto', height: "auto" }}
                   />
                 </a>
               </div>
@@ -1811,8 +1817,8 @@ const validateFields = () => {
       }
       
       {/* {permission && ( */}
-           {showDiv &&   <div className="card cardborder p-31 mt-3">
-                <div className="" style={{
+           {showDiv &&   <div className="card newsmart">
+                <div className="card-body" style={{
                
                   }}>
                       {/* <h5 className="mb-3 Permissionsectionstyle">
@@ -1822,7 +1828,7 @@ const validateFields = () => {
                       <div className="row">
                         <div className="col-md-10 w90">
 
-                        <h3 className="header-title text-dark font-16 mb-1">Permission</h3>
+                        <h3 className="header-title text-dark font-16 mb-1 fw-bold">Permission</h3>
      
      <p className="subheader font-14 mb-3">
        Define Permission for the documents submitted by Team
@@ -1837,9 +1843,9 @@ const validateFields = () => {
                           <a onClick={handleAddRowForPermission}>
                             <img 
                               className="bi bi-plus"
-                              src={require("../assets/plus.png")}
+                              src={require("../assets/addnew.png")}
                               alt="add"
-                              style={{ width: "50px", top:'0px', left:'auto', right:'0px', marginLeft:'10px', position:'absolute', height: "50px" }}
+                              style={{ width: "auto", top:'0px', left:'auto', right:'5px', marginLeft:'10px', position:'absolute', height: "auto" }}
                             />
                           </a>
                         </div>
@@ -1924,31 +1930,34 @@ const validateFields = () => {
            
                 </div>
         </div> }
-        <div className="d-flex mt-3 justify-content-center buttonstyle">
+        <div className="d-flex mt-3 justify-content-end buttonstyle12">
         <button
-          className="btn btn-create me-2 mt-0 btncolorCreate"
+          className="me-2 mt-0 btncolorCreate1"
           onClick={handleCreate}
           id="CreateFolderInsideSharePoint"
         >
+           <span className="mb-1 mt-2" data-tooltip='Create'>
+
+
           <img
-            className="bi"
-            src={require("../assets/checkmark2.png")}
+            className=""
+            src={require("../assets/submit-new.png")}
             alt="Create"
           />
-          Create
+          </span>
         </button>
-        <button className="btn btn-cancel btncolorcancel" onClick={clearForm}>
-          <img
-            className="bi"
-            src={require("../assets/cross.png")}
+        <button className=" btncolorCreate1 mt-0" onClick={clearForm}>
+        <span className="mb-1 mt-2" data-tooltip='Cancel'>  <img
+            className="cancelnewi" 
+            src={require("../assets/cancelnew.png")}
             alt="Cancel"
           />
-          Cancel
+          </span>
         </button>
                 </div>
       {/* ) */}
       {/* } */}
-      <br/>
+      
       
     </>
   );

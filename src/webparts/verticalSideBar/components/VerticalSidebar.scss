@@ -93,7 +93,10 @@
 .btn-success{background: rgba(31,176,229,1) !important;    border-color: #2c9942 !important;
 }
 
-
+input[type="checkbox"]:checked{
+  background-color: var(--primary-color) !important; /* Green when checked */
+  border: none;
+}
 .announcementner {
   height: 330px;
   overflow: hidden;
@@ -1790,7 +1793,7 @@ color: #fff !important;
 .btn-status {
   background: #fff;
   border: 1px solid #efefef !important;
-  border-radius: 30px !important;
+  border-radius: 0px !important;
   color: #3c3c3c;
   font-size: 13px !important;
   width: 100px;

@@ -155,19 +155,23 @@ let documenttemplatetofill : any;
 let isprocessfolder :any;
 let folderpathbacktodmsfrompreviewisprocessfolder :any
 let Undo = require('../assets/Undo.svg');
-let sharewithmeicon = require('../assets/nodes.png')
-let recyclebin = require('../assets/recycle-bin.png')
-let sharewithothericon = require('../assets/share.png')
-let starticon = require('../assets/star.png')
-let listicon = require('../assets/list.png')
-let listicon1 = require('../assets/list1.png')
-let listicon2 = require('../assets/list2.png')
-let listicon3 = require('../assets/list3.png')
-let listicon4 = require('../assets/list4.png')
-let listicon5 = require('../assets/list5.png')
-let listicon6 = require('../assets/list6.png')
+let sharewithmeicon = require('../assets/sharen.png')
+let recyclebin = require('../assets/recyn.png')
+let sharewithothericon = require('../assets/shar12.png')
+let starticon = require('../assets/myfav.png')
+let listicon = require('../assets/uploadfile.png')
+let create1 = require('../assets/create1.png')
+let create2 = require('../assets/create2.png')
+let listicon1 = require('../assets/link.png')
+let listicon2 = require('../assets/newr.png')
+let listicon3 = require('../assets/bupload.png')
+let listicon4 = require('../assets/newt.png')
+let listicon5 = require('../assets/gridview.png')
+let listicon6 = require('../assets/listview.png')
+let listiconshare = require('../assets/listiconshare.png')
+let listicond = require('../assets/listicond.png')
 let downloadicon = require('../assets/download.png')
- let foldericon = require('../assets/foldericon.png')
+ let foldericon = require('../assets/newf.png')
 let Docicon = require("../assets/DOC.png");
 let Txticon = require("../assets/TXT.png");
 let Pdficon = require("../assets/PDF.png");
@@ -6915,7 +6919,17 @@ window.PreviewFile = function(path :any , SiteID:any , docLibName:any, status:st
   previewfileframe.style.display = 'none'
   const librarydiv= document.getElementById('files-container')
   const createbutton = document.createElement('button')
-  createbutton.textContent = 'Close File preivew';
+  //createbutton.textContent = 'Close File preivew';
+  const closeImage = document.createElement('img');
+closeImage.src = '../../assets/fulls.png'; // Replace with your image URL
+closeImage.alt = 'Close Preview';
+closeImage.style.cursor = 'pointer'; // Make it look clickable
+closeImage.style.display = 'none'; // Initially hide the close image
+// Add the iframe and image to the container
+createpreviewdiv.appendChild(previewfileframe);
+createpreviewdiv.appendChild(closeImage);
+// Add the preview div to the page
+librarydiv.appendChild(createpreviewdiv);
   console.log("enter here in preview : ",path)
   
   const encodedFilePath = encodeURIComponent(path);
@@ -17102,7 +17116,17 @@ const fileNotFound=(fileName:any)=>{
   const [activeComponent, setActiveComponent] = useState<string>('');
   const [listorgriddata, setlistorgriddata] = useState<string>('');
   const handleButtonClickShow = (componentName:any) => {
-    setActiveComponent(componentName); // Set the active component based on the button clicked
+   // setActiveComponent(componentName); // Set the active component based on the button clicked
+    {/* srs 25/11/25 */}
+   // setlistorgriddata("CreateFolder");
+  //  setlistorgriddata(componentName);
+  setActiveComponent("");  // clear previous component
+  setlistorgriddata("");
+  const container = document.getElementById("files-container");
+  container.innerHTML = "";
+    setTimeout(() => {
+      setlistorgriddata(componentName); // set the new component
+    }, 0);
   };
   const handleReturnToMain = () => {
     setActiveComponent(''); // Reset to show the main component
@@ -22309,25 +22333,25 @@ librarydiv.appendChild(mainContainer)
                             </div>
 
                             
-                            <div style={{display:'flex', justifyContent:'end', gap:'5px'}} className="col-lg-10 newbutton">
+                            <div style={{display:'flex', justifyContent:'end', gap:'5px'}} className="col-lg-10 newbutton tool">
                               
-                               <button style={{marginTop:'8px'}}  type="button" className="btn  grid-view notactive"    
-                                onClick={()=>window.open('https://officeindia.sharepoint.com/sites/Intranetdemos/SitePages/CheckUrl.aspx' , "_blank") }>
-                                         
-                                  <img className="sidebariconssmall" src={listicon1}></img> Check Missing Links
-                                </button>
-                               <button style={{marginTop:'8px'}}  type="button" className="btn   grid-view notactive"    
+                               <div className="newright">
+
+                               <div className="d-flex justify-content-center gap-3 mt-2">
+
+                               
+                               <button style={{marginTop:'0px'}}  type="button" className="btn   grid-view notactive"    
                                 onClick={(e)=>Newrequestpw(event) }>
-                                         
-                                  <img className="sidebariconssmall" src={listicon2}></img> New Request
+                                    <span className="mt-2 mb-1" data-tooltip='New Request'>    
+                                  <img className="sidebariconssmall" src={listicon2}></img> </span>  
                                 </button>
                                <div>
-                                                        <Dropdown as={ButtonGroup} style={{ marginTop: '8px' }}>
-                                                          <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}}  id="dropdown-left" className="mt-0" onClick={() => {
+                                                        <Dropdown as={ButtonGroup} style={{ marginTop: '0px' }}>
+                                                          <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}}  id="dropdown-left" className="mt-0 remoare" onClick={() => {
                                                                   setshowBulkUpload(true);
                                                                 }}>
-                                                         
-                                                            <img className="sidebariconssmall" src={listicon3}></img>     Document type bulk uplaod
+                                                         <span className="mt-2 mb-1" data-tooltip='Document Type Bulk Upload'> 
+                                                            <img className="sidebariconssmall" src={listicon3}></img>  </span>  
                                                           </Dropdown.Toggle>
                               
                                                      
@@ -22335,10 +22359,10 @@ librarydiv.appendChild(mainContainer)
                               
                                                       </div>
                                <div>
-                      <Dropdown as={ButtonGroup} style={{  marginTop: '8px' }}>
+                      <Dropdown as={ButtonGroup} style={{  marginTop: '0px' }}>
                         <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}} id="dropdown-left" className="mt-0">
-                        
-<img className="sidebariconssmall" src={listicon4}></img> Select Template
+                        <span className="mt-2 mb-1" data-tooltip='Select Template'>                       
+<img className="sidebariconssmall" src={listicon4}></img> </span>
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu className="dropdown-menu-start newtheme font-14">
@@ -22351,25 +22375,73 @@ librarydiv.appendChild(mainContainer)
                           ))}
                       
                         </Dropdown.Menu>
-                      </Dropdown>
-                                </div>
-{/* till here is intranet demo ESSA */}
+                      </Dropdown></div>
+                    
 
-                              <div id="hidegidvewlistviewbutton" className="view-buttons mt-2">
+                                </div>  <p style={{fontSize:'14px'}} className="mb-0 mt-2">New</p></div>
+{/* till here is intranet demo ESSA */}
+<div className="bordernewr">
+  <div className="d-flex justify-content-center gap-3 mt-2">
+  <button style={{marginLeft:'14px'}} type="button" className="btn mt-0">
+  <span className="mb-1" data-tooltip='Upload File'>
+
+  <img className="sidebariconssmall" src={create1}></img> &nbsp;</span>
+  </button>
+    <button type="button" className="btn mt-0">
+
+    <span className="mb-1" data-tooltip='Create Folder'>
+  <img className="sidebariconssmall" src={create2}></img> &nbsp;</span>
+  </button>
+  </div>
+  <p style={{fontSize:'14px'}} className="mb-0 mt-2">Create</p>
+</div>
+<div className="bordernewr">
+  <div className="d-flex justify-content-center gap-3 mt-2">
+  <button type="button" className="btn mt-0">
+  <span className="mb-1" data-tooltip='Share'>
+
+  <img className="sidebariconssmall" src={listiconshare}></img> &nbsp;</span>
+  </button>
+    <button type="button" className="btn mt-0">
+
+    <span className="mb-1" data-tooltip='Delete'>
+  <img className="sidebariconssmall" src={listicond}></img> &nbsp;</span>
+  </button>
+  </div>
+  <p style={{fontSize:'14px'}} className="mb-0 mt-2">Action</p>
+</div>
+
+                              <div id="hidegidvewlistviewbutton" className="view-buttons  bordernewr">
+                                <div className="d-flex justify-content-center gap-4 mt-2">
                                 <button  type="button" className="btn  btngridview mt-0 grid-view newl active"    
                                 onClick={(event: any = null, siteIdToUpdate: string = null)=>myRequest(event) }>
-                                          
-                                  <img className="sidebariconssmall" src={listicon5}></img> Grid View
+                                     <span className="mt-2 mb-1" data-tooltip='Grid View'>
+                                           
+                                  <img className="sidebariconssmall" src={listicon5}></img> </span>  
                                 </button>
                                 <button type="button" className="btn btnlistview list-view mt-0" onClick={(event:any)=>MyrequestshowListView('ListViewComponent')}>
-                               
-                                  <img className="sidebariconssmall" src={listicon6}></img> &nbsp;List View
+                                <span className="mt-2 mb-1" data-tooltip='List View'>
+                                  <img className="sidebariconssmall" src={listicon6}></img> &nbsp;</span>
                                 </button>
+                                </div>
+                                <p style={{fontSize:'14px'}} className="mb-0 mt-2">View</p>
                  
                           </div>
+                          <div className="missing-link">
+                          <button type="button" className="btn  grid-view notactive mt-2"    
+                                onClick={()=>window.open('https://officeindia.sharepoint.com/sites/Intranetdemos/SitePages/CheckUrl.aspx' , "_blank") }>
+                                                                         <span className="mt-2 mb-1" data-tooltip='Check Mission Link'>
+
+                                                                         
+                                  <img className="sidebariconssmall" src={listicon1}></img> </span>
+                                  {/* Check Missing Links */}
+                                </button>
+                                <p style={{fontSize:'14px'}} className="mb-0 mt-2"> Link </p>
+                                </div>
                           {displayuploadfileandcreatefolder && (
     <div id="createuploadfilecont" className="createuploadfilecont mt-2"> 
-    <button
+     {/* srs 25/11/25 */}
+    <button type = "button"
        className="mybutton1 mt-0"
        id="createFileButton"
        onClick={() => handleButtonClickShow("UploadFile")}
@@ -22384,8 +22456,8 @@ librarydiv.appendChild(mainContainer)
      >
        + Create Folder
      </button> */}
-
-     <button
+ {/* srs 25/11/25 */}
+     <button type = "button"
        className="mybutton2 mt-0"
        id="CreateFolder"
        onClick={() => handleButtonClickShow("CreateFolder")}
@@ -22607,11 +22679,15 @@ librarydiv.appendChild(mainContainer)
                       
                       </div>
                     </div>
+
+                    
+                    
                     <div className="librarydata">
                       {showDeletepopup && (
                         <div className="popup">This is a small popup!</div>
                       )}
                        {/* Start Code Update by Amjad */}
+                       <div className="bgnewwhite">
                       <div className="row">
                         <div className="col-xl-7">
                       <div
@@ -22672,10 +22748,12 @@ librarydiv.appendChild(mainContainer)
                       </div>
 
   </div>
-  </div>
+  </div></div>
                    {/* End Code Update by Amjad */} 
+                   <div className="bgnewwhite1">
+                       <div id="files-container" className="buttonalignment">
 
-                       <div id="files-container" className="buttonalignment"></div>
+                       </div>  </div>
                        <div id="loader2" style={{
                             display: "none",
                             textAlign: "center",
@@ -22749,6 +22827,37 @@ librarydiv.appendChild(mainContainer)
         context={props.context}
         />
       )}
+ {/* srs 25/11/25 */}
+{listorgriddata === 'CreateFolder' && (
+         <CreateFolder  OthProps={{
+          "Entity" : currentEntity,
+          "Entityurl": currentEntityURL,
+          "siteID": currentsiteID,
+          "Devision":  currentDevision,
+          "Department" : currentDepartment,
+          "DocumentLibrary": currentDocumentLibrary,
+          "Folder" :currentFolder,
+          "folderpath": currentfolderpath,
+          "IsFolderDeligationUser":`${IsFolderDeligationUser}`,
+           "IsExternal":`${IsExternal}`,
+         }}
+         onReturnToMain={handleReturnToMain} />
+      )}
+ {/* srs 25/11/25 */}
+{listorgriddata === 'UploadFile' && (
+                      <UploadFile
+                      currentfolderpath={{
+                         "Entity" : currentEntity,
+                         "Entityurl": currentEntityURL,
+                         "siteID": currentsiteID,
+                         "Devision":  currentDevision,
+                         "Department" : currentDepartment,
+                         "DocumentLibrary": currentDocumentLibrary,
+                         "Folder" :currentFolder,
+                         "folderpath": currentfolderpath
+                        }}
+                        onReturnToMain={handleReturnToMain} />
+                      )}
       {navItems.some(item => item.DocumentCategory === listorgriddata) ? (
     //   <DocumentTemplate 
     //  selectedCategory={listorgriddata}
@@ -22772,7 +22881,7 @@ librarydiv.appendChild(mainContainer)
 }
 
                      
-                    </div>
+                  </div>
                 
               <div className="Manageworkflow">
            
@@ -22780,7 +22889,8 @@ librarydiv.appendChild(mainContainer)
                   </div>
                 ) : (
                   <div>
-                    {activeComponent === "UploadFile" && (
+                     {/* srs 25/11/25 */}
+                    {/* {activeComponent === "UploadFile" && (
                       <UploadFile
                       currentfolderpath={{
                          "Entity" : currentEntity,
@@ -22794,8 +22904,9 @@ librarydiv.appendChild(mainContainer)
                         }}
                         onReturnToMain={handleReturnToMain}
                       />
-                    )}
-                      {activeComponent === "CreateFolder" && (
+                    )} */}
+                     {/* srs 25/11/25 */}
+                      {/* {activeComponent === "CreateFolder" && (
                     <CreateFolder  OthProps={{
                       "Entity" : currentEntity,
                       "Entityurl": currentEntityURL,
@@ -22809,7 +22920,7 @@ librarydiv.appendChild(mainContainer)
                        "IsExternal":`${IsExternal}`,
                      }}
                      onReturnToMain={handleReturnToMain} />
-                    )}
+                    )} */}
                   
                    
                   </div>

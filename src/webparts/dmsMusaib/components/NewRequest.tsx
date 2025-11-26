@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { initializeIcons } from '@fluentui/react/lib/Icons';
 import styles from './NewRequest.module.scss';
-
+let addnew1 = require('../assets/addnew.png')
+let submitnew = require('../assets/submit-new.png')
+let cancelnew = require('../assets/cancelnew.png')
 initializeIcons();
 
 import {
@@ -719,12 +721,17 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
     };
 
     return (
-        <div className={styles.newRequest}>
-            <h2>New Request</h2>
+        <div>
+        <div style={{display:'grid'}}>
+        <div className='card mar-9011'>
+            <div className='card-body'>
+
+          
+            <h2 className='mb-3 fw-bold text-dark header-title'>New Request</h2>
 
             {/* Project Information Section */}
             <div className={styles.section}>
-                <h3 >Project Information</h3>
+                <h3 className='font-16 fw-bold text-dark mb-1'>Project Information</h3>
                 {alertMessage && (
                     <div className={styles.customAlert}>
                         <span>{alertMessage}</span>
@@ -816,16 +823,24 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
                 </div>
             </div>
 
+            </div>
+            </div>
             {/* Deliverables Section */}
+            <div className='card'>
+            <div className='card-body'>
             <div className='d-flex align-items-center  justify-content-between mb-2'>
                     <h4 style={{margin:'0px'}} className='font-16 fw-bold text-dark mb-0'>Deliverables</h4>
-                    <IconButton
+                    <span className="mb-1 mt-2" data-tooltip="Add">
+                         <img onClick={addDeliverableRow}  src={addnew1}></img> </span>
+                    
+                    
+                    {/* <IconButton
                         iconProps={{ iconName: 'Add' }}
                         title="Add Row"
                         ariaLabel="Add Row"
                         onClick={addDeliverableRow}
                         className={styles.addButton}
-                    />
+                    /> */}
                 </div>
             <div className={styles.tableWrapper}>
                
@@ -936,9 +951,27 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
                     </tbody>
                 </table>
             </div>
-
+            </div>
+            </div>
+           
             <div className={styles.buttonRow}>
-                <PrimaryButton
+
+                <div   onClick={handleSubmit} className='me-2 mt-0 btncolorCreate1'>
+                <span className="mb-1 mt-2" data-tooltip="Submit">
+                <img   src={submitnew}></img>
+
+                </span>
+
+                </div>
+                <div     onClick={handleCancel} className='me-2 mt-0 btncolorCreate1'>
+                <span className="mb-1 mt-2" data-tooltip="Cancel">
+                <img  src={cancelnew}></img>
+                </span>
+
+                </div>
+               
+               
+                {/* <PrimaryButton
                     text="Submit"
                     iconProps={{ iconName: 'CheckMark' }}
                     onClick={handleSubmit}
@@ -949,7 +982,7 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
                     iconProps={{ iconName: 'Cancel' }}
                     onClick={handleCancel}
                     className={styles.cancelButton}
-                />
+                /> */}
             </div>
             {/* Custom Popup */}
             <CustomPopup
@@ -962,7 +995,7 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
                 onClose={handleCloseValidation}
                 onSuccessOk={handleSuccessOk}
             />
-        </div>
+       </div></div>
     );
 };
 

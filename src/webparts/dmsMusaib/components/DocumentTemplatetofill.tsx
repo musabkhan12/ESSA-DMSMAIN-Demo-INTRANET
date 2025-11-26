@@ -1,3 +1,7 @@
+
+let submitnew = require('../assets/submit-new.png')
+let cancelnew = require('../assets/cancelnew.png')
+let fullw = require('../assets/fulls.png')
 // import React, { useState, useEffect } from "react";
 // import Swal from "sweetalert2";
 // import { getSP } from "../loc/pnpjsConfig";
@@ -1809,44 +1813,14 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
     }
 
     return (
-        <div style={{ padding: "0px", fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
+        <div  style={{ fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
             {editUrl ? (
                 <div>
+                    <div className="Newfilealign">
+
                     <div style={{ marginBottom: "15px", display: "flex", justifyContent:"end", gap: "10px", flexWrap: "wrap" }}>
                      
-                         <button 
-                            style={{ 
-                                padding: "10px 15px", 
-                                border: "none", 
-                                borderRadius: "4px", 
-                                cursor: "pointer", 
-                                fontWeight: "600", 
-                                backgroundColor: "#008751", 
-                                color: "white", marginTop:"0px",
-                                transition: "background-color 0.3s ease"
-                            }}
-                            onMouseOver={(e) => {
-                                const target = e.target as HTMLButtonElement;
-                                target.style.backgroundColor = "#106ebe";
-                            }}
-                            onMouseOut={(e) => {
-                                const target = e.target as HTMLButtonElement;
-                                target.style.backgroundColor = "#008751";
-                            }}
-                            onClick={handleSubmit}
-                        >
-                            Submit Edited File
-                        </button>
-                          <button onClick={()=>window.location.reload()}  style={{ 
-                                padding: "10px 15px", 
-                                border: "none", 
-                                borderRadius: "4px", 
-                                cursor: "pointer", 
-                                fontWeight: "600", 
-                                backgroundColor: "#008751", 
-                                color: "white", marginTop:"0px",
-                                transition: "background-color 0.3s ease"
-                            }} >Cancel</button>
+                        
                       {/* <button
                             style={{ 
                                 padding: "10px 15px", 
@@ -1874,36 +1848,49 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
                         >
                             {isFullScreen ? "Exit Full Screen" : "Full Screen"}
                         </button> */}
-                        <button
-    type="button"   // ⬅ prevents form submission / page reload
+                        <div
+     // ⬅ prevents form submission / page reload
     style={{ 
-        padding: "10px 15px", 
+       
         border: "none", 
-        borderRadius: "4px", 
+       
         cursor: "pointer",  marginTop:"0px",
         fontWeight: "600", 
-        backgroundColor: "#6c757d", 
-        color: "white",
+        
         position: isFullScreen ? "fixed" : "static",
         top: isFullScreen ? "10px" : "auto",
         right: isFullScreen ? "10px" : "auto",
-        zIndex: 10000,
+        zIndex: 10000, background:'#fff', padding:'6px',
         transition: "background-color 0.3s ease"
     }}
-    onMouseOver={(e) => {
-        const target = e.target as HTMLButtonElement;
-        target.style.backgroundColor = "#5a6268";
-    }}
-    onMouseOut={(e) => {
-        const target = e.target as HTMLButtonElement;
-        target.style.backgroundColor = "#6c757d";
-    }}
+    // onMouseOver={(e) => {
+    //     const target = e.target as HTMLButtonElement;
+    //     target.style.backgroundColor = "#5a6268";
+    // }}
+    // onMouseOut={(e) => {
+    //     const target = e.target as HTMLButtonElement;
+    //     target.style.backgroundColor = "#6c757d";
+    // }}
     onClick={() => setIsFullScreen(!isFullScreen)}
 >
-    {isFullScreen ? "Exit Full Screen" : "Full Screen"}
-</button>
+{
+  isFullScreen ? (
+    <span className="mb-1 mt-2" data-tooltip="Exit Full Screen">
+      <img src={fullw} alt="Exit Full Screen" />
+    </span>
+  ) : (
+    <span className="mb-1 mt-2" data-tooltip="Full Screen">
+      <img src={fullw} alt="Full Screen" />
+    </span>
+  )
+}
+
+    {/* <span className="mb-1 mt-2" data-tooltip="Full Screen">
+                              <img  src={fullw}></img></span> */}
+</div>
 
                     </div>
+                   
                     
                     <div style={{ 
                         border: "1px solid #ddd", 
@@ -1928,22 +1915,12 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
                             title="Editable Document"
                             allowFullScreen
                         ></iframe>
-                    </div>
+                    </div> </div>
                     
-                    <div style={{ 
-                        marginTop: "20px", 
-                        padding: "15px", 
-                        backgroundColor: "#f8f9fa", 
-                        borderRadius: "4px",
-                        border: "1px solid #e9ecef"
-                    }}>
-                        <h3 style={{ 
-                            marginTop: "0", 
-                            color: "#323130", 
-                            borderBottom: "2px solid #008751", 
-                            paddingBottom: "8px",
-                            fontSize: "1.25rem"
-                        }}>
+                    <div className="card mar-90">
+                    <div className="card-body">
+                        <h3 className="mb-1 fw-bold text-dark header-title"
+                        >
                             Approval Hierarchy
                         </h3>
                         <table style={{ 
@@ -1954,8 +1931,8 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
                             <thead>
                                 <tr>
                                     <th style={{ 
-                                        backgroundColor: "#008751", 
-                                        color: "white", 
+                                        backgroundColor: "#f6f9fc", 
+                                        color: "6f6f6f", 
                                         textAlign: "left", 
                                         padding: "12px",
                                         fontSize: "0.9rem"
@@ -1963,8 +1940,8 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
                                         User
                                     </th>
                                     <th style={{ 
-                                        backgroundColor: "#008751", 
-                                        color: "white", 
+                                         backgroundColor: "#f6f9fc", 
+                                         color: "6f6f6f",
                                         textAlign: "left", 
                                         padding: "12px",
                                         fontSize: "0.9rem"
@@ -1972,8 +1949,8 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
                                         Level
                                     </th>
                                     <th style={{ 
-                                        backgroundColor: "#008751", 
-                                        color: "white", 
+                                          backgroundColor: "#f6f9fc", 
+                                          color: "6f6f6f",
                                         textAlign: "left", 
                                         padding: "12px",
                                         fontSize: "0.9rem"
@@ -2008,10 +1985,10 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
           {item.Emails.join(", ")}
         </td>
         <td style={{ padding: "12px", fontSize: "0.9rem" }}>
-          {item.Level}
+         <span className="circlelevel">{item.Level}</span> 
         </td>
         <td style={{ padding: "12px", fontSize: "0.9rem" }}>
-          {getApprovalTypeText(item.ApprovalType)}
+        <span className="appbg">  {getApprovalTypeText(item.ApprovalType)} </span>
         </td>
       </tr>
     ))
@@ -2028,7 +2005,28 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
                             </tbody>
                         </table>
                     </div>
+                   
                 </div>
+                <div className="d-flex justify-content-end gap-3 mt-3 mar-90">
+                    <button className="btncolorCreate1 mt-0"
+                            
+                            // onMouseOver={(e) => {
+                            //     const target = e.target as HTMLButtonElement;
+                            //     target.style.backgroundColor = "#106ebe";
+                            // }}
+                            // onMouseOut={(e) => {
+                            //     const target = e.target as HTMLButtonElement;
+                            //     target.style.backgroundColor = "#008751";
+                            // }}
+                            onClick={handleSubmit}
+                        > <span className="mb-1 mt-2" data-tooltip="Submited Edited File ">
+                              <img  src={submitnew}></img></span>
+                           
+                        </button>
+                          <button className=" btncolorCreate1 mt-0" onClick={()=>window.location.reload()} 
+                            > <span className="mb-1 mt-2" data-tooltip="Cancel">
+                             <img  src={cancelnew}></img></span> </button>
+          </div></div>
             ) : (
                 <div style={{ textAlign: "center", padding: "40px" }}>
                     <p style={{ marginBottom: "15px", color: "#323130", fontSize: "18px" }}>Loading document from template...</p>

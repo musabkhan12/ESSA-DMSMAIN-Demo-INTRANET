@@ -557,7 +557,7 @@ a:hover
   background-color: #66AEE0;
 }
 .newbutton img{
-  filter: brightness(0);
+  /* filter: brightness(0); */
 }
 .btngridview {
   margin-right: -8px;
@@ -566,7 +566,7 @@ a:hover
 
 }
 .newbutton button:hover img{
-  filter: brightness(0) invert(1);
+  filter: sepia(0) saturate(1) hue-rotate(-50deg) brightness(.8);
 }
 #userSelect {
     width: 100%;
@@ -843,7 +843,7 @@ top: 0;
 }
 #hidegidvewlistviewbutton button:hover svg, #hidegidvewlistviewbutton2 button:hover svg, #createuploadfilecont button:hover svg{color: #fff !important ;}
 .search-container input{padding: 10px 14px;
-  background: #fff !important;
+  background: #fff !important;    margin-bottom: 12px;
   border-radius: 5px;}
   .searchbutton{
     position: absolute;
@@ -853,9 +853,26 @@ top: 0;
   }.searchbutton img{
     width: 20px;
   }
+  #hidegidvewlistviewbutton button:hover{
+    background: transparent !important;
+    
+
+  }
+  #hidegidvewlistviewbutton button:hover img,.notactive:hover img,.tool .btn-primary:hover img{
+  filter: sepia(0) saturate(1) hue-rotate(-50deg) brightness(.8);
+  }
   #files-container .card{
     width: 32.1%; margin: 5px; float: left;
   } 
+  .tool .btn-primary:hover{
+    background: transparent !important; color: #000 !important;
+  }
+  .newsmart{
+
+    
+    position: relative;
+    top: -98px;    border-bottom: 10px solid #eaeaea;
+  }
  #files-container .card {
     border: 2.2px dotted #c9c9c9 !important;
     border-radius: 0px !important;
@@ -912,9 +929,9 @@ top: 0;
   
   text-overflow: ellipsis;
 }
-   .newbutton button{height: 38px; font-size: 14px; padding: 9px 7px !important;
+   .newbutton button{height: 27px; font-size: 14px; padding: 0px 0px !important;
   color: #000; border-radius: 4px;
-  background: var(--light-color);
+  background: transparent !important;
   }
 .filestatus {
   font-size: 11px;

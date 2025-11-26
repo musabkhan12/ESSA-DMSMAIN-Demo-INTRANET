@@ -25,18 +25,25 @@
 }
 
 .sidebariconssmall{
-  width: 14px; margin-top: -2px;
+  width: 14px; 
 }
+.tool img{width: auto !important;}
+.bgnewwhite{background: #fff; padding: 12px 12px 0px 12px;}
+.bgnewwhite1{background: #fbfbfb; padding: 12px;}
 .librarydata{
   /* margin-top: 3rem; */
   /* padding: 20px; */
   margin-top: 0rem;
  
  overflow: initial !important;
-  width: 80%; background: #fff; padding:15px;
-  float: left; margin-top: 10px;  margin-left:10px; border-radius: 5px;
+  width: 80%;  padding:0px;
+  float: left; margin-top: 10px;  margin-left:10px; border-radius: 0px;
 
+}.newright{
+  border-left:1px solid #dfdfdf; width: 170px; display: block; text-align: center;
 }
+.bordernewr{border-left:1px solid #dfdfdf; width: 100px;text-align: center; display: block !important;}
+.missing-link{width: 80px; text-align: center; border-left: 1px solid #dfdfdf;}
 .cardsearch{    border: 1px solid #2c9942 !important;
   border-radius: 6px !important;
   float: left;
@@ -784,7 +791,7 @@ label{font-size: 0.875rem !important; font-weight: 400 !important; color: #6c757
   width: 19%;
   float: left;
   padding: 5px 10px;
-  position: relative; background:#fff; margin-top: 10px; border-radius: 5px;
+  position: relative; background:#fff; margin-top: 10px; border-radius: 0px;
 }
 #folderContainer2{
     /* width: 17rem; */
@@ -839,7 +846,7 @@ border-radius: 5px;}
 }
 #showfolderpermission h5{    margin: inherit;
   margin-bottom: 3px !important;}
-#hidegidvewlistviewbutton button,   #hidegidvewlistviewbutton2 button{font-size: 14px; margin-top: 5px;}
+#hidegidvewlistviewbutton button,   #hidegidvewlistviewbutton2 button{font-size: 14px; margin-top: 5px; border: 0px solid #ccc !important;}
 #hidegidvewlistviewbutton button .active svg,  #hidegidvewlistviewbutton2 button .active svg{color:#fff !important}
 
 
@@ -966,12 +973,28 @@ text-align: center;}
   color: white;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 9px;
 }
 .CardTextContainer{
   padding-left: 0px;
 }
-
+.buttonstyle12{position: relative; top:-100px;}
+.btncolorCreate1{    background: #fff;
+  border-radius: 1000px;
+  height: 50px;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px !important;}
+  .btncolorCreate1:hover{
+    background: #fff !important;
+  }
+  .cancelnewi{
+    margin-left: 2px;
+    margin-top: -3px;
+  }
+.card{border-radius: 0px !important; border: 0px;}
 .flexContainer-75, .ms-TooltipHost, .root-53, .root-61 {
   display: block !important;
 }
@@ -1082,11 +1105,150 @@ text-align: center;}
 
  
 }
+
+.mar-90{margin-top: -80px;}
+.mar-9011{margin-top: -90px; border-bottom: 10px solid #eaeaea; }
+.appbg{    background-color: #d5efd6;
+  color: #008751;
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-top: 0px;
+  float: left;}
+.circlelevel{border-radius: 1000px;
+  color: #696969;
+  font-size: 14px;
+  font-weight: 600;
+  height: 33px;
+  text-align: center;
+  width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f2f5f8;}
+.Newfilealign{position: relative; background: #fff; padding: 12px; top: -90px;}
 .notactive:hover,.newho:hover,.btnlistview:hover{color: #fff;}
 .notactive:hover img,.newho:hover img,.btnlistview:hover img{
-  filter: brightness(0) invert(1);
+  // filter: sepia(0) saturate(1) hue-rotate(-50deg) brightness(0.8);
 }
 #hidegidvewlistviewbutton .active img{
-  filter: brightness(0) invert(1);
+  // filter: sepia(0) saturate(1) hue-rotate(-50deg) brightness(0.8);
+}
+
+/* Add this attribute to the element that needs a tooltip */
+ [data-tooltip] {
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+}
+
+/* Hide the tooltip content by default */
+ [data-tooltip]:before,
+[data-tooltip]:after {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Position tooltip below the element with a box shadow */
+[data-tooltip]:before {
+  position: absolute;
+  top: 120%;  /* Move tooltip below the element */
+  left: 50%;
+  margin-top: 10px; /* Space between element and tooltip */
+  margin-left: -80px; /* Center the tooltip horizontally */
+  padding: 7px;
+  width: 120px; /* Adjusted width */
+  border-radius: 0px; /* Rounded corners */
+  background-color: #333; /* Dark background for visibility */
+  color: #fff; /* White text */
+  content: attr(data-tooltip);
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.2;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Add box shadow */
+  white-space: break-spaces;
+}
+
+/* Triangle hack to make tooltip look like a speech bubble */
+ [data-tooltip]:after {
+  position: absolute;
+  top: 29px;  /* Position the arrow above the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  width: 0;
+  border-bottom: 5px solid #333; /* Match the tooltip background */
+  border-right: 5px solid transparent;
+  border-left: 5px solid transparent;
+  content: " ";
+  font-size: 0;
+  line-height: 0;
+}
+button [data-tooltip]:after{
+  top: 42px;
+}
+/* Show tooltip content on hover */
+ [data-tooltip]:hover:before,
+ [data-tooltip]:hover:after {
+  visibility: visible;
+  opacity: 1;
+}
+/* Add this attribute to the element that needs a tooltip */
+.tool [data-tooltip] {
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+}
+
+/* Hide the tooltip content by default */
+.tool [data-tooltip]:before,
+.tool [data-tooltip]:after {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Position tooltip below the element with a box shadow */
+.tool [data-tooltip]:before {
+  position: absolute;
+  top: 120%;  /* Move tooltip below the element */
+  left: 50%;
+  margin-top: 10px; /* Space between element and tooltip */
+  margin-left: -80px; /* Center the tooltip horizontally */
+  padding: 7px;
+  width: 160px; /* Adjusted width */
+  border-radius: 0px; /* Rounded corners */
+  background-color: #333; /* Dark background for visibility */
+  color: #fff; /* White text */
+  content: attr(data-tooltip);
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.2;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Add box shadow */
+  white-space: break-spaces;
+}
+
+/* Triangle hack to make tooltip look like a speech bubble */
+.tool [data-tooltip]:after {
+  position: absolute;
+  top: 25px;  /* Position the arrow above the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  width: 0;
+  border-bottom: 5px solid #333; /* Match the tooltip background */
+  border-right: 5px solid transparent;
+  border-left: 5px solid transparent;
+  content: " ";
+  font-size: 0;
+  line-height: 0;
+}
+
+/* Show tooltip content on hover */
+.tool [data-tooltip]:hover:before,
+.tool [data-tooltip]:hover:after {
+  visibility: visible;
+  opacity: 1;
+}
+.btn-group #dropdown-left .dropdown-toggle:after{
+  display: none !important;
 }
 .buttonalignment button{right:40px !important;    top: 22.6% !important;}
