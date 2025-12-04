@@ -14,7 +14,9 @@ declare global {
     confirmUndo:(fileId:any, siteId:any, FileMasterList:any, documentLibraryName:any, ID:any,folderPath:any,fileName:any) =>void;
     hideSharePopUp : ()=>void;
     revokeAccess :  (UserArray:string,FileName:string,fileId:any,siteId:any,folderpath:any)=>void
-    RenameFile : (FileName:string ,CurrentFolderPath:string  ,SiteID:string ,myrequest:any,FileUID:string , SiteName:any) =>void
+    RenameFile : (FileName:string ,CurrentFolderPath:string  ,SiteID:string ,myrequest:any,FileUID:string , SiteName:any) =>void;
+    triggerPowerAutomateFlow : (siteID:string,documentLibraryName:string,folderPath:string,fileName:string,actionType:string) => void;
+    triggerPowerAutomateversionFlow : (siteID:string,documentLibraryName:string,folderPath:string,fileName:string,actionType:string) => void;
   }
 
 }
@@ -158,10 +160,11 @@ let Undo = require('../assets/Undo.svg');
 let sharewithmeicon = require('../assets/sharen.png')
 let recyclebin = require('../assets/recyn.png')
 let sharewithothericon = require('../assets/shar12.png')
+let sharenew = require('../assets/Newshare.png')
 let starticon = require('../assets/myfav.png')
 let listicon = require('../assets/uploadfile.png')
-let create1 = require('../assets/create1.png')
-let create2 = require('../assets/create2.png')
+let create1 = require('../assets/uploafnew.png')
+let create2 = require('../assets/createnew.png')
 let listicon1 = require('../assets/link.png')
 let listicon2 = require('../assets/newr.png')
 let listicon3 = require('../assets/bupload.png')
@@ -205,6 +208,7 @@ let manageWorkFlowIcon =  require('../assets/ManageWorkflow.svg')
 let viewIcon =  require('../assets/View.svg')
 // import viewIcon from '../assets/View.svg';
 let editIcon =  require('../assets/Edit.svg')
+
 // import editIcon from '../assets/Edit.svg';
 let deleteIcon =  require('../assets/Delete.svg')
 // import deleteIcon from '../assets/Delete.svg';
@@ -258,6 +262,28 @@ const ArgPoc = ({ props }: any) => {
   const [showfolderpermission, setShowfolderpermission] = useState(false);
 
     const [showBulkUpload, setshowBulkUpload] = useState(false);
+    const [flowResponse, setFlowResponse] = useState<any>(null); 
+    const [AILoading, setAILoading] = useState(false); 
+    // useEffect(() => {
+    //   const element = document.querySelector(".buttonalignment");
+    
+    //   if (!element) return;
+    
+    //   if (flowResponse && !AILoading) {
+    //     element.classList.add("Airesponse");
+    //   } else {
+    //     element.classList.remove("Airesponse");
+    //   }
+    // }, [flowResponse, AILoading]);
+    useEffect(() => {
+      const element = document.querySelector(".buttonalignment");
+    
+      if (!element) return;
+    
+      if (!flowResponse) {
+        element.classList.remove("Airesponse");
+      } 
+    }, [flowResponse]);
   let cleanUrlInMyRequest=false;
   // const handleButtonClickShow = () => {
   //   setShowFirstDiv(false);
@@ -3890,7 +3916,7 @@ const myrequestbuttonclick =()=>{
 
 // pagination
 const getdoclibdata = async (FolderPath: any, siteID: any, docLibName: any, searchText: any = null) => {
-    console.log(searchText.value + "searchText text")
+    // console.log(searchText.value + "searchText text")
    routeToDiffSideBar="documentLibrary";
     const site = await sp.site.select("Url")();
     const fullUrl = site.Url;
@@ -4059,7 +4085,8 @@ const renderPagination = (totalItems: number) => {
 
         if (currentPageFiles.length === 0) {
             const noFileMessage = document.createElement("p");
-            noFileMessage.textContent = "No files found.";
+            noFileMessage.classList.add("bg-class-name");
+            noFileMessage.textContent = "";
             noFileMessage.style.color = "gray";
             noFileMessage.style.fontSize = "16px";
             noFileMessage.style.textAlign = "center";
@@ -4118,7 +4145,8 @@ const renderPagination = (totalItems: number) => {
                         console.log(response, "response")
                     } catch (error) {
                         const container = document.getElementById("files-container");
-                        noFileMessage.textContent = "No files found.";
+                        noFileMessage.classList.add("bg-class-name");
+                        noFileMessage.textContent = "";
                         noFileMessage.style.color = "gray";
                         noFileMessage.style.fontSize = "16px";
                         noFileMessage.style.textAlign = "center";
@@ -4297,7 +4325,8 @@ const renderPagination = (totalItems: number) => {
                         console.log(response, "response")
                     } catch (error) {
                         const container = document.getElementById("files-container");
-                        noFileMessage.textContent = "No files found.";
+                        noFileMessage.classList.add("bg-class-name");
+                        noFileMessage.textContent = "";
                         noFileMessage.style.color = "gray";
                         noFileMessage.style.fontSize = "16px";
                         noFileMessage.style.textAlign = "center";
@@ -5483,6 +5512,35 @@ const createFileExtensionHtml=(FileName:any)=>{
   </div>`;
   return fileIconHtml;
 }
+
+// om changes for file size in kb and mb
+const fixSize = (value: number): string => {
+ 
+  // if null/undefined
+  if (value == null) return "0 B";
+ 
+  // CASE 1: value is very small float (like 0.04, 0.6) → it's MB!
+  if (value > 0 && value < 10 && value % 1 !== 0) {
+    const bytes = value * 1024 * 1024; // convert MB → bytes
+    return formatSize(bytes);
+  }
+ 
+  // CASE 2: value looks like KB (100–9000)
+  if (value >= 100 && value < 10000) {
+    const bytes = value * 1024; // convert KB → bytes
+    return formatSize(bytes);
+  }
+ 
+  // CASE 3: already bytes
+  return formatSize(value);
+};
+ 
+// helper
+const formatSize = (bytes: number): string => {
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
+  return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+};
 const createFileCardForDocumentLibrary=(file:any,fileIcon:any,siteID:string,IsHardDelete:boolean,docLibName:string,displayPropertyforUnFillFavourite:any,displayPropertyforFillFavourite:any,favouriteText:any,permission:any,FolderPath:any)=>{
   // console.log("permission",permission);
   const extensionHtml=createFileExtensionHtml(file.Name);
@@ -5497,7 +5555,7 @@ const createFileCardForDocumentLibrary=(file:any,fileIcon:any,siteID:string,IsHa
          <div class="col-md-10 pe-0">
          <div class="CardTextContainer">
         <p style="cursor: pointer;" class="p1st" title="${file.Name}" onclick="PreviewFile('${file.ServerRelativeUrl}', '${siteID}' , '${docLibName}','${file.ListItemAllFields.Status}')">${file.Name}</p>
-          <p class="p3rd">${((file.Length as unknown as number) / (1024 * 1024)).toFixed(2)} MB</p>
+            <p class="p3rd">${fixSize(file.Length as unknown as number)}</p>
          </div>
          </div>
          </div>
@@ -5845,30 +5903,23 @@ window.versionHistory=async(fileName:string,folderPath:string,siteId:string,flag
 // Create the blurred overlay
 const blurOverlay = document.createElement("div");
 blurOverlay.id = "blurOverlay";
-blurOverlay.style.cssText = `
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100vw;
-  background-color: rgba(0, 0, 0, 0.2);
-  z-index: 9998;
-`;
-document.body.appendChild(blurOverlay);
+
+//document.body.appendChild(blurOverlay);
+
   // Create the popup dynamically
   const popupContainer = document.createElement("div");
   popupContainer.style.cssText = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
-    width: 60%;
-     z-index:9999;
+    position: absolute;
+    top: 20%;
+    left: 8%;
+   
+    z-index: 2;
+    
+    
     background-color: white;
-    border: 1px solid #ccc;
+   
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    border-radius: 5px;
     padding: 20px;
     overflow-y: auto;
   `;
@@ -5878,12 +5929,13 @@ document.body.appendChild(blurOverlay);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: bold;
-    margin-bottom: 20px;
+    margin-bottom: 20px;border-bottom: 1px solid #dfdfdf;
+    padding-bottom: 10px;
   `;
   popupHeader.innerHTML = `
-    <span>Version History</span>
+    <span style="    color: #4c4c4c;">Version History</span>
     <span style="cursor: pointer; font-size: 1.2rem;" id="closePopup">x</span>
   `;
 
@@ -5907,23 +5959,22 @@ document.body.appendChild(blurOverlay);
           (version) => `
         <tr>
         ${version.IsCurrentVersion ? `<td style="padding: 8px; border-bottom: 1px solid #eee;">
-            <a href="javascript:void(0);"
+           <span style="background:#bbd6f3; color:#0263d1; border-radius:4px; font-weight:600; padding:3px 7px">  <a href="javascript:void(0);"
               style="text-decoration: none; color: blue; cursor: pointer;"
               onclick="Download('${fileId}','${siteId}')"
               >
               ${version?.VersionLabel}
-            </a>
+            </a> </span>
           </td>` : `<td style="padding: 8px; border-bottom: 1px solid #eee;">
-            <a href="${version["odata.id"]?.split('/_api/')[0]}/${version?.Url}"
+           <span style="background:#bbd6f3; color:#0263d1; border-radius:4px; font-weight:600; padding:3px 7px"> <a href="${version["odata.id"]?.split('/_api/')[0]}/${version?.Url}"
               style="text-decoration: none; color: blue; cursor: pointer;">
               ${version?.VersionLabel}
-            </a>
+            </a> </span>
           </td>`}
-          <td style="padding: 8px; border-bottom: 1px solid #eee;">${new Date(
-            version.Created
-          ).toLocaleString()}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee;">
+          <span style="background:#ebf1f8; border:1px solid #c4d6ea; border-radius:4px; padding:3px 7px">${new Date( version.Created).toLocaleString()}</td>
           <td style="padding: 8px; border-bottom: 1px solid #eee;">${version.CreatedBy.Title}</td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee;">${((version.Size as unknown as number) / (1024 * 1024)).toFixed(2)} MB</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee;"><span style="background:#ebf1f8; border:1px solid #c4d6ea; border-radius:4px; padding:3px 7px">${((version.Size as unknown as number) / (1024 * 1024)).toFixed(2)} MB </span> </td>
         </tr>
       `
         )
@@ -5934,13 +5985,24 @@ document.body.appendChild(blurOverlay);
   popupContainer.appendChild(popupHeader);
   popupContainer.appendChild(table);
 
-  document.body.appendChild(popupContainer);
+  //document.body.appendChild(popupContainer);
+  const checkInterval = setInterval(() => {
+    const container = document.querySelector('.librarydata');
+    if (container) {
+      container.appendChild(blurOverlay);
+      container.appendChild(popupContainer);
+      clearInterval(checkInterval);
+    }
+  }, 100);
 
   // Close popup event
-  document.getElementById("closePopup")?.addEventListener("click", () => {
-    popupContainer.remove();
-    blurOverlay.remove(); // Remove the blur background
-  });
+  const closeBtn = popupHeader.querySelector('#closePopup') as HTMLElement | null;
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      popupContainer.remove();
+      blurOverlay.remove(); // Remove the blur background
+    });
+  }
 
 
     } catch (error) {
@@ -6885,264 +6947,416 @@ function PreviewFileFromMail (path :any , SiteID:any , docLibName:any,status:str
 //   }
    
 //   }
-// this is working fine preview code without even flicker
-window.PreviewFile = function(path :any , SiteID:any , docLibName:any, status:string , filepreviewurl){
-  // console.log(docLibName , "docLibName")
-  console.log("Status",status);
-  console.log(filepreviewurl , "filepreviewurl")
-  console.log("path",path);
-  const segments = path.split('/');
-  // extarct the current entity start
-    const currentSubsite = segments[3];
-  // end
-  // Find the index of 'sites'
-  const sitesIndex = segments.indexOf('sites');
+// this is working fine preview code without even flicker and all action buttonshide
+// window.PreviewFile = function(path :any , SiteID:any , docLibName:any, status:string , filepreviewurl){
+//   // console.log(docLibName , "docLibName")
+//   console.log("Status",status);
+//   console.log(filepreviewurl , "filepreviewurl")
+//   console.log("path",path);
+//   const segments = path.split('/');
+//   // extarct the current entity start
+//     const currentSubsite = segments[3];
+//   // end
+//   // Find the index of 'sites'
+//   const sitesIndex = segments.indexOf('sites');
    
-  // If 'sites' is found and there are enough segments after it
-  let myactualdoclib
-  if (sitesIndex !== -1 && segments.length > sitesIndex + 3) {
-    myactualdoclib = segments[sitesIndex + 3];
-    console.log(myactualdoclib , "myactualdoclib")
-    // return segments[sitesIndex + 3];  // The document library is the 4th segment after 'sites'
-  } else {
-    // return null;  // Return null if not enough segments are available
-  }
-  event.preventDefault()
-  event.stopPropagation()
-  const createpreviewdiv = document.createElement('div')
-  createpreviewdiv.style.display = 'grid'
-  const previewfileframe = document.createElement('iframe')
-  previewfileframe.id = 'filePreview'
-  previewfileframe.style.width = '930px'
-  previewfileframe.style.height = '500px'
-  // Set initial display to none to prevent flicker
-  previewfileframe.style.display = 'none'
-  const librarydiv= document.getElementById('files-container')
-  const createbutton = document.createElement('button')
-  //createbutton.textContent = 'Close File preivew';
-  const closeImage = document.createElement('img');
-closeImage.src = '../../assets/fulls.png'; // Replace with your image URL
-closeImage.alt = 'Close Preview';
-closeImage.style.cursor = 'pointer'; // Make it look clickable
-closeImage.style.display = 'none'; // Initially hide the close image
-// Add the iframe and image to the container
-createpreviewdiv.appendChild(previewfileframe);
-createpreviewdiv.appendChild(closeImage);
-// Add the preview div to the page
-librarydiv.appendChild(createpreviewdiv);
-  console.log("enter here in preview : ",path)
+//   // If 'sites' is found and there are enough segments after it
+//   let myactualdoclib
+//   if (sitesIndex !== -1 && segments.length > sitesIndex + 3) {
+//     myactualdoclib = segments[sitesIndex + 3];
+//     console.log(myactualdoclib , "myactualdoclib")
+//     // return segments[sitesIndex + 3];  // The document library is the 4th segment after 'sites'
+//   } else {
+//     // return null;  // Return null if not enough segments are available
+//   }
+//   event.preventDefault()
+//   event.stopPropagation()
+//   const createpreviewdiv = document.createElement('div')
+//   createpreviewdiv.style.display = 'grid'
+//   const previewfileframe = document.createElement('iframe')
+//   previewfileframe.id = 'filePreview'
+//   previewfileframe.style.width = '930px'
+//   previewfileframe.style.height = '500px'
+//   // Set initial display to none to prevent flicker
+//   previewfileframe.style.display = 'none'
+//   const librarydiv= document.getElementById('files-container')
+//   const createbutton = document.createElement('button')
+//   //createbutton.textContent = 'Close File preivew';
+//   const closeImage = document.createElement('img');
+// closeImage.src = '../assets/fulls.png'; // Replace with your image URL
+// closeImage.alt = 'Close Preview';
+// closeImage.style.cursor = 'pointer'; // Make it look clickable
+//  // Initially hide the close image
+// // Add the iframe and image to the container
+// createpreviewdiv.appendChild(previewfileframe);
+// createpreviewdiv.appendChild(closeImage);
+// // Add the preview div to the page
+// librarydiv.appendChild(createpreviewdiv);
+//   console.log("enter here in preview : ",path)
   
-  const encodedFilePath = encodeURIComponent(path);
-  console.log(encodedFilePath, "encodedFilePath");
+//   const encodedFilePath = encodeURIComponent(path);
+//   console.log(encodedFilePath, "encodedFilePath");
    
-  // Extract the parent folder correctly
-  const parentFolder = path.substring(0, path.lastIndexOf('/'));
-  console.log(parentFolder, "parentFolder");
+//   // Extract the parent folder correctly
+//   const parentFolder = path.substring(0, path.lastIndexOf('/'));
+//   console.log(parentFolder, "parentFolder");
    
-  // Correctly encode the parent folder
-  const encodedParentFolder = encodeURIComponent(parentFolder);
+//   // Correctly encode the parent folder
+//   const encodedParentFolder = encodeURIComponent(parentFolder);
    
-  // Get the base site URL
-  const siteUrl = window.location.origin;
-  console.log(siteUrl, "siteUrl");
+//   // Get the base site URL
+//   const siteUrl = window.location.origin;
+//   console.log(siteUrl, "siteUrl");
    
-  console.log(path , ".....path")
-  if( ismyrequordoclibforfilepreview === "myRequest" || ismyrequordoclibforfilepreview === "myFavourite" || ismyrequordoclibforfilepreview  === "sharewithme" || ismyrequordoclibforfilepreview  === "sharewithothers"){
-    const previewUrl = filepreviewurl
+//   console.log(path , ".....path")
+//   if( ismyrequordoclibforfilepreview === "myRequest" || ismyrequordoclibforfilepreview === "myFavourite" || ismyrequordoclibforfilepreview  === "sharewithme" || ismyrequordoclibforfilepreview  === "sharewithothers"){
+//     const previewUrl = filepreviewurl
    
-    console.log(previewUrl, "Generated preview URL");
+//     console.log(previewUrl, "Generated preview URL");
    
-    console.log("Generated Preview URL:", previewUrl);
-    if(previewUrl){
-      librarydiv.innerHTML = "";
-      previewfileframe.src = previewUrl;
-      previewfileframe.onload = () => {
-        console.log("Iframe has loaded");
+//     console.log("Generated Preview URL:", previewUrl);
+//     if(previewUrl){
+//       librarydiv.innerHTML = "";
+//       previewfileframe.src = previewUrl;
+//       previewfileframe.onload = () => {
+//         console.log("Iframe has loaded");
    
-        const checkAndHideButton = () => {
-          // *** Key Change: Declare iframeDocument outside try block ***
-          let iframeDocument: Document | null = null;
-          try {
-            iframeDocument = previewfileframe.contentDocument || previewfileframe.contentWindow?.document;
-            if (iframeDocument) {
-              const button = iframeDocument.getElementById("OneUpCommandBar") as HTMLElement;
-              const excelToolbar = iframeDocument.getElementById("m_excelEmbedRenderer_m_ewaEmbedViewerBar") as HTMLElement;
-              // const openInAppButton=iframeDocument.getElementById('openCommandGroup') as HTMLButtonElement;
-              // console.log("openInAppButton",openInAppButton);
-              if(excelToolbar){
-                excelToolbar.style.display= "none"
-              }
-              if (button) {
-                console.log("Hiding the OneUpCommandBar element");
-                button.style.display = "none";
+//         const checkAndHideButton = () => {
+//           // *** Key Change: Declare iframeDocument outside try block ***
+//           let iframeDocument: Document | null = null;
+//           try {
+//             iframeDocument = previewfileframe.contentDocument || previewfileframe.contentWindow?.document;
+//             if (iframeDocument) {
+//               const button = iframeDocument.getElementById("OneUpCommandBar") as HTMLElement;
+//               const excelToolbar = iframeDocument.getElementById("m_excelEmbedRenderer_m_ewaEmbedViewerBar") as HTMLElement;
+//               // const openInAppButton=iframeDocument.getElementById('openCommandGroup') as HTMLButtonElement;
+//               // console.log("openInAppButton",openInAppButton);
+//               if(excelToolbar){
+//                 excelToolbar.style.display= "none"
+//               }
+//               if (button) {
+//                 console.log("Hiding the OneUpCommandBar element");
+//                 button.style.display = "none";
    
-                // Show iframe only after hiding elements
-                previewfileframe.style.display = "block";
+//                 // Show iframe only after hiding elements
+//                 previewfileframe.style.display = "block";
    
-              } else {
-                console.log("OneUpCommandBar not found, rechecking...");
-              }
+//               } else {
+//                 console.log("OneUpCommandBar not found, rechecking...");
+//               }
              
-              const helpbutton = iframeDocument.getElementById("m_excelEmbedRenderer_m_ewaEmbedViewerBar") as HTMLElement;
-              if(helpbutton){
-                helpbutton.style.display = "none"
-              }
-            }
-          } catch (error) {
-            console.error("Error accessing iframe content:", error);
-            // Show iframe on error to avoid it being hidden forever
-            previewfileframe.style.display = "block";
-          }
+//               const helpbutton = iframeDocument.getElementById("m_excelEmbedRenderer_m_ewaEmbedViewerBar") as HTMLElement;
+//               if(helpbutton){
+//                 helpbutton.style.display = "none"
+//               }
+//             }
+//           } catch (error) {
+//             console.error("Error accessing iframe content:", error);
+//             // Show iframe on error to avoid it being hidden forever
+//             previewfileframe.style.display = "block";
+//           }
    
-          // Continue checking if elements are not yet hidden
-          if (!iframeDocument || !iframeDocument.getElementById("OneUpCommandBar")) {
-            setTimeout(checkAndHideButton, 100);
-          }
-        };
+//           // Continue checking if elements are not yet hidden
+//           if (!iframeDocument || !iframeDocument.getElementById("OneUpCommandBar")) {
+//             setTimeout(checkAndHideButton, 100);
+//           }
+//         };
    
-        checkAndHideButton();
-      };
-      createpreviewdiv.appendChild(createbutton)
-      createpreviewdiv.appendChild(previewfileframe);
-      librarydiv.appendChild(createpreviewdiv)
-      createbutton.addEventListener('click', function() {
-        event.preventDefault()
-        event.stopPropagation()
+//         checkAndHideButton();
+//       };
+//       createpreviewdiv.appendChild(createbutton)
+//       createpreviewdiv.appendChild(previewfileframe);
+//       librarydiv.appendChild(createpreviewdiv)
+//       createbutton.addEventListener('click', function() {
+//         event.preventDefault()
+//         event.stopPropagation()
    
-        if(ismyrequordoclibforfilepreview === "myRequest"){
-          myRequest();
-        }
-        if(ismyrequordoclibforfilepreview === "myFavourite"){
-          myFavorite();
-        }
-        if(ismyrequordoclibforfilepreview === "sharewithme"){
-          ShareWithMe();
-        }
-        if(ismyrequordoclibforfilepreview === "sharewithothers"){
-          ShareWithOther();
-        }
-        // if(flag === "shareWithMe"){
-        //     ShareWithMe(null,null);
-        // }
-        // if(flag === "documentLibrary"){
-        //   getdoclibdata(currentfolderpath , currentsiteID , currentDocumentLibrary)
-        // }
+//         if(ismyrequordoclibforfilepreview === "myRequest"){
+//           myRequest();
+//         }
+//         if(ismyrequordoclibforfilepreview === "myFavourite"){
+//           myFavorite();
+//         }
+//         if(ismyrequordoclibforfilepreview === "sharewithme"){
+//           ShareWithMe();
+//         }
+//         if(ismyrequordoclibforfilepreview === "sharewithothers"){
+//           ShareWithOther();
+//         }
+//         // if(flag === "shareWithMe"){
+//         //     ShareWithMe(null,null);
+//         // }
+//         // if(flag === "documentLibrary"){
+//         //   getdoclibdata(currentfolderpath , currentsiteID , currentDocumentLibrary)
+//         // }
        
-    });
-    }
-  }
-  if(ismyrequordoclibforfilepreview === "getdoclibdata"){
+//     });
+//     }
+//   }
+//   if(ismyrequordoclibforfilepreview === "getdoclibdata"){
   
-    // i have added this when there was issue in file preview at path there was & in the path
-    // so i encode the path and then append in preview url 
-    let encodepath:any
-    const hasAmpersand = path.includes('&');
-    if (hasAmpersand) {
-      console.log("Path contains '&'");  
-       encodepath = encodeURIComponent(path); // Properly declare the variable
-      // alert("getdoclibdata encodepath: " + encodepath);
-    } else {
-      console.log("Path does not contain '&'");
-      encodepath = path;
-    }
+//     // i have added this when there was issue in file preview at path there was & in the path
+//     // so i encode the path and then append in preview url 
+//     let encodepath:any
+//     const hasAmpersand = path.includes('&');
+//     if (hasAmpersand) {
+//       console.log("Path contains '&'");  
+//        encodepath = encodeURIComponent(path); // Properly declare the variable
+//       // alert("getdoclibdata encodepath: " + encodepath);
+//     } else {
+//       console.log("Path does not contain '&'");
+//       encodepath = path;
+//     }
   
-    // Generate the correct preview URL
-    const previewUrl = `${siteUrl}${locationPath}/${currentSubsite}/${myactualdoclib}/Forms/AllItems.aspx?id=${encodepath}&parent=${encodedParentFolder}`;
+//     // Generate the correct preview URL
+//     const previewUrl = `${siteUrl}${locationPath}/${currentSubsite}/${myactualdoclib}/Forms/AllItems.aspx?id=${encodepath}&parent=${encodedParentFolder}`;
    
-    console.log(previewUrl, "Generated preview URL");
+//     console.log(previewUrl, "Generated preview URL");
    
-    console.log("Generated Preview URL:", previewUrl);
-    if(previewUrl){
-      librarydiv.innerHTML = "";
-      previewfileframe.src = previewUrl;
-      previewfileframe.onload = () => {
-        console.log("Iframe has loaded");
+//     console.log("Generated Preview URL:", previewUrl);
+//     if(previewUrl){
+//       librarydiv.innerHTML = "";
+//       previewfileframe.src = previewUrl;
+//       previewfileframe.onload = () => {
+//         console.log("Iframe has loaded");
    
-        const checkAndHideButton = () => {
-          // *** Key Change: Declare iframeDocument outside try block ***
-          let iframeDocument: Document | null = null;
-          try {
-            iframeDocument = previewfileframe.contentDocument || previewfileframe.contentWindow?.document;
-            if (iframeDocument) {
-              const button = iframeDocument.getElementById("OneUpCommandBar") as HTMLElement;
-              const excelToolbar = iframeDocument.getElementById("m_excelEmbedRenderer_m_ewaEmbedViewerBar") as HTMLElement;
-              if(excelToolbar){
-                excelToolbar.style.display= "none"
-              }
-              if (button) {
-                console.log("Hiding the OneUpCommandBar element");
-                button.style.display = "block";
-                const commandBar1 = button.querySelectorAll("button");
-                commandBar1.forEach(button => {
-                  button.style.display = "none";
-                });
-                 // Show only the "Open" button
-                const openButton = iframeDocument.getElementById("openCommandGroup");
-                const userProfile = iframeDocument.getElementById("presenceCommand");
-                if(userProfile){
-                  userProfile.style.display='none'
-                }
-                if (openButton) {
-                  // console.log("openButton",openButton);
-                  if(status === 'Auto Approved'){
-                    openButton.style.display = "block";
-                  }
+//         const checkAndHideButton = () => {
+//           // *** Key Change: Declare iframeDocument outside try block ***
+//           let iframeDocument: Document | null = null;
+//           try {
+//             iframeDocument = previewfileframe.contentDocument || previewfileframe.contentWindow?.document;
+//             if (iframeDocument) {
+//               const button = iframeDocument.getElementById("OneUpCommandBar") as HTMLElement;
+//               const excelToolbar = iframeDocument.getElementById("m_excelEmbedRenderer_m_ewaEmbedViewerBar") as HTMLElement;
+//               if(excelToolbar){
+//                 excelToolbar.style.display= "none"
+//               }
+//               if (button) {
+//                 console.log("Hiding the OneUpCommandBar element");
+//                 button.style.display = "block";
+//                 const commandBar1 = button.querySelectorAll("button");
+//                 commandBar1.forEach(button => {
+//                   button.style.display = "none";
+//                 });
+//                  // Show only the "Open" button
+//                 const openButton = iframeDocument.getElementById("openCommandGroup");
+//                 const userProfile = iframeDocument.getElementById("presenceCommand");
+//                 if(userProfile){
+//                   userProfile.style.display='none'
+//                 }
+//                 if (openButton) {
+//                   // console.log("openButton",openButton);
+//                   if(status === 'Auto Approved'){
+//                     openButton.style.display = "block";
+//                   }
                  
-                }
-                // Show iframe only after hiding elements
-                previewfileframe.style.display = "block";
+//                 }
+//                 // Show iframe only after hiding elements
+//                 previewfileframe.style.display = "block";
    
-              } else {
-                console.log("OneUpCommandBar not found, rechecking...");
-              }
-              // if(openInAppButton){
-              //   openInAppButton.style.display='block'
-              // }
-              const helpbutton = iframeDocument.getElementById("m_excelEmbedRenderer_m_ewaEmbedViewerBar") as HTMLElement;
-              if(helpbutton){
-                helpbutton.style.display = "none"
-              }
-            }
-          } catch (error) {
-            console.error("Error accessing iframe content:", error);
-            // Show iframe on error to avoid it being hidden forever
-            previewfileframe.style.display = "block";
-          }
+//               } else {
+//                 console.log("OneUpCommandBar not found, rechecking...");
+//               }
+//               // if(openInAppButton){
+//               //   openInAppButton.style.display='block'
+//               // }
+//               const helpbutton = iframeDocument.getElementById("m_excelEmbedRenderer_m_ewaEmbedViewerBar") as HTMLElement;
+//               if(helpbutton){
+//                 helpbutton.style.display = "none"
+//               }
+//             }
+//           } catch (error) {
+//             console.error("Error accessing iframe content:", error);
+//             // Show iframe on error to avoid it being hidden forever
+//             previewfileframe.style.display = "block";
+//           }
    
-          // Continue checking if elements are not yet hidden
-          if (!iframeDocument || !iframeDocument.getElementById("OneUpCommandBar")) {
-            setTimeout(checkAndHideButton, 100);
-          }
-        };
+//           // Continue checking if elements are not yet hidden
+//           if (!iframeDocument || !iframeDocument.getElementById("OneUpCommandBar")) {
+//             setTimeout(checkAndHideButton, 100);
+//           }
+//         };
    
-        checkAndHideButton();
-      };
-      createpreviewdiv.appendChild(createbutton)
-      createpreviewdiv.appendChild(previewfileframe);
-      librarydiv.appendChild(createpreviewdiv)
-      createbutton.addEventListener('click', function() {
-        event.preventDefault()
-        event.stopPropagation()
+//         checkAndHideButton();
+//       };
+//       createpreviewdiv.appendChild(createbutton)
+//       createpreviewdiv.appendChild(previewfileframe);
+//       librarydiv.appendChild(createpreviewdiv)
+//       createbutton.addEventListener('click', function() {
+//         event.preventDefault()
+//         event.stopPropagation()
    
-        // if(flag === "shareWithMe"){
-        //     ShareWithMe(null,null);
-        // }
-        // if(flag === "documentLibrary"){
-        //   getdoclibdata(currentfolderpath , currentsiteID , currentDocumentLibrary)
-        // }
-        if(isprocessfolder === true){
-            //  alert(currentfolderpath  + "currentfolderpath in process true")
-             getdoclibdata(currentfolderpath , currentsiteID , currentDocumentLibrary ,"")
-        }else{
-            // alert(currentfolderpath  + "currentfolderpath in process false")
-         getdoclibdata(currentfolderpath , currentsiteID , currentDocumentLibrary , "")
-        }
+//         // if(flag === "shareWithMe"){
+//         //     ShareWithMe(null,null);
+//         // }
+//         // if(flag === "documentLibrary"){
+//         //   getdoclibdata(currentfolderpath , currentsiteID , currentDocumentLibrary)
+//         // }
+//         if(isprocessfolder === true){
+//             //  alert(currentfolderpath  + "currentfolderpath in process true")
+//              getdoclibdata(currentfolderpath , currentsiteID , currentDocumentLibrary ,"")
+//         }else{
+//             // alert(currentfolderpath  + "currentfolderpath in process false")
+//          getdoclibdata(currentfolderpath , currentsiteID , currentDocumentLibrary , "")
+//         }
       
-    });
+//     });
+//     }
+//   }
+// }
+window.PreviewFile = function(path: any, SiteID: any, docLibName: any, status: string, filepreviewurl: string) {
+ 
+  const librarydiv = document.getElementById('files-container');
+ 
+  if (!librarydiv) return; // Safety check
+ 
+  // 1. DO NOT DELETE CONTENT
+ 
+  // 2. Hide existing files instead.
+  // *** TYPESCRIPT FIX HERE: Cast to HTMLElement[] ***
+  const existingFiles = Array.from(librarydiv.children) as HTMLElement[];
+  existingFiles.forEach(child => child.style.display = 'none');
+ 
+  // 3. Temporarily switch layout to block
+  const originalLayout = librarydiv.style.display;
+  librarydiv.style.display = 'block';
+ 
+  const createpreviewdiv = document.createElement('div');
+  createpreviewdiv.classList.add('my-class-new');
+  createpreviewdiv.style.display = 'grid';
+  createpreviewdiv.style.position = 'relative';
+  createpreviewdiv.style.height = '100%';
+ 
+  let finalPreviewUrl = "";
+ 
+  try {
+    const currentOrigin = window.location.origin;
+    let serverRelativePath = "";
+    let baseUrl = "";
+ 
+    // --- LOGIC TO GENERATE URL ---
+    if (filepreviewurl && filepreviewurl !== "undefined") {
+      try {
+        const urlObj = new URL(filepreviewurl);
+        const params = new URLSearchParams(urlObj.search);
+        serverRelativePath = params.get("id") || "";
+ 
+        const pathStr = urlObj.pathname;
+        const formsIndex = pathStr.toLowerCase().indexOf('/forms/');
+        if (formsIndex !== -1) {
+           const pathUpToForms = pathStr.substring(0, formsIndex);
+           const lastSlashIndex = pathUpToForms.lastIndexOf('/');
+           baseUrl = urlObj.origin + pathUpToForms.substring(0, lastSlashIndex);
+        } else {
+           baseUrl = urlObj.origin;
+        }
+      } catch (e) {
+        console.warn("Error parsing filepreviewurl");
+      }
     }
+ 
+    if (!baseUrl) {
+        if (typeof path === 'string' && path.startsWith('/')) {
+            serverRelativePath = path;
+            if (docLibName && path.includes(docLibName)) {
+                const libIndex = path.indexOf(docLibName);
+                const webPath = path.substring(0, libIndex);
+                const cleanWebPath = webPath.endsWith('/') ? webPath.slice(0, -1) : webPath;
+                baseUrl = currentOrigin + cleanWebPath;
+            } else {
+                const pathParts = path.split('/');
+                if (pathParts[1] && pathParts[1].toLowerCase() === 'sites' && pathParts[2]) {
+                    baseUrl = currentOrigin + `/sites/${pathParts[2]}`;
+                } else {
+                    baseUrl = currentOrigin;
+                }
+            }
+        } else {
+            baseUrl = currentOrigin;
+        }
+    }
+ 
+    let extension = "";
+    if (serverRelativePath) {
+      extension = serverRelativePath.split('.').pop()?.toLowerCase() || "";
+    } else if (typeof path === 'string' && path.includes('.')) {
+      extension = path.split('.').pop()?.toLowerCase() || "";
+    }
+ 
+    const officeExtensions = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'csv'];
+    const isOfficeFile = officeExtensions.includes(extension);
+ 
+    if (isOfficeFile) {
+      let sourceDocValue = "";
+      const isPathString = (typeof path === 'string' && path.trim().startsWith('/'));
+ 
+      if (isPathString) {
+        sourceDocValue = encodeURIComponent(serverRelativePath || path);
+      } else {
+        sourceDocValue = `{${path}}`;
+      }
+      finalPreviewUrl = `${baseUrl}/_layouts/15/Doc.aspx?sourcedoc=${sourceDocValue}&action=edit`;
+    } else {
+      if (serverRelativePath) {
+        finalPreviewUrl = serverRelativePath.startsWith('http') ? serverRelativePath : currentOrigin + serverRelativePath;
+      } else {
+        finalPreviewUrl = path;
+      }
+    }
+  } catch (error) {
+    console.error("Error generating preview URL:", error);
+    return;
   }
+ 
+  // 4. Create Iframe
+  const previewfileframe = document.createElement('iframe');
+  previewfileframe.id = 'filePreview';
+  previewfileframe.style.width = '100%';
+  previewfileframe.style.height = '600px';
+  previewfileframe.style.border = 'none';
+  previewfileframe.src = finalPreviewUrl;
+ 
+  // 5. Create Close Button
+  const closeButton = document.createElement('button');
+  closeButton.classList.add('my-class'); 
+  closeButton.innerHTML = "&times;";
+  closeButton.title = 'Close Preview';
+  closeButton.style.background = 'transparent';
+  closeButton.style.border = 'none';
+  closeButton.style.fontSize = '28px';
+  closeButton.style.fontWeight = 'bold';
+  closeButton.style.color = '#333';
+  closeButton.style.cursor = 'pointer';
+  closeButton.style.justifySelf = 'end';
+  closeButton.style.lineHeight = '1';
+  closeButton.style.marginBottom = '5px';
+  closeButton.style.padding = '0 10px';
+ 
+  closeButton.onmouseover = () => closeButton.style.color = 'red';
+  closeButton.onmouseout = () => closeButton.style.color = '#333';
+ 
+  // *** ON CLOSE LOGIC ***
+  closeButton.onclick = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+   
+    // A. Remove only the preview div
+    if (librarydiv.contains(createpreviewdiv)) {
+        librarydiv.removeChild(createpreviewdiv);
+    }
+   
+    // B. Restore the original layout (Grid)
+    librarydiv.style.display = originalLayout;
+   
+    // C. Show the original files again
+    // No extra cast needed here because existingFiles is already typed as HTMLElement[]
+    existingFiles.forEach(child => child.style.display = '');
+  };
+ 
+  createpreviewdiv.appendChild(closeButton);
+  createpreviewdiv.appendChild(previewfileframe);
+  librarydiv.appendChild(createpreviewdiv);
 }
-
 
 
 
@@ -7334,6 +7548,79 @@ const searchFiles = async (event: React.FormEvent) => {
   }
 
 }
+ // search file clear 
+ const clearSearch = async () => {
+
+  const searchInput = document.getElementById('searchinput') as HTMLInputElement;
+  debugger;
+  // 1. Clear the input
+
+  searchInput.value = "";
+
+  setcurrentSearchText("");
+ 
+  // 2. Clear results
+
+  const container = document.getElementById("files-container");
+ debugger;
+  container.innerHTML = "";
+ 
+  // 3. Load default page (same as without search)
+
+  // if (routeToDiffSideBar === "") {
+  //   debugger;
+  //   // Load main file listing
+
+  //   getdoclibdata(currentfolderpath, currentsiteID, currentDocumentLibrary, null);
+
+  // }
+
+  // else 
+  if (routeToDiffSideBar === "myRequest") {
+
+    myRequest(null, null, null);
+
+  }
+
+  else if (routeToDiffSideBar === "documentLibrary") {
+     debugger;
+    getdoclibdata(currentfolderpath, currentsiteID, currentDocumentLibrary, null);
+
+  }
+
+  else if (routeToDiffSideBar === "myFavourite") {
+
+    myFavorite(null, null, null);
+
+  }
+
+  else if (routeToDiffSideBar === "myFolder") {
+
+    mycreatedfolders(null, null);
+
+  }
+
+  else if (routeToDiffSideBar === "shareWithOthers") {
+
+    ShareWithOther(null, null);
+
+  }
+
+  else if (routeToDiffSideBar === "shareWithMe") {
+
+    ShareWithMe(null, null);
+
+  }
+
+  else if (routeToDiffSideBar === "recyclebin") {
+
+    Recyclebin(null, null, null);
+
+  }
+
+};
+ 
+
 // const searchFiles = async (event: React.FormEvent ) => {
 // event.preventDefault();
 // event.stopPropagation();
@@ -7904,7 +8191,7 @@ const ShareWithOther = async (
               <div class="CardTextContainer">
                 <p class="p1st" title="${file.FileName}">${file.FileName}</p>
                 <div class="fileSizeAndVersion">
-                  <p class="p3rd">${file.FileSize} MB</p>
+                     <p class="p3rd">${fixSize(file.FileSize as number)}</p>
                 </div>
               </div>
             </div>
@@ -7990,7 +8277,7 @@ const ShareWithOther = async (
       pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
       pageInfo.style.margin = "12px 103px 0px 0px";
       pageInfo.style.lineHeight = "30px";
-      pageInfo.style.fontSize = "14px";
+      pageInfo.style.fontSize = "12px";
 
       creatediv.appendChild(prevButton);
       creatediv.appendChild(nextButton);
@@ -8031,16 +8318,16 @@ window.revokeAccess=(UserArray:string,FileName:string,fileId:any,siteId:any,fold
  const filePath=`${folderpath}/${FileName}`
    // Create the popup container
    const popup = document.createElement("div");
-   popup.style.position = "fixed";
+   popup.style.position = "absolute";
    popup.style.top = "0";
    popup.style.left = "0";
    popup.style.width = "100%";
    popup.style.height = "100%";
-   popup.style.backgroundColor = "rgba(0,0,0,0.5)";
+   popup.style.backgroundColor = "rgba(246,246,246,0.87)";
    popup.style.display = "flex";
    popup.style.justifyContent = "center";
    popup.style.alignItems = "center";
-   popup.style.zIndex = "9999";
+   popup.style.zIndex = "2";
  
   // Create the popup content box
   const content = document.createElement("div");
@@ -8049,18 +8336,19 @@ window.revokeAccess=(UserArray:string,FileName:string,fileId:any,siteId:any,fold
   content.style.padding = "20px";
   content.style.borderRadius = "8px";
   content.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
-  content.style.width = "600px";
+
   content.style.textAlign = "center";
  
    // Create the heading
    const heading = document.createElement("h2");
    heading.innerText = "Shared Users List";
    heading.style.margin = "0 0 20px 0";
-   heading.style.color = "#333";
+   heading.style.color = "#4c4c4c";
    heading.style.textAlign = "left";
-   heading.style.fontSize = "18px";
-   heading.style.borderBottom = "1px solid #ccc";
+   heading.style.fontSize = "1.25rem";
+   heading.style.borderBottom = "1px solid #dfdfdf";
    heading.style.paddingBottom = "10px";
+   heading.style.fontWeight = "600";
  
   // Create the close button
   const closeButton = document.createElement("button");
@@ -8069,14 +8357,15 @@ window.revokeAccess=(UserArray:string,FileName:string,fileId:any,siteId:any,fold
   closeButton.style.top = "-6px";
   closeButton.style.right = "18px";
   closeButton.style.backgroundColor = "white";
-  closeButton.style.color = "#333";
-  closeButton.style.border = "1px solid #ccc";
+  closeButton.style.color = "#ec1c24";
+  closeButton.style.border = "1px solid #ec1c24";
   closeButton.style.borderRadius = "1000px";
   closeButton.style.lineHeight = "30px";
   closeButton.style.minWidth = "30px";
   closeButton.style.height = "30px";
   closeButton.style.cursor = "pointer";
   closeButton.style.padding = "0px";
+  
    
   closeButton.onclick = () => {
     document.body.removeChild(popup);
@@ -8325,7 +8614,15 @@ window.revokeAccess=(UserArray:string,FileName:string,fileId:any,siteId:any,fold
    popup.appendChild(content);
  
    // Append popup to the body
-   document.body.appendChild(popup);
+ //  document.body.appendChild(popup);
+ // Append the popup into .librarydata instead of body
+const shareInterval = setInterval(() => {
+  const container = document.querySelector('.librarydata');
+  if (container) {
+    container.appendChild(popup);
+    clearInterval(shareInterval);
+  }
+}, 100);
 }
 // const ShareWithMe=async(event:React.MouseEvent<HTMLButtonElement>=null,searchText:HTMLInputElement=null)=>{
 //   if(event){
@@ -9014,7 +9311,7 @@ const ShareWithMe = async (event: React.MouseEvent<HTMLButtonElement> = null, se
               <div class="CardTextContainer">
                 <p class="p1st" title="${file.FileName}">${file.FileName}</p>
                 <div class="fileSizeAndVersion">
-                  <p class="p3rd">${file.FileSize} MB</p>
+                 <p class="p3rd">${fixSize(file.FileSize as number)}</p>
                 </div>
                 <p class="p3rd">${userName}</p>
               </div>
@@ -9071,7 +9368,7 @@ const ShareWithMe = async (event: React.MouseEvent<HTMLButtonElement> = null, se
   pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
   pageInfo.style.margin = "12px 103px 0px 0px";
   pageInfo.style.lineHeight = "30px";
-  pageInfo.style.fontSize = "14";
+  pageInfo.style.fontSize = "12";
 
   // Disable/enable buttons with styles
   const styleButton = (button: HTMLButtonElement, disabled: boolean) => {
@@ -9999,7 +10296,7 @@ const Recyclebin = async (
                 <div class="CardTextContainer"> 
                   <p class="p1st" title="${file.FileName}">${file.FileName}</p>
                   <p class="p2nd"></p>
-                  <p class="p3rd">${file.FileSize}</p>
+                    <p class="p3rd">${fixSize(file.FileSize as number)}</p>
                 </div>
               </div>
             </div>
@@ -10066,6 +10363,7 @@ const Recyclebin = async (
       pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
       pageInfo.style.margin = "12px 103px 0px 0px";
   pageInfo.style.lineHeight = "30px";
+  pageInfo.style.fontSize = "12px";
 
       // Apply disabled styles
       if (prevButton.disabled) {
@@ -10272,11 +10570,15 @@ popupContent.appendChild(noButton);
 popupContainer.appendChild(popupContent);
 
 // Append the popup container to the document body
-document.body.appendChild(popupContainer);
+// document.body.appendChild(popupContainer);
+const undoContainer = document.querySelector('.librarydata') || document.body;
+undoContainer.appendChild(popupContainer);
 
 // Function to remove the popup from the DOM
 function closePopup() {
-  document.body.removeChild(popupContainer);
+  if (popupContainer.parentNode) {
+    popupContainer.parentNode.removeChild(popupContainer);
+  }
 }
 }
 // This function is called when we click on the share.
@@ -12919,6 +13221,7 @@ if (disableNext) {
            pageInfo.textContent = `Page ${currentPage} of ${Math.max(totalPages, 1)}`;
            pageInfo.style.margin = "12px 103px 0px 0px";
            pageInfo.style.lineHeight = "30px";
+           pageInfo.style.fontSize = "12px";
   
             // Add controls to container
                   paginationContainer.appendChild(creatediv); 
@@ -13154,6 +13457,8 @@ window.deleteFolder=(siteName:any,folderName:any,itemId:any,siteId:any,folderpat
   console.log("siteId",siteId)
   console.log("folderpath",folderpath)
   console.log("IsLibrary",IsLibrary)
+  const container = document.querySelector(".librarydata") as HTMLElement | null;
+
   Swal.fire({
     title: "Are you sure you want to delete this folder?",
     text: "Deleting this folder will also permanently delete all files and subfolders inside it.",
@@ -13161,7 +13466,8 @@ window.deleteFolder=(siteName:any,folderName:any,itemId:any,siteId:any,folderpat
     showCancelButton: true,
     confirmButtonColor: "#3085d6",
     cancelButtonColor: "#d33",
-    confirmButtonText: "Yes, delete it!"
+    confirmButtonText: "Yes, delete it!",
+    target:container ?? document.body
   }).then(async(result) => {
     if (result.isConfirmed) {
         setIsLoading(true);
@@ -13642,8 +13948,8 @@ window.renameFolder=(siteName:any,folderName:any,itemId:any,siteId:any)=>{
      closeButton.style.right = "0px";
      closeButton.style.cursor = "pointer";
      closeButton.style.fontSize = "18px";
-     closeButton.style.border = "1px solid #ccc";
-     closeButton.style.color = "#666";
+     closeButton.style.border = "1px solid #ec1c24";
+     closeButton.style.color = "#ec1c24";
      closeButton.style.minWidth = "30px";
      closeButton.style.height = "30px";
      closeButton.style.textAlign = "center";
@@ -13710,7 +14016,15 @@ window.renameFolder=(siteName:any,folderName:any,itemId:any,siteId:any)=>{
     popup.appendChild(wrapper);
   
     // Add the popup to the document body
-    document.body.appendChild(popup);
+ //   document.body.appendChild(popup);
+ // Append the popup into .librarydata instead of body
+const shareInterval = setInterval(() => {
+  const container = document.querySelector('.librarydata');
+  if (container) {
+    container.appendChild(popup);
+    clearInterval(shareInterval);
+  }
+}, 100);
 }
 
 // This function called when we click on the Rename Column option inside the mycreated Folder
@@ -13745,21 +14059,41 @@ window.renameColumn=async(siteName:string,documentLibraryName:string)=>{
  
 
   // Generate the form dynamically
-  const formContent = existingColumns
-    .map(
-      (column) => `
-         <div className="row1">
-        <div style="margin-bottom: 15px;" classname="col-sm-4">
-          <input 
-            type="text" 
-            id="col-${column.ID}" 
-            value="${column.IsRename !== null ? column.IsRename : column.ColumnName}" 
-            data-id="${column.ID}" 
-            style="width: calc(100% - 10px); padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-        </div> </div>
-      `
-    )
-    .join("");
+  const labels = [
+    "Code",
+    "New Description",
+    "Expiry Date",
+    "Contract No.",
+    "Confidential"
+  ];
+   
+  const formContent = `
+    <div  class="row">
+   
+      ${existingColumns
+        .map(
+          (column, index) => `
+            <div class="col-lg-12 mb-1">
+             
+              <label for="col-${column.ID}" style="display:block; font-weight:600; margin-bottom:6px;">
+                ${labels[index]}
+              </label>
+   
+              <input
+                type="text"
+                id="col-${column.ID}"
+                value="${column.IsRename !== null ? column.IsRename : column.ColumnName}"
+                data-id="${column.ID}"
+                style="width:100%; padding:10px;    height: 36px; margin-bottom:4px; font-size:14px; border:1px solid #ccc; border-radius:6px; " />
+           
+            </div>
+          `
+        )
+        .join("")}
+   
+    </div>
+  `;
+   
 
   // popup.innerHTML = `
   //   <h3 style="margin-top: 0; text-align: center; font-size: 18px;">Rename Columns</h3>
@@ -13791,11 +14125,11 @@ window.renameColumn=async(siteName:string,documentLibraryName:string)=>{
     right: 15px; 
     font-size: 18px; 
     font-weight: bold; 
-    color: #333; 
-    cursor: pointer; border:1px solid #ccc; line-height:30px;
+    color: #ec1c24; 
+    cursor: pointer; border:1px solid #ec1c24; line-height:30px;
     border-radius:1000px;min-width:30px;height:30px; text-align:center;
   `;
-  closeButton.onclick = () => document.body.removeChild(popup);
+  closeButton.onclick = () => popup.remove();
   wrapper.innerHTML = `
   <h3 style="margin-top: 0; padding-bottom:15px;margin-bottom:15px; border-bottom:1px solid #ccc; text-align: center; font-size: 18px;">Rename Meta Columns</h3>
   <form id="renameForm">
@@ -13823,7 +14157,13 @@ window.renameColumn=async(siteName:string,documentLibraryName:string)=>{
   // popup.prepend(closeButton);
   wrapper.appendChild(closeButton);
   popup.appendChild(wrapper); 
+  const container = document.querySelector(".librarydata") as HTMLElement | null;
+if (container) {
+  container.appendChild(popup);
+} else {
   document.body.appendChild(popup);
+}
+
 
   // Handle form submission
   document
@@ -13883,13 +14223,14 @@ window.renameColumn=async(siteName:string,documentLibraryName:string)=>{
 
       console.log("Updated items:", updatedItems);
 
-
-      document.body.removeChild(popup);
+ popup.remove();
+     // document.body.removeChild(popup);
     });
 
   // Handle cancel button
   document.getElementById("cancelBtn")!.addEventListener("click", () => {
-    document.body.removeChild(popup);
+ //   document.body.removeChild(popup);
+ popup.remove();
   });
 
 }
@@ -14319,7 +14660,7 @@ const createFileCard = (file:any, fileIcon:any, siteId:any,listToUpdate:any,file
          <div class="CardTextContainer">
     <p class="p1st" title="${file.FileName}">${file.FileName}</p>
 
-    <p class="p3rd">${file.FileSize} MB</p>
+       <p class="p3rd">${fixSize(file.FileSize as number)}</p>
     </div></div>
     </div>
     <div id="three-dots" class="three-dots" onclick="toggleMenu2('${file.FileUID}', '${siteId}')">
@@ -16626,7 +16967,7 @@ window.RenameFile = async (FileName:any,CurrentFolderPath:any,SiteID:any,myreque
   console.log("FileUID",FileUID)
 
      const newsp = await sp.site.openWebById(SiteID);
-     alert("newsp" + newsp)
+     
     // Check if a popup already exists, if so, remove it
     const existingPopup = document.getElementById("renamefile-popup");
     if (existingPopup) {
@@ -16668,8 +17009,8 @@ window.RenameFile = async (FileName:any,CurrentFolderPath:any,SiteID:any,myreque
      closeButton.style.right = "0px";
      closeButton.style.cursor = "pointer";
      closeButton.style.fontSize = "18px";
-     closeButton.style.border = "1px solid #ccc";
-     closeButton.style.color = "#666";
+     closeButton.style.border = "2px solid #ec1d25";
+     closeButton.style.color = "#ec1d25";
      closeButton.style.minWidth = "30px";
      closeButton.style.height = "30px";
      closeButton.style.textAlign = "center";
@@ -16694,7 +17035,15 @@ window.RenameFile = async (FileName:any,CurrentFolderPath:any,SiteID:any,myreque
    
      // Add the submit button
      const submitButton = document.createElement("button");
-     submitButton.innerText = "Submit";
+    //  submitButton.innerText = "Submit";
+    const img = document.createElement("img");
+img.src = require("../assets/submit-new.png");
+img.alt = "Create";
+img.style.width = "18px";    // optional
+img.style.height = "18px";   // optional
+img.style.marginRight = "6px";
+submitButton.appendChild(img);
+submitButton.appendChild(img);
      submitButton.style.padding = "6px 20px";
      submitButton.style.backgroundColor = "#2c9942";
      submitButton.style.color = "#fff";
@@ -16797,7 +17146,15 @@ window.RenameFile = async (FileName:any,CurrentFolderPath:any,SiteID:any,myreque
     popup.appendChild(wrapper);
   
     // Add the popup to the document body
-    document.body.appendChild(popup);
+   // document.body.appendChild(popup);
+   // Append the popup into .librarydata instead of body
+const shareInterval = setInterval(() => {
+  const container = document.querySelector('.librarydata');
+  if (container) {
+    container.appendChild(popup);
+    clearInterval(shareInterval);
+  }
+}, 100);
 }
 const myRequest = async (
   event: React.MouseEvent<HTMLButtonElement> = null,
@@ -16887,7 +17244,7 @@ const myRequest = async (
             <div class="CardTextContainer">
               <p class="p1st" style="cursor: pointer;" title="${file.FileName}" onclick="PreviewFile('${file.FileUID}','${file.SiteID}','${file.ID}' , '${file.FileMasterList}', '${file.FilePreviewURL}')">${file.FileName}</p>
               <p class="p2nd" title="${file.CurrentFolderPath ? file.CurrentFolderPath.split('/').slice(3).join('/') : ''}">${file.DocumentLibraryName}</p>
-              <p class="p3rd ">${((file.FileSize as unknown as number) / (1024 * 1024)).toFixed(2)}MB</p>
+ <p class="p3rd">${fixSize(file.FileSize as number)}</p>
               <p class="filestatus myrequestp3rd">${file.Status ? file.Status : ''}</p>
             </div>
             <div class="three-dots" onclick="toggleMenu2('${file.FileUID}','${file.SiteID}','${file.ID}' , '${file.FileMasterList}')">
@@ -16920,6 +17277,12 @@ const myRequest = async (
           </li>
           <li onclick="RenameFile('${file.FileName}', '${file.CurrentFolderPath}', '${file.SiteID}' ,'MyRequest','${file.FileUID}' , '${file.SiteName}') ">
             <img src=${editIcon} alt="Version History"/> Rename File
+          </li>
+          <li onclick="triggerPowerAutomateFlow('${file.FileName}', '${file.CurrentFolderPath}', '${file.FilePreviewURL}' ) ">
+            <img src=${editIcon} alt="Document Summary"/> Document Summary
+          </li>
+           <li onclick="triggerPowerAutomateversionFlow('${file.FileName}', '${file.CurrentFolderPath}', '${file.FilePreviewURL}' ) ">
+            <img src=${editIcon} alt="Document Summary"/> AI Version Compare
           </li>
           ${file.Status === "Rework" ? `
             <li onclick="rework('${file.FileUID}', '${file.SiteID}','${file?.DocumentLibraryName}','${file?.SiteName}','${file.CurrentFolderPath}/${file.FileName}')">
@@ -17023,7 +17386,7 @@ const myRequest = async (
     pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
     pageInfo.style.margin = "12px 103px 0px 0px";
     pageInfo.style.lineHeight = "30px";
-    pageInfo.style.fontSize = "14px";
+    pageInfo.style.fontSize = "12px";
 
     // Add elements to container
     buttonsContainer.appendChild(prevButton);
@@ -17112,9 +17475,183 @@ const myRequest = async (
 const fileNotFound=(fileName:any)=>{
   Swal.fire(`No results found`,`${fileName}`, "warning");
 }
+const POWER_AUTOMATE_URL  = 'https://62fe413aac9fe8f9abf4ad8c89c177.dd.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/98a7abb60acd4d1fa6c36edd3a7bf859/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Zu-Gf4C-_sPd9nxRF1xqla42wt-3YQJUiQfVttic3GE'
+window.triggerPowerAutomateFlow = async (
+  FileName: string,
+  folderPath: string,
+  FilePerivewUrl: string
+) => {
+
+  const element = document.querySelector(".buttonalignment");
+  if (element) element.classList.add("Airesponse");
+
+
+  setFlowResponse(true);
+  setAILoading(true); 
+  try {
+    const requestBody = {
+      FileName,
+      folderPath,
+      FilePerivewUrl
+    };
+
+    console.log("Triggering Power Automate Flow with:", requestBody);
+
+    const response = await fetch(POWER_AUTOMATE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("AI Insight Response:", data);
+    setFlowResponse(data); 
+    setAILoading(false); 
+    return data;
+  } catch (error) {
+    console.error("Error triggering AI Insight:", error);
+    throw error;
+  }
+};
+
+const POWER_AUTOMATE_VERSION_URL  = 'https://62fe413aac9fe8f9abf4ad8c89c177.dd.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1b6dbcfe07964343a4ea5b293dbbdbe7/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=qTAUaBnlv-OuOp53EJeAHf42jvPUxvlA6oJNF1Qvnks'
+window.triggerPowerAutomateversionFlow = async (
+  FileName: string,
+  folderPath: string,
+  FilePerivewUrl: string
+) => {
+
+  const element = document.querySelector(".buttonalignment");
+  if (element) element.classList.add("Airesponse");
+
+
+  setFlowResponse(true);
+  setAILoading(true); 
+  try {
+    const requestBody = {
+      FileName,
+      folderPath,
+      FilePerivewUrl
+    };
+
+    console.log("Triggering Power Automate Flow with:", requestBody);
+
+    const response = await fetch(POWER_AUTOMATE_VERSION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("AI Insight Response:", data);
+    setFlowResponse(data); 
+    setAILoading(false); 
+    return data;
+  } catch (error) {
+    console.error("Error triggering AI Insight:", error);
+    throw error;
+  }
+};
+useEffect(() => {
+ 
+  const createFolderIcon = document.getElementById("CreateFolderIcon") as HTMLElement | null;
+  const uploadFileIcon = document.getElementById("UploadFileIcon") as HTMLElement | null;
+ 
+  if (!displayuploadfileandcreatefolder) {
+    if (createFolderIcon) {
+      createFolderIcon.style.display = "none";
+    }
+    if (uploadFileIcon) {
+      uploadFileIcon.style.display = "none";
+    }
+   
+    return;
+  }
+ 
+ 
+  const syncIcons = () => {
+    const createFolderBtn = document.getElementById("CreateFolder") as HTMLElement | null;
+    const createFolderIconEl = document.getElementById("CreateFolderIcon") as HTMLElement | null;
+    const uploadFileBtn = document.getElementById("createFileButton") as HTMLElement | null;
+    const uploadFileIconEl = document.getElementById("UploadFileIcon") as HTMLElement | null;
+ 
+    // Create Folder icon
+    if (createFolderIconEl) {
+     
+      createFolderIconEl.style.display = createFolderBtn?.style.display || "none";
+    }
+ 
+    // Upload File icon
+    if (uploadFileIconEl) {
+      uploadFileIconEl.style.display = uploadFileBtn?.style.display || "none";
+    }
+  };
+ 
+ 
+  syncIcons();
+ 
+ 
+  const createFolderBtn = document.getElementById("CreateFolder") as HTMLElement | null;
+  const uploadFileBtn = document.getElementById("createFileButton") as HTMLElement | null;
+ 
+  const observerOptions: MutationObserverInit = {
+    attributes: true,
+    attributeFilter: ["style"],
+  };
+ 
+  const folderObserver = createFolderBtn ? new MutationObserver(syncIcons) : null;
+  const uploadObserver = uploadFileBtn ? new MutationObserver(syncIcons) : null;
+ 
+  if (createFolderBtn && folderObserver) {
+    folderObserver.observe(createFolderBtn, observerOptions);
+  }
+  if (uploadFileBtn && uploadObserver) {
+    uploadObserver.observe(uploadFileBtn, observerOptions);
+  }
+ 
+  // Cleanup
+  return () => {
+    folderObserver?.disconnect();
+    uploadObserver?.disconnect();
+  };
+}, [displayuploadfileandcreatefolder]);
+
 // end
+
   const [activeComponent, setActiveComponent] = useState<string>('');
   const [listorgriddata, setlistorgriddata] = useState<string>('');
+// Useeffect function added from sourish side to render bulk upload and hide librarydata div
+
+useEffect(() => {
+  debugger;
+  const bg1 = document.querySelector(".bgnewwhite") as HTMLElement | null;
+  const bg2 = document.querySelector(".bgnewwhite1") as HTMLElement | null;
+ 
+  if (listorgriddata === "BulkUpload") {
+    debugger;
+    if (bg1) bg1.style.display = "none";
+    if (bg2) bg2.style.display = "none";
+  } else {
+    debugger;
+    if (bg1) bg1.style.display = "block";
+    if (bg2) bg2.style.display = "block";
+  }
+}, [listorgriddata]);
+
   const handleButtonClickShow = (componentName:any) => {
    // setActiveComponent(componentName); // Set the active component based on the button clicked
     {/* srs 25/11/25 */}
@@ -17783,42 +18320,49 @@ const fileNotFound=(fileName:any)=>{
       switch (text) {
         case 'My Uploaded Files':
           setDynamicContent('Mentioned below are the documents submitted by logged in user.');
+          setFlowResponse(null);
           button.style.backgroundColor = "#6a6a6a";
           button.style.color = "white";
           // document.getElementById('Myrequestbutton').style.backgroundColor = "#959b95";
           break;
         case 'My Favourites':
           setDynamicContent('All the files and folder which is marked as Favourite.');
+          setFlowResponse(null);
           button.style.backgroundColor = "#6a6a6a";
           button.style.color = "white";
           // document.getElementById('Myfavouritebutton').style.backgroundColor = "#959b95";
           break;
         case 'My Folders':
           setDynamicContent('Manage All Folder Created By Me.');
+          setFlowResponse(null);
           button.style.backgroundColor = "#6a6a6a";
           button.style.color = "white";
           // document.getElementById('Mycreatedfolderbutton').style.backgroundColor = "#959b95";
           break;
         case 'Shared with Others':
           setDynamicContent('My files shared with other users.');
+          setFlowResponse(null);
           button.style.backgroundColor = "#6a6a6a";
           button.style.color = "white";
           // document.getElementById('sharedwithotherbutton').style.backgroundColor = "#959b95";
           break;
         case 'Shared with me':
           setDynamicContent('File upload by other team members and shared with me.');
+          setFlowResponse(null);
           button.style.backgroundColor = "#fa901d";
           button.style.color = "white";
           // document.getElementById('sharedwithmebutton').style.backgroundColor = "#959b95";
           break;
         case 'Recycle Bin':
           setDynamicContent('below are the documents Deleted by logged in use.');
+          setFlowResponse(null);
           button.style.backgroundColor = "#6a6a6a";
           button.style.color = "white";
           // document.getElementById('recyclebinbutton').style.backgroundColor = "#959b95";
           break;
         default:
           setDynamicContent(null);
+          setFlowResponse(null);
       }
     }
     // alert(`You clicked on ${button.id}`);
@@ -17900,7 +18444,13 @@ window.editFile = async (siteName: string, documentLibraryName:string ) => {
   popupContainer.appendChild(wrapper);
 
   // Append to body
+  const container = document.querySelector(".librarydata");
+if (container) {
+  container.appendChild(popupContainer);
+} else {
   document.body.appendChild(popupContainer);
+}
+
 
   // Create close button
   const closeButton = document.createElement("span");
@@ -19226,18 +19776,6 @@ if (existingPopup) {
 existingPopup.remove();
 }
 
-// Dummy data
-// const users = [
-//   { value: 'Test1', id: '14',email:"User1@officeindia.onmicrosoft.com" },
-//   { value: 'Test2', id: '31',email:"User2@officeindia.onmicrosoft.com" },
-//   { value: 'Test3', id: '137',email:"User3@officeindia.onmicrosoft.com"},
-//   { value: 'Test4', id: '33',email:"User4@officeindia.onmicrosoft.com" },
-//   { value: 'Test5', id: '32',email:"User5@officeindia.onmicrosoft.com" },
-//   { value: 'Test6', id: '34',email:"User6@officeindia.onmicrosoft.com" },
-//   { value: 'Test User1', id: '39',email:"User7@officeindia.onmicrosoft.com" },
-//   ];
-
-
 // Declare selectedUsers with an explicit type, assuming user IDs are of type string for selecting the user for share
 let selectedUsers: { id: string; value: string; email:string }[] = [];
 // Create the pop-up element
@@ -19282,12 +19820,13 @@ popup.innerHTML = `
 </div>
 <div class="share-popup-body">
   <div id="share-reactSelect">
-      <input type="text" id="userInput" placeholder="Add a Name, Group, or Email" style="
-      width: 100%; 
+  <label>Add a Name, Group, or Email</label>
+      <input type="text" id="userInput" placeholder="Enter a Name, Group, or Email" style="
+      width: 100%;
       padding: 10px;
       font-size: 14px;
       border-radius: 4px;
-      border: 1px solid #ccc;
+      border: 1px solid #ccc;  margin-bottom:10px;
     "/>
     <div id="userDropdown" class="user-dropdown" style="
       display: none;
@@ -19303,20 +19842,22 @@ popup.innerHTML = `
     </div>
   </div>
    <div>
+    <label>Permissions</label>
     <select id="permissionSelect" style="
       margin-bottom:10px;
-      width: 100%; 
+      width: 100%;
       padding: 10px;
       font-size: 14px;
       border-radius: 4px;
       border: 1px solid #ccc;
-      margin-top: 10px;
+      margin-top: 0px;
     ">
-      <option value="" disabled selected>Permission</option>
+      <option value="" disabled selected>Select a Permission</option>
       ${options}
     </select>
   </div>
-  <textarea id="share-message" placeholder="Write a message..." >
+   <label>Comments</label>
+  <textarea id="share-message" placeholder="Enter Comments">
   </textarea>
 </div>
 <div class="share-popup-footer">
@@ -19325,13 +19866,24 @@ popup.innerHTML = `
 </div>
 `;
 
-// Append the  popup to the body
-document.body.appendChild(popup);
-
+// Append the popup into .librarydata instead of body
+const shareInterval = setInterval(() => {
+  
+  const container = document.querySelector('.librarydata');
+  if (container) {
+    container.appendChild(popup);
+    clearInterval(shareInterval);
+    initSharePopupDropdown();
+  }
+}, 100);
+function initSharePopupDropdown() {
 // Get references to the input box and dropdown
 const userInput = document.getElementById('userInput') as HTMLInputElement;
+debugger;
+console.log("userInput",userInput);
 const userDropdown = document.getElementById('userDropdown');
-
+debugger;
+console.log("userDropdown",userDropdown);
 // Function to render dropdown options based on user input
 function renderDropdown(users: { id: string, value: string,email:string }[]) {
 // Clear previous options
@@ -19819,7 +20371,7 @@ document.getElementById('share-shareFileButton').addEventListener('click', async
     // }
 
 });
-
+}
 
 }
 
@@ -20483,7 +21035,7 @@ console.log("approverDetailsArray", approverDetailsArray);
     </div>
   `;
 
-    if ((index + 1) % 3 === 0 || index === resultArrayThatContainstheColumnDetails.length - 1) {
+    if ((index + 1) % 4 === 0 || index === resultArrayThatContainstheColumnDetails.length - 1) {
       detailRowsHTML += '</div>';
     }
   });
@@ -20511,7 +21063,8 @@ approverDetailsArray.forEach((approver) => {
       <td class="approver-level">${approver.level}</td>
       <td class="approver-name">${approver.approver}</td>
       <td class="approver-date">${approver.actionDateTime}</td>
-      <td class="approver-status">${status}</td>
+      <td class="approver-status"> <span style="background: #bddbcc; border-radius: 4px;padding: 4px 10px;
+    color: #00733b;"> ${status} </span> </td>
       <td class="approver-remark">${approver.remark || ""}</td>
     </tr>
   `;
@@ -20559,25 +21112,25 @@ approverDetailsArray.forEach((approver) => {
   const style = document.createElement('style');
   style.textContent = `
     .audit-history-popup {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      border: 1px solid #ccc;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      z-index: 9999;
-      width: 90%;
+      position: absolute;
+      top: 0%;
+      left: 0%;
+      transform: translate(0%, 0%);
+      background: rgba(246,246,246,0.87);
+      border: 0px solid #ccc;
+      
+      z-index: 1;
+      width: 100%;
       max-width: 1200px;
       max-height: auto !important;
-      height: auto !important;
+      height: 100vh !important;
       overflow-y: auto;
-      border-radius: 8px;
+      border-radius: 0px; 
     }
     
     .popup-content-auditHistory {
-      padding: 20px;
-      display: block; width:100% !important;
+      padding: 20px;box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      display: block; width:80% !important;
     }
       .popup-content-auditHistory .mtbalenew tbody {
     
@@ -20601,18 +21154,20 @@ approverDetailsArray.forEach((approver) => {
     }
     
     .popup-header h5 {
-      margin: 0;
-      color: #333;
+          margin: 0;
+    color: #4c4c4c;
+    font-weight: bold;
+    padding-top: 10px;
     }
     
     .close-btn {
       cursor: pointer;
-      font-size: 24px;
-      color: #999;
+      font-size: 27px;
+      color: #ec1c24;
     }
     
     .close-btn:hover {
-      color: #333;
+      color: #ec1c24;
     }
     
     .popup-details {
@@ -20623,30 +21178,31 @@ approverDetailsArray.forEach((approver) => {
       display: flex;
       flex-wrap: wrap;
       margin-bottom: 0px;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 0px solid #f0f0f0;
       padding-bottom: 15px;
     }
     
     .detail-column {
-      flex: 1;
-      min-width: 30%;
-      padding: 0px 15px;
+      flex: 1; display:block;
+      min-width: 25%;
+      padding: 0px 10px 0px 0px;
     }
-    
+  
+
     .detail-label {
-      font-weight: bold;
-      color: #555;
+      font-weight: 600;
+      color: #4a4a4a; font-size:14px;
       margin-bottom: 5px;
     }
     
     .detail-value {
-      color: #333;
-      word-break: break-word;
+      color: #9f9f9f;
+      word-break: break-word;font-size:14px;
     }
     
     .approval-table-container {
-      margin-top: 20px;
-      overflow-x: auto;
+      margin-top: 0px;
+      overflow-x: auto;  width: 100%;
     }
     
     .approval-table {
@@ -20682,7 +21238,19 @@ approverDetailsArray.forEach((approver) => {
 
   
   document.head.appendChild(style);
-  document.body.appendChild(popup);
+  // ensure style is inserted (already present above)
+document.head.appendChild(style);
+ 
+// wait until .librarydata exists, then append popup inside it
+const checkInterval = setInterval(() => {
+  const container = document.querySelector('.librarydata');
+  if (container) {
+    container.appendChild(popup);
+    clearInterval(checkInterval);
+  }
+}, 100);
+
+  
 };
 
 
@@ -22288,29 +22856,11 @@ librarydiv.appendChild(mainContainer)
                 activeComponent === "" ? (
                   <div className=" dmsmaincontainer">
 
-{/* <div className="btn-group dropleft">
-  <button type="button" className="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Dropleft
-  </button>
-  <div className="dropdown-menu">
-  <button   className="dropdown-item" type="button">change request       </button>
-    <button className="dropdown-item" type="button">cancellation request</button>
-    <button className="dropdown-item" type="button">Annual audit program</button>
-    <button className="dropdown-item" type="button">audit plan           </button>
-    <button className="dropdown-item" type="button">NC            /button>
-  </div>
-</div> */}
 
 
-                    {showWorkflow && (
-      <div id="workflowdiv">
-        <ManageWorkFlow
-          OthProps={propsForManageWorkFlow}
-          onReturnToMain={handleReturnToMainFromManageWorkFlow}
-        />
-      </div>
-    )}
-    {showfolderpermission  && (
+
+        
+    {/* {showfolderpermission  && (
       <div id="showfolderpermission">
                  <ManageFolderPermission
                       OthProps={managePermissionProps}
@@ -22318,7 +22868,7 @@ librarydiv.appendChild(mainContainer)
                       />
       </div>
                      
-                    )}
+                    )} */}
                 {/* Start Code Update by Amjad */}
                   <div className="card card-body1">
                     <div className="row">
@@ -22334,7 +22884,31 @@ librarydiv.appendChild(mainContainer)
 
                             
                             <div style={{display:'flex', justifyContent:'end', gap:'5px'}} className="col-lg-10 newbutton tool">
-                              
+
+                          
+                            {displayuploadfileandcreatefolder && (
+<div className="bordernewr">
+  <div className="d-flex justify-content-center gap-3 mt-2">
+  <button style={{marginLeft:'14px'}} type="button" className="btn mt-0"
+  id="createFileButton"
+  onClick={() => handleButtonClickShow("UploadFile")}
+  >
+  <span className="mb-1" data-tooltip='Upload File'>
+
+  <img className="sidebariconssmall" src={create1}></img> &nbsp;</span>
+  </button>
+    <button type="button" className="btn mt-0"  id="CreateFolder"
+       onClick={() => handleButtonClickShow("CreateFolder")}>
+
+    <span className="mb-1" data-tooltip='Create Folder'>
+  <img className="sidebariconssmall" src={create2}></img> &nbsp;</span>
+  </button>
+  </div>
+  <p style={{fontSize:'14px'}} className="mb-0 mt-2">Create</p>
+</div>
+)
+
+}
                                <div className="newright">
 
                                <div className="d-flex justify-content-center gap-3 mt-2">
@@ -22345,20 +22919,8 @@ librarydiv.appendChild(mainContainer)
                                     <span className="mt-2 mb-1" data-tooltip='New Request'>    
                                   <img className="sidebariconssmall" src={listicon2}></img> </span>  
                                 </button>
-                               <div>
-                                                        <Dropdown as={ButtonGroup} style={{ marginTop: '0px' }}>
-                                                          <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}}  id="dropdown-left" className="mt-0 remoare" onClick={() => {
-                                                                  setshowBulkUpload(true);
-                                                                }}>
-                                                         <span className="mt-2 mb-1" data-tooltip='Document Type Bulk Upload'> 
-                                                            <img className="sidebariconssmall" src={listicon3}></img>  </span>  
-                                                          </Dropdown.Toggle>
                               
-                                                     
-                                                        </Dropdown>
-                              
-                                                      </div>
-                               <div>
+                               
                       <Dropdown as={ButtonGroup} style={{  marginTop: '0px' }}>
                         <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}} id="dropdown-left" className="mt-0">
                         <span className="mt-2 mb-1" data-tooltip='Select Template'>                       
@@ -22375,26 +22937,13 @@ librarydiv.appendChild(mainContainer)
                           ))}
                       
                         </Dropdown.Menu>
-                      </Dropdown></div>
+                      </Dropdown>
                     
 
                                 </div>  <p style={{fontSize:'14px'}} className="mb-0 mt-2">New</p></div>
 {/* till here is intranet demo ESSA */}
-<div className="bordernewr">
-  <div className="d-flex justify-content-center gap-3 mt-2">
-  <button style={{marginLeft:'14px'}} type="button" className="btn mt-0">
-  <span className="mb-1" data-tooltip='Upload File'>
 
-  <img className="sidebariconssmall" src={create1}></img> &nbsp;</span>
-  </button>
-    <button type="button" className="btn mt-0">
 
-    <span className="mb-1" data-tooltip='Create Folder'>
-  <img className="sidebariconssmall" src={create2}></img> &nbsp;</span>
-  </button>
-  </div>
-  <p style={{fontSize:'14px'}} className="mb-0 mt-2">Create</p>
-</div>
 <div className="bordernewr">
   <div className="d-flex justify-content-center gap-3 mt-2">
   <button type="button" className="btn mt-0">
@@ -22438,29 +22987,36 @@ librarydiv.appendChild(mainContainer)
                                 </button>
                                 <p style={{fontSize:'14px'}} className="mb-0 mt-2"> Link </p>
                                 </div>
-                          {displayuploadfileandcreatefolder && (
+                                <div className="missing-link">
+                                <Dropdown as={ButtonGroup} style={{ marginTop: '.5rem' }}>
+                                                          <Dropdown.Toggle variant="primary" style={{padding:'10px 15px'}}  id="dropdown-left" className="mt-0 remoare" onClick={() => {
+                                                                  //this below line was commented and new line added from sourish side to render bulk uupload at place of librarydata div
+                                                                  // setshowBulkUpload(true);
+                                                                  setlistorgriddata("BulkUpload");
+                                                                }}>
+                                                         <span className="mt-2 mb-1" data-tooltip='Document Type Bulk Upload'> 
+                                                            <img className="sidebariconssmall" src={listicon3}></img>  </span>  
+                                                          </Dropdown.Toggle>
+                              
+                                                     
+                                                        </Dropdown>
+                                <p style={{fontSize:'14px'}} className="mb-0 mt-2"> Bulk </p>
+                                </div>
+                          {/* {displayuploadfileandcreatefolder && (
     <div id="createuploadfilecont" className="createuploadfilecont mt-2"> 
-     {/* srs 25/11/25 */}
+
     <button type = "button"
        className="mybutton1 mt-0"
-       id="createFileButton"
-       onClick={() => handleButtonClickShow("UploadFile")}
+     id="createFileButton"
+     onClick={() => handleButtonClickShow("UploadFile")}
      >
        + Upload File
      </button>
      
-       {/* <button
-       className="mybutton2 mt-0"
-       id="createFileButton2"
-       onClick={() => handleButtonClickShow("CreateFolder")}
-     >
-       + Create Folder
-     </button> */}
- {/* srs 25/11/25 */}
+       
      <button type = "button"
        className="mybutton2 mt-0"
-       id="CreateFolder"
-       onClick={() => handleButtonClickShow("CreateFolder")}
+ 
      >
        + Create Folder
      </button>
@@ -22477,7 +23033,7 @@ librarydiv.appendChild(mainContainer)
      </div>
                           )
 
-                          }
+                          } */}
             
                           {showMyfavButtons && ( <div id="hidegidvewlistviewbutton2"  className="view-buttons mt-2">
                                   <button className="btn btngridview grid-view active"    
@@ -22683,6 +23239,25 @@ librarydiv.appendChild(mainContainer)
                     
                     
                     <div className="librarydata">
+
+                    {showWorkflow && (
+      <div id="workflowdiv">
+        <ManageWorkFlow
+          OthProps={propsForManageWorkFlow}
+          onReturnToMain={handleReturnToMainFromManageWorkFlow}
+        />
+      </div>
+    )}
+
+                    {showfolderpermission && (
+    <div id="showfolderpermission">
+      <ManageFolderPermission
+        OthProps={managePermissionProps}
+        onReturnToMain={handleReturnToMainFromManageWorkFlow}
+      />
+    </div>
+  )}
+
                       {showDeletepopup && (
                         <div className="popup">This is a small popup!</div>
                       )}
@@ -22731,6 +23306,16 @@ librarydiv.appendChild(mainContainer)
                           className="search-input"
                           placeholder="Search files..."
                         />
+                        
+                           <a style={{right:'45px'}} className="searchbutton" onClick={clearSearch}>
+                                   
+                                   
+     <img style={{width:'13px'}}
+       src={require("../assets/exitf.png")}
+       alt="Clear"
+       className="search-icon"
+     />
+   </a>
                         {/* <a className="searchbutton" onClick={RemoveSSearchFile}>
                           <img
                             src={require("../assets/cross.png")}
@@ -22751,9 +23336,97 @@ librarydiv.appendChild(mainContainer)
   </div></div>
                    {/* End Code Update by Amjad */} 
                    <div className="bgnewwhite1">
-                       <div id="files-container" className="buttonalignment">
+                       {/* <div id="files-container" className="buttonalignment">
 
-                       </div>  </div>
+                       </div> */}
+                                     <div style={{ display: 'flex', gap: '2px', alignItems: 'flex-start' }}>
+
+{/* LEFT SECTION */}
+<div id="files-container" className="buttonalignment" style={{ flex: 1 }}></div>
+
+{/* LOADER ONLY FOR POWER AUTOMATE */}
+{AILoading && (
+  <div
+    style={{
+      width: "420px",
+      minWidth: "320px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      paddingTop: "40px",
+    }}
+  >
+    <img
+      style={{ width: "116px", margin: "31px" }}
+      src={require("../assets/ESSAROLLER.gif")}
+      alt="Loading..."
+    />
+    <h1>Generating AI Response…</h1>
+  </div>
+)}
+
+{/* POWER AUTOMATE RESPONSE PANEL */}
+{!AILoading && flowResponse && (
+  <div id="ai-response-panel" style={{ width: "35%", minWidth: "320px" }}>
+    <div
+      className="pa-response-box"
+      style={{
+        marginTop: "5px",
+        padding: "15px",
+        border: "2px dotted #c9c9c9",
+        borderRadius: "0px",
+        background: "#fff",
+      }}
+    >
+         {/* ❌ CLOSE BUTTON */}
+         
+  <div className="missing-link newdovvlose">
+                          <button type="button" className="btn  grid-view notactive mt-2"    
+                               onClick={() => {
+                                setFlowResponse(null);
+                                setAILoading(false);
+                              }}>
+                                                                         <span className="mt-2 mb-1" data-tooltip='Close Document Summary'>
+
+                                                                         
+                                  <img className="sidebariconssmall"  src={require("../assets/exitf.png")}></img> </span>
+                              
+                                </button>
+                                <p style={{fontSize:'14px'}} className="mb-0 mt-0"> Close</p>
+                                </div>
+         {/* <button
+        onClick={() => {
+          setFlowResponse(null);
+          setAILoading(false);
+        }}>
+        X
+      </button> */}
+      <h2 style={{ fontSize: "15px", fontWeight:'600', marginBottom: "10px" }}>AI Insight</h2>
+
+      <p  className="font-14 mb-0"><strong>Status:</strong> <span  style={{color:'#101010'}}> {flowResponse.success ? "Success" : "Failed"} </span></p>
+      <p className="font-14 mb-0"><strong>Message:</strong> <span style={{color:'#101010'}}> {flowResponse.message} </span></p>
+
+      <div
+        style={{
+          background: "#fff",
+          padding: "0px",
+          borderRadius: "0px",
+          border: "0px solid #ddd",
+        height: 'calc(100vh - 88px)',
+          overflow: "auto",
+          marginTop: "5px", fontSize:'12px', lineHeight:'20px', color:'#101010'
+        }}
+      >
+        <strong>Extracted Text:</strong>
+        <br />
+        {flowResponse.extractedText}
+      </div>
+    </div>
+  </div>
+)}
+
+</div>
+                         </div>
                        <div id="loader2" style={{
                             display: "none",
                             textAlign: "center",
@@ -22858,6 +23531,10 @@ librarydiv.appendChild(mainContainer)
                         }}
                         onReturnToMain={handleReturnToMain} />
                       )}
+      {/* this below  new line added from sourish side to render bulk uupload at place of librarydata div */}
+                      {listorgriddata === 'BulkUpload' && (
+   <UploadFileInDestination />
+)}
       {navItems.some(item => item.DocumentCategory === listorgriddata) ? (
     //   <DocumentTemplate 
     //  selectedCategory={listorgriddata}

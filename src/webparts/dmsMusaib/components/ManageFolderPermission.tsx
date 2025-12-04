@@ -1070,7 +1070,7 @@ const ManageFolderPermission : React.FC<ManageFolderPermissionProps> = ({
                           <div  className='row'>
                             <div className='col-sm-8 w90'>
                             <h5 className="mb-3 " style={{
-                              display:"block", margin:'inherit'
+                              display:'block', color:'#838383', fontWeight:'700', margin:'inherit',
                              
                           }}>
                               Manage Permission
@@ -1085,7 +1085,7 @@ const ManageFolderPermission : React.FC<ManageFolderPermissionProps> = ({
                             <div  className="mb-0">
                             <div style={{height:'20px'}} className="col-12 d-flex justify-content-end">
                               <a onClick={handleAddRow}>
-                                <img className="bi bi-plus newl" src={require("../assets/plus.png")} alt="add" style={{ width: "50px", position:'relative', height: "50px" , top:'0px'}} />
+                                <img className="newl" src={require("../assets/addnew.png")} alt="add" style={{ position:'relative',  top:'7px'}} />
                               </a>
                             </div>
                           </div>
@@ -1132,8 +1132,8 @@ const ManageFolderPermission : React.FC<ManageFolderPermissionProps> = ({
                                   </div>
                                   {/* {row.id === 0 ? null : ( */}
                                     <div className="col-12 mb-2 col-md-2 d-flex align-items-end">
-                                      <a onClick={(e) => handleRemoveRow(row.id, e)} style={{ width: "50px",    height: "50px", cursor: "pointer" }}>
-                                        <img className="fas fa-trash" src={require("../assets/del.png")} alt="delete" />
+                                      <a onClick={(e) => handleRemoveRow(row.id, e)} style={{ width: "50px", marginTop:'2px',    height: "50px", cursor: "pointer" }}>
+                                        <img className="fas" src={require("../assets/delemodal.png")} alt="delete" />
                                       </a>
                                     </div>
                                   {/* )} */}
@@ -1176,7 +1176,7 @@ const ManageFolderPermission : React.FC<ManageFolderPermissionProps> = ({
                                     <td style={{minWidth:'75px', maxWidth:'75px'}}>
                                         <img
                                             className={styles.deleteicon}
-                                            src={require("../assets/del.png")}
+                                            src={require("../assets/delemodal.png")}
                                             alt="Delete"
                                             style={{
                                               height:"25px"
@@ -1202,17 +1202,19 @@ const ManageFolderPermission : React.FC<ManageFolderPermissionProps> = ({
 
                             </div>
                             <div className='col-md-4'>
-                            <div style={{textAlign:'right'}} className="text-right pb-0">
-                                    <button type="button" className="btn btn-primary me-2" 
+                            <div style={{textAlign:'right'}} className="text-right d-flex justify-content-end pb-0 newmanage">
+                                    <button type="button" className="btncolorCreate1 me-2" 
                                     onClick={handleCreate}
                                     >
-                                    Create
+                                    <span className="mb-1 mt-2" data-tooltip="Submit">
+                                      <img  src={require("../assets/submit-new.png")}/></span>
                                     </button>
-                                    <button type="button" className="btn btn-secondary" 
+                                    <button type="button" className="btncolorCreate1 alitool" 
                                     //   onClick={toggleModal}
                                     onClick={onReturnToMain}
                                     >
-                                        Cancel{" "}
+                                        <span className="mb-1 mt-2" data-tooltip="Cancel">
+                                        <img  src={require("../assets/cancelnew.png")}/></span>
                                     </button>
                             </div>
 
@@ -1271,18 +1273,23 @@ const ManageFolderPermission : React.FC<ManageFolderPermissionProps> = ({
                     {toggelPermission === "No"  ?
                     (
                     <div>
-                       <h6>"This document library is public. Would you like to Make it private?"</h6>
+
+                       <h6 className='Newalignwidth'>"This document library is public. Would you like to Make it private?"</h6>
+                      
+                      
+                        
                         <div className='setApprover' style={{
                           display:"flex",
                           marginLeft:"280px",
                           gap:"10px"
                         }}>
-                        <button type="button" className="btn btn-primary" onClick={handlesetTogglePermission}>Set Permission</button>
-                        <button type="button" className="btn btn-secondary" 
+                        <button style={{width:'125px'}} type="button" className="btn btn-primary" onClick={handlesetTogglePermission}>Set Permission</button>
+                        <button style={{width:'125px'}} type="button" className="btn btn-secondary" 
                           onClick={onReturnToMain}
                         >
                           Cancel{" "}
                         </button>
+                        {/* <img style={{position:'absolute'}} src={require("../assets/cross1.png")}> </img> */}
                       </div>
                   </div>
                 )

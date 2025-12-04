@@ -62,11 +62,16 @@
 #folderContainer2::-webkit-scrollbar-thumb:hover {
   background: #555; 
 }
-p.folder {font-size: 14px; font-weight: 600; margin-bottom: 7px; }
+p.folder {font-size: 14px; font-weight: 600; margin-bottom: 7px;
+
+
+}
 .p3rd{
   width: 47%; float: left;
 }
-.share-popup-header h4{    font-size: 1.25rem !important;}
+.share-popup-header h4{    font-size: 1.25rem !important;    color: #4c4c4c;
+  font-weight: bold;
+  padding-top: 10px;}
 .filestatus,.filestatus2{float:right;    width: 70px;
   text-align: center;
   line-height: 21px !important;}
@@ -110,11 +115,11 @@ p.folder {font-size: 14px; font-weight: 600; margin-bottom: 7px; }
         width: 35px;
  
         height: 35px;
-        border: 1px solid #ccc;
+        border: 1px solid var(--primary-color) !important;
         border-radius: 1000px;
         text-align: center;
         line-height: 35px;
-        color: #333;
+        color: var(--primary-color) !important;
     }
     .btn-primary{
       background:var(--primary-color);; border-color:var(--primary-color);;
@@ -440,27 +445,37 @@ a:hover
 /* Css for share file popup */
  
 /* Pop-up container */
+.Newalignwidth{
+  width: 38%;
+  font-size: 16px;
+  color: #838383;
+  font-weight: 600;
+  line-height: 26px;
+  padding-top: 20px;
+  padding-bottom: 0px;
+  margin-bottom: 0px
+}
 .share-popup {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  background-color:rgba(0, 0, 0, 0.7);
+  height: 100vh;
+  background-color:rgba(246,246,246,0.87);
   /* box-shadow:  rgba(0, 0, 0, 0.7); */
   display: flex;
   justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
+  align-items: start;
+  z-index: 1; padding-top: 70px;
+} 
  
 /* Popup content */
 .share-popup-content {
   display: flex;
   flex-direction: column;
   background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  border: 0px solid #ccc;
+  border-radius: 5px;
   padding: 20px;
   width: 500px;
 }
@@ -476,9 +491,9 @@ a:hover
  
 /* Close "X" button */
 .share-close-popup {
-  border: 1px solid #ededed;
+  border: 1px solid var(--primary-color);
     border-radius: 1000px;
-    color: #666;
+    color: var(--primary-color);
     cursor: pointer;
     font-size: 19px;
     font-weight: 700;
@@ -494,10 +509,10 @@ a:hover
 }
 #rename-popup h3, #renamePopup h3{ font-weight: 600 !important; text-align: left !important;  font-size: 18px !important;}
 .setApprover{margin-left: 0px !important; justify-content: center;}
-#showfolderpermission .modal-dialog, #workflowdiv .modal-dialog {min-width: 70% !important;}
+#showfolderpermission .modal-dialog, #workflowdiv .modal-dialog {min-width: 92% !important;}
 #files-container iframe{width: 100% !important; margin-top: 35px;}
 #showfolderpermission .modal-dialog .modal-content, #workflowdiv .modal-dialog .modal-content{
-  width: 100% !important; padding: 15px !important;
+  width: 100% !important; padding: 15px !important; border: 0px solid #ccc !important;
 }
 #showfolderpermission .modal-dialog h6, #workflowdiv .modal-dialog h6{
   text-align: center;
@@ -591,7 +606,7 @@ a:hover
 .blur-backround{
   width: 600px;
     background: #fff;
-    border-radius: 8px;
+    border-radius: 5px;
     padding: 20px;
     
 }
@@ -602,13 +617,13 @@ a:hover
 
 top: 0;
   z-index: 99999;
-  background: rgba(0, 0, 0, 0.5);
-  position: fixed;
-  height: 100%;  
+  background: hsla(0,0%,96%,.87)!important;
+
+  height: 100vh !important;
   display: flex
   ;
       justify-content: center;
-      align-items: center;
+      align-items: start; padding-top: 70px;
   
 }
  
@@ -695,12 +710,12 @@ top: 0;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh !important;
   background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
-  align-items: center;
-  z-index: 10000;
+  align-items: start;
+  z-index: 1; padding-top: 70px;
 }
  
 .popup-content-auditHistory {
@@ -728,7 +743,7 @@ top: 0;
   cursor: pointer;
   font-size: 24px;
   padding: 2px;
-  border: 1px solid #ccc;
+  border: 1px solid #ec1c24;
   
   height: 30px;
   width: 30px;
@@ -813,7 +828,7 @@ top: 0;
    background: #fff; right: 16px;
    top: 29px;
    
-   z-index: 99;}
+   z-index: 1;}
 #files-container .show{display: block !important}
 .popup-menu ul{    list-style: none;
   padding: 0;
@@ -822,11 +837,13 @@ top: 0;
   .form-control:focus{box-shadow: none;}
   .row1{width: 33.3%; float: left;}
 .popup-menu ul li{ padding: 7px; cursor: pointer; margin-bottom: 1px;font-size: 13px;}
-.popup-menu ul li:hover{background: #f7fbfc;color: #2c9942;}
+.popup-menu ul li:hover{background: #f7fbfc;color: var(--primary-color);    filter: sepia(50%) hue-rotate(0deg) saturate(100%);}
 .popup-menu ul li img{width: 14px; float: left; margin-top: 2px; margin-right: 5px;}
 .sidebardmsButton:hover{background: #fff;}
 
-.popup-menu ul li:hover img{filter: sepia(100%) hue-rotate(190deg) saturate(500%);}
+.popup-menu ul li:hover img{
+  filter: sepia(100%) hue-rotate(0deg) saturate(900%);
+}
 #hidegidvewlistviewbutton, #hidegidvewlistviewbutton2{justify-content: end; display: flex; gap: 5px;}
 .btngridview.active {
   background:var(--secondary-color); ; color: #fff; border-color:var(--secondary-color);
@@ -929,7 +946,7 @@ top: 0;
   
   text-overflow: ellipsis;
 }
-   .newbutton button{height: 27px; font-size: 14px; padding: 0px 0px !important;
+   .newbutton button{height: 27px !important; font-size: 14px; padding: 0px 0px !important;
   color: #000; border-radius: 4px;
   background: transparent !important;
   }

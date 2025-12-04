@@ -2,6 +2,7 @@
 let submitnew = require('../assets/submit-new.png')
 let cancelnew = require('../assets/cancelnew.png')
 let fullw = require('../assets/fulls.png')
+let fullw1 = require('../assets/exitf.png')
 // import React, { useState, useEffect } from "react";
 // import Swal from "sweetalert2";
 // import { getSP } from "../loc/pnpjsConfig";
@@ -1858,9 +1859,9 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
         fontWeight: "600", 
         
         position: isFullScreen ? "fixed" : "static",
-        top: isFullScreen ? "10px" : "auto",
-        right: isFullScreen ? "10px" : "auto",
-        zIndex: 10000, background:'#fff', padding:'6px',
+        top: isFullScreen ? "6px" : "auto",
+        right: isFullScreen ? "96px" : "auto",
+        zIndex: 10000,  padding:'6px',
         transition: "background-color 0.3s ease"
     }}
     // onMouseOver={(e) => {
@@ -1876,7 +1877,7 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
 {
   isFullScreen ? (
     <span className="mb-1 mt-2" data-tooltip="Exit Full Screen">
-      <img src={fullw} alt="Exit Full Screen" />
+      <img style={{width:'13px'}} src={fullw1} alt="Exit Full Screen" />
     </span>
   ) : (
     <span className="mb-1 mt-2" data-tooltip="Full Screen">
@@ -2023,7 +2024,7 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
                               <img  src={submitnew}></img></span>
                            
                         </button>
-                          <button className=" btncolorCreate1 mt-0" onClick={()=>window.location.reload()} 
+                          <button className=" btncolorCreate1 mt-0 alitool" onClick={()=>window.location.reload()} 
                             > <span className="mb-1 mt-2" data-tooltip="Cancel">
                              <img  src={cancelnew}></img></span> </button>
           </div></div>

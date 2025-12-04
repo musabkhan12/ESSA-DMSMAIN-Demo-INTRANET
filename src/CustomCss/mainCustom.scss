@@ -404,6 +404,9 @@ tbody tr:nth-child(odd)
 {
   background-color: #198754 !important;
 }
+div:where(.swal2-container),.modal{
+  position: absolute !important; background: rgba(246,246,246,0.87) !important;
+}
 .btn-secondary {
   --ct-btn-color: #fff;
   --ct-btn-bg: #6c757d;

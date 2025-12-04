@@ -723,7 +723,7 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
     return (
         <div>
         <div style={{display:'grid'}}>
-        <div className='card mar-9011'>
+        <div className='card mar-9011 from8'>
             <div className='card-body'>
 
           
@@ -963,7 +963,7 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
                 </span>
 
                 </div>
-                <div     onClick={handleCancel} className='me-2 mt-0 btncolorCreate1'>
+                <div     onClick={handleCancel} className='me-2 mt-0 btncolorCreate1 alitool'>
                 <span className="mb-1 mt-2" data-tooltip="Cancel">
                 <img  src={cancelnew}></img>
                 </span>

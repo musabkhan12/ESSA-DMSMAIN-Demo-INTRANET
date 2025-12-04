@@ -3,7 +3,7 @@ import { getSP } from "../loc/pnpjsConfig";
 import { SPFI } from "@pnp/sp/presets/all";
 import Swal from "sweetalert2";
 import { Modal } from 'react-bootstrap';
-
+let folderdes = require('../assets/folderdes.png');
 import '../components/uploadfilecss.css';
 
 interface FolderNode {
@@ -282,8 +282,8 @@ const uploadFileInDestination = () => {
                         gap: 4,
                         // background: "none",
                         // border: "none",
-                        color: "black",
-                        fontWeight: "bold",
+                        color: "#000",
+                        fontWeight: "400",
                         marginTop:'0px'
                         // cursor: "pointer",
                         // padding: "4px 8px"
@@ -329,19 +329,38 @@ const uploadFileInDestination = () => {
                     </div>
                 </div>
             )}
-            <div className="card mt-3">
+            <div className="card mt-0">
                 
                 <div className="card-body">
-                     <h3 className="font-16 mb-3">Bulk Upload</h3>
+                     <h3 className="mb-3 fw-bold text-dark header-title">Bulk Upload</h3>
 
                     <div className="row">
 
+                    <div className="col-sm-12">
+                            <div style={{  marginBottom: "20px" }}>
+                                <div>
+                                    <label htmlFor="file-upload">Select file:</label>
+
+                                    <input
+                                        type="file"
+                                        id="file-upload"
+                                        accept=".xlsx, .xls,.csv"
+                                        onChange={e => {
+                                            const file = e.target.files && e.target.files[0];
+                                            setSelectedFile(file || null);
+                                        }}
+                                    />
+                                </div>
+
+                            </div>
 
 
-                        <div className="col-sm-4">
+                        </div>
+
+                        <div className="col-sm-6">
                             {/* 🔹 Source Folder Dropdown */}
                             <label>Insert source folder path : </label>
-                            <input type="text" className="form-control" value={selectedSource} onChange={(e) => setSelectedSource(e.target.value)} />
+                            <input style={{height:'60px'}} type="text" className="form-control" value={selectedSource} onChange={(e) => setSelectedSource(e.target.value)} />
                             {/* <select className="form-select"
                                 value={selectedSource}
                                 onChange={(e) => setSelectedSource(e.target.value)}
@@ -354,12 +373,12 @@ const uploadFileInDestination = () => {
                                 ))}
                             </select> */}
                         </div>
-                        <div className="col-sm-4">
+                        <div style={{textAlign:'right'}} className="col-sm-6 mt-3">
 
                             {/* 🔹 Destination Folder Dropdown */}
-                            <button type="button" onClick={() => setShowModal(true)}>Select Destination Folder</button>
+                            <button className="newselc" type="button" onClick={() => setShowModal(true)}>  <img className="sidebariconssmall" src={folderdes}></img> Select Destination Folder</button>
                             {/* Breadcrumbs */}
-                            <div style={{ marginBottom: 10  , display: "flex"}}>
+                            <div style={{ marginBottom: 10  ,marginTop: 10  , display: "flex", justifyContent:'end'}}>
                                 {selectedPath.length === 0 ? (
                                     <span style={{ color: "#666" }}>No folder selected</span>
                                 ) : (
@@ -398,31 +417,19 @@ const uploadFileInDestination = () => {
 
                         </div>
 
-                        <div className="col-sm-4">
-                            <div style={{ display: "flex", alignItems: "flex-end", gap: "16px", marginBottom: "20px" }}>
-                                <div>
-                                    <label htmlFor="file-upload">Select file:</label>
-
-                                    <input
-                                        type="file"
-                                        id="file-upload"
-                                        accept=".xlsx, .xls,.csv"
-                                        onChange={e => {
-                                            const file = e.target.files && e.target.files[0];
-                                            setSelectedFile(file || null);
-                                        }}
-                                    />
-                                </div>
-
-                            </div>
-
-
-                        </div>
+                        
 
 
 
-                        <div style={{ flex: 1, display: "flex", gap: '5px', justifyContent: "center", alignItems: 'center' }}>
-                            <button className="btn btn-primary"
+                       
+                    </div>
+                </div>
+                
+                
+                </div>
+
+                <div style={{ flex: 1, display: "flex", gap: '10px', justifyContent: "end", alignItems: 'center' }} className="newrequ">
+                            <button className="btncolorCreate1"
                                 type="button"
                                 onClick={() => {
                                     handleFile((document.getElementById("file-upload") as HTMLInputElement).files![0]);
@@ -430,10 +437,12 @@ const uploadFileInDestination = () => {
                                 style={{ height: "36px" }}
                                 disabled={!selectedFile || !selectedSource.trim() || !selectedPath.length}
                             >
-                                Submit
+                                
+ <span className="mb-1 mt-2" data-tooltip="Submit">
+                                      <img  src={require("../assets/submit-new.png")}/></span>
                             </button>
 
-                            <button className="btn btn-primary"
+                            <button className="btncolorCreate1 alitool"
                                 type="button"
                                 onClick={() => {
                                     window.location.reload();
@@ -441,7 +450,8 @@ const uploadFileInDestination = () => {
                                 style={{ height: "36px" }}
 
                             >
-                                Cancel
+                                <span className="mb-1 mt-2" data-tooltip="Cancel">
+                                <img  src={require("../assets/cancelnew.png")}/></span>
                             </button>
 
                             {/* <button
@@ -459,11 +469,7 @@ const uploadFileInDestination = () => {
                                 </button> */}
 
                         </div>
-                    </div>
-                </div></div>
-
-
-            <Modal show={showModal} onHide={() => setShowModal(false)} className='newmobmodal'>
+            <Modal show={showModal} onHide={() => setShowModal(false)} className='newmobmodal' id="popfolder">
                 <Modal.Header closeButton>
                     <Modal.Title > <h4 className='font-16 text-dark fw-bold mb-1'>Select Destination Folder</h4>
                         {/* <p className='text-muted font-14 mb-0 fw-400'>Below are the attachment details for IMS Audit Plan

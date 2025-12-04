@@ -78,7 +78,7 @@ a:hover
     text-decoration: none;
 }
 .manage-master .box1:hover {
-    border: 2px solid #2c9942;
+    border: 2px solid var(--primary-color);
     background: #efefef !important;
 }
 .content-page

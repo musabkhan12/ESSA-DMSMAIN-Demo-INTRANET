@@ -181,9 +181,9 @@ input.form-control.inputcss {
   }
   
   .page-item.active .page-link {
-    background-color: #2c9942;
+    background-color: var(--primary-color);
     // color: white;
-    border-color: #2c9942;
+    border-color:var(--primary-color);
   }
   
   .page-link:hover {

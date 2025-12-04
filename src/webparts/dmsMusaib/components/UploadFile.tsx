@@ -1,6 +1,6 @@
 // @ts-ignore
 import * as React from "react";
-import { useEffect , useState , useRef} from "react";
+import { useEffect , useState , useRef, useMemo } from "react";
 import { getSP } from "../loc/pnpjsConfig";
 import { SPFI } from "@pnp/sp";
 import "@pnp/sp/webs";
@@ -10,6 +10,8 @@ import './uploadfilecss'
 import * as XLSX from 'xlsx';
 import './uploadfilecss'
 import Swal from 'sweetalert2';
+let info = require('../assets/infon.png')
+let back = require('../assets/backnew.png')
 let showbulkupload : any;
 let IsApproval : any
 let status :any;
@@ -22,7 +24,14 @@ interface UploadFileProps {
 
 let previewURLN;
 const submitButton=document.createElement('button');
-submitButton.textContent= buttontext
+const img = document.createElement("img");
+img.src = require("../assets/submit-new.png");
+img.alt = "Create";
+img.style.width = "18px";    // optional
+img.style.height = "18px";   // optional
+img.style.marginRight = "6px";
+submitButton.appendChild(img);
+// submitButton.textContent= buttontext
 submitButton.id="submitBtn";
 submitButton.type="submit";
 // submitButton.style.display='none';
@@ -2023,17 +2032,59 @@ useEffect(()=>{
     getsubmitbuttonbulk.disabled = !(isChecked && uploadedFiles.length > 0);
   }
 },[isChecked,uploadedFiles]);
-
+const breadcrumbParts = useMemo(() => {
+  try{
+    const parts: string[] = [];
+    if (currentfolderpath?.Entity) parts.push(currentfolderpath.Entity);
+    if (currentfolderpath?.DocumentLibrary) parts.push(currentfolderpath.DocumentLibrary);
+    // prefer explicit Folder prop if present
+    if (currentfolderpath?.Folder) {
+      const f = currentfolderpath.Folder;
+      if (f) parts.push(f);
+    } else if (currentfolderpath?.folderpath) {
+      const segs = String(currentfolderpath.folderpath).split('/').filter(s => s && s.trim() !== '');
+      // try to remove any site segments and the document library itself
+      const docIdx = segs.findIndex(s => s === currentfolderpath.DocumentLibrary);
+      const rest = docIdx >= 0 ? segs.slice(docIdx + 1) : segs;
+      parts.push(...rest);
+    }
+    return parts;
+  }catch(e){
+    return [];
+  }
+}, [currentfolderpath]);
     return (
       <>
-          <button className='BackButton me-3 mb-3' 
+      <div className="card mar-9011">
+      <div className="card-body">
+
+
+       
+          <div style={{float:'right'}} className='mt-0' 
           onClick={()=>{location.reload() ;onReturnToMain()}}
-          > Back 
-          </button>
-          <div className="container mt-3 UploadFileCont">
-              <div className='main-containeruploadfile'>
-              <div className='column column2 p-3'>
-                      <h1>File Preview</h1>
+          >   
+           <span className="mb-1" data-tooltip='Back'>
+           <img  src={back}></img> &nbsp;</span>
+          </div>
+          <div className="mt-3 UploadFileCont">
+              <div className='row'>
+              <div className='col-lg-6'>
+              <nav className="dms-breadcrumb" aria-label="Breadcrumb" style={{marginBottom:12}}>
+              <img className="" src={info}></img> 
+            {breadcrumbParts && breadcrumbParts.length > 0 ? (
+              breadcrumbParts.map((seg, idx) => (
+                <span key={idx} className="dms-breadcrumb-segment">
+                  <span className="dms-breadcrumb-text">{seg}</span>
+                  {idx < breadcrumbParts.length - 1 && (
+                    <span className="dms-breadcrumb-sep">&nbsp;&gt;&nbsp;</span>
+                  )}
+                </span>
+              ))
+            ) : (
+              <span className="dms-breadcrumb-text">Upload</span>
+            )}
+          </nav>
+                      {/* <h1>File Preview</h1> */}
                       <div className="borderprev">
                         {isUploading && (
                           <>
@@ -2082,27 +2133,28 @@ useEffect(()=>{
                       </div>
                       </div>
                      
-                      <div className='column p-3 column1'>
+                      <div className='col-lg-6'>
                           <form id='formSelector'>
-                              <h1>Upload file</h1>
+                              <h1 className="font-16 fw-bold text-dark mb-0">Upload file</h1>
                               {/* <label className="switch">
                               <input type="checkbox"/>
                               <span className="slider round"></span>
                             </label> */}
                             {showBulkUpload === true && ( 
-                              <p>File uploaded to this folder will require approval. After submission, a request will be sent for review. The file will only be visible and accessible once it has been approved by the designated approvers.
+                              <p style={{color:'#6c757d'}} className="font-14"> Files uploaded to this folder require approval. After submission, your request will be reviewed, and the file will become visible only after it has been approved.
  </p>
                              )}
                              <div>
       {showBulkUpload === false && ( // Show only if IsApproval is false
       <div style={{display:'flex', justifyContent:'space-between',alignItems:'center'}} className="mt-3 mb-3">
-        <p className="mb-0 text-dark">Bulk upload:</p>
+        <p className="mb-0 text-dark">Bulk  Upload :</p>
         <div style={{display:'flex', gap:'5px', alignItems:'center'}}>
           <label className="switch">
           <input type="checkbox" checked={isChecked} onChange={handleToggle} />
           <span className="slider round"></span>
+          
         </label>
-         <p className="mb-0 text-dark fw-bold">{isChecked ? "ON" : "OFF"}</p>
+        <p className="mb-0 text-dark fw-bold">{isChecked ? "ON" : "OFF"}</p>
          </div>
 
         
@@ -2121,7 +2173,11 @@ useEffect(()=>{
                   </label> */}
         <input type="file" name="bulkfile" id="bulkfile" multiple onChange={(e)=>handlebulkFileChange(e)}/>
         <ul className="newbulnup">
-  {uploadedFiles.map((file, index) => (
+        <div className="d-flex align-items-center justify-content-between"><p className="fw-bold font-14">Selected</p>
+           <span className="clearall">Clear All    <img style={{margin:'-3px 0px 0px 3px'}} src={require("../assets/delnew1.png")} /></span>
+          </div>
+            {uploadedFiles.map((file, index) => (
+              
     <li 
       key={index}
       style={{
@@ -2131,8 +2187,8 @@ useEffect(()=>{
         <div style={{width:'20px', textAlign:'center', fontSize:'14px', float:'left'}}>     
           {index + 1}.
         </div> 
-        <div className="font-14" style={{overflow:'hidden', width:'66%', textAlign:'left', textOverflow:'ellipsis',whiteSpace:'nowrap', padding:'0px 5px',  fontWeight:'500'}}>  
-          <a style={{color:'#2c9942'}} href="#" onClick={() => {
+        <div className="font-14" style={{overflow:'hidden', width:'85%', textAlign:'left', textOverflow:'ellipsis',whiteSpace:'nowrap', padding:'0px 5px',  fontWeight:'500'}}>  
+          <a style={{color:'#858585'}} href="#" onClick={() => {
               handlePreview(file.url)
               setSelectedIndex(index);
             }
@@ -2142,19 +2198,20 @@ useEffect(()=>{
         </div> 
         <div>   
           <a href="" onClick={() => handleRemove(index)} >
-            <img src={require("../assets/del.png")} className="fas fa-trash"   alt="delete" />
+            <img src={require("../assets/delnew.png")} className="fas fa-trash"   alt="delete" />
           </a>
       </div> 
     </li>
   ))}
 </ul>
 <div style={{display:'flex', justifyContent:'right'}}>
-        <button style={{display:'none',width:'130px', marginTop:'0px'}} id="submitBtn2" type="submit" onClick={handleSubmitBulk}>Bulk Submit</button> 
+        <div style={{display:'none', marginTop:'0px'}} id="submitBtn2" className="btncolorCreate1" onClick={handleSubmitBulk}> 
+        <span className="mb-1" data-tooltip='Bulk Submit'> <img src={require("../assets/submit-new.png")}    alt="delete" /> </span> </div> 
         </div>
         </div>
       )}
     </div>
-    {!isChecked ?   <h3 className="mt-2 mb-2 font-16 text-dark">Tags</h3> : null}
+    {!isChecked ?   <h3 className="mt-2 mb-2 font-16 text-dark fw-bold">Tags</h3> : null}
     
     </div>
    
@@ -2163,6 +2220,8 @@ useEffect(()=>{
 
                      
               </div>
+          </div>
+          </div>
           </div>
       </>
     );

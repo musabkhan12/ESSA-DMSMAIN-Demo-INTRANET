@@ -27,20 +27,31 @@
 .sidebariconssmall{
   width: 14px; 
 }
+.newdovvlose {
+  position: absolute;
+  margin-top: -194px;
+  right: 56%;
+}
+.newdovvlose .sidebariconssmall{
+  width: 17px; 
+} 
+.Airesponse .card{
+  width: 48.1% !important;
+}
 .tool img{width: auto !important;}
 .bgnewwhite{background: #fff; padding: 12px 12px 0px 12px;}
 .bgnewwhite1{background: #fbfbfb; padding: 12px;}
 .librarydata{
   /* margin-top: 3rem; */
   /* padding: 20px; */
-  margin-top: 0rem;
+  margin-top: 0rem; position: relative;
  
  overflow: initial !important;
   width: 80%;  padding:0px;
   float: left; margin-top: 10px;  margin-left:10px; border-radius: 0px;
 
 }.newright{
-  border-left:1px solid #dfdfdf; width: 170px; display: block; text-align: center;
+  border-left:1px solid #dfdfdf; width: 100px; display: block; text-align: center;
 }
 .bordernewr{border-left:1px solid #dfdfdf; width: 100px;text-align: center; display: block !important;}
 .missing-link{width: 80px; text-align: center; border-left: 1px solid #dfdfdf;}
@@ -55,7 +66,7 @@
   .cardsearch p.mb-0{margin-bottom: 0px !important;}
   .cardsearch .p1st a{color: #000 !important;}
   .width50{width: 50% !important; float: left;}
-  .cardsearch .p1st a:hover{color: #2c9942 !important;}
+  .cardsearch .p1st a:hover{color: var(--primary-color) !important;}
   .cardsearch .p2nd span{font-weight: 600; color: #000;}
   .cardsearch .newfont{font-size: 14px;}
   .cardsearch .newdes{display: flex; gap: 10px;}
@@ -100,19 +111,21 @@ button:hover{
         top: 10px;
         width: 35px;
         height: 35px;
-        border: 1px solid #ccc;
+        border: 1px solid var(--primary-color) !important;
         border-radius: 1000px;
         text-align: center;
         line-height: 35px;
-        color: #333;
+        color: var(--primary-color) !important;
     }
     .btn-primary{
       background:#2c9942; border-color:#2c9942;
     }
+    .newselc{border: 1px solid #fa901d !important; color:#fa901d !important; background: #fff !important;}
  
 .btn-secondary {
   background:#6c757d; color:#fff; border:1px solid #6c757d;    display: inline-block;
 }
+.newselc:hover{background: transparent !important;}
 .Backbutton {display: flex;
     justify-content: end;
     margin-bottom: 10px;
@@ -229,7 +242,7 @@ a:hover
   text-decoration: none;
 }
 .manage-master .box1:hover {
-  border: 2px solid #2c9942;
+  border: 2px solid var(--primary-color);
   background: #efefef !important;
 }
 
@@ -431,27 +444,40 @@ a:hover
 /* Css for share file popup */
  
 /* Pop-up container */
+
 .share-popup {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  background-color:rgba(0, 0, 0, 0.7);
+  height: 100vh;
+  background-color:rgba(246,246,246,0.87);
   /* box-shadow:  rgba(0, 0, 0, 0.7); */
   display: flex;
   justify-content: center;
-  align-items: center;
-  z-index: 9999;
+  align-items: start;padding-top: 70px;
+  z-index: 1; 
 }
- 
+ #renamefile-popup,#blurOverlay{
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100%;
+  height: 100vh;
+  background-color:rgba(246,246,246,0.87);
+  /* box-shadow:  rgba(0, 0, 0, 0.7); */
+  display: flex;
+  justify-content: center;
+  align-items: start; padding-top: 70px;
+  z-index: 1;
+ }
 /* Popup content */
 .share-popup-content {
   display: flex;
   flex-direction: column;
   background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  border: 0px solid #ccc;
+  border-radius: 5px;
   padding: 20px;
   width: 500px;
 }
@@ -468,10 +494,10 @@ a:hover
 }
  
 /* Close "X" button */
-.share-close-popup {
-  border: 1px solid #ededed;
+.share-close-popup,#closePopup {
+  border: 1px solid var(--primary-color) !important;
   border-radius: 1000px;
-  color: #666;
+  color: var(--primary-color) !important;
   cursor: pointer;
   font-size: 19px;
   font-weight: 700;
@@ -543,6 +569,9 @@ input::placeholder,select::placeholder,textarea::placeholder,#react-select-3-pla
 .popup-footer button:hover {
   background-color: #66AEE0;
 }
+.share-popup-footer button:hover{
+  background: transparent !important;
+}
  
 #userSelect {
     width: 100%;
@@ -567,25 +596,25 @@ input::placeholder,select::placeholder,textarea::placeholder,#react-select-3-pla
 .blur-backround{
   width: 600px;
     background: #fff;
-    border-radius: 8px;
+    border-radius: 5px;
     padding: 20px;
     position: relative;
 }
 #renameForm button{margin-top: 0px !important;}
 .edit-popup,#rename-popup,#renamePopup {
-  position: fixed;
+  position: absolute !important;
 
   width: 100%;
-z-index: 99999;
+z-index: 2;
  
 top: 0;
-  background: rgba(0, 0, 0, 0.5);
-  position: fixed;
+  background: rgba(246,246,246,0.87) !important;
+  
   height: 100%;  
   display: flex
   ;
       justify-content: center;
-      align-items: center;
+      align-items: start; padding-top: 70px;
  
 }
 #addMetaColumn-wrapper .bi-plus{
@@ -672,9 +701,12 @@ top: 0;
   font-size: 14px; float:none; margin: 20px auto 0px;
 }
 
-label{font-size: 0.875rem !important; font-weight: 400 !important; color: #6c757d !important;}
+label{font-size: 0.9rem !important; font-weight: 500 !important; color: #6c757d !important;}
 .edit-popup button:hover {
-  background-color: #45a049;
+  background-color: var(--secondary-color);
+}
+.newrequ button:hover{
+  background: transparent !important;;
 }
  
 /* Close button or cancel */
@@ -694,14 +726,14 @@ label{font-size: 0.875rem !important; font-weight: 400 !important; color: #6c757
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh !important;
   background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
-  align-items: center;
-  z-index: 10000;
+  align-items: start;
+  z-index: 1; padding-top: 70px;
 }
- 
+#showfolderpermission .modal, #workflowdiv .modal{height: 100vh !important;}
 .popup-content-auditHistory {
   background: white;
   padding: 20px;
@@ -728,7 +760,7 @@ label{font-size: 0.875rem !important; font-weight: 400 !important; color: #6c757
 .close-btn {
   cursor: pointer;
   font-size: 24px;
-  padding: 5px;
+  padding: 5px; color: #ec1c24;
 }
  
 .popup-details {
@@ -851,7 +883,7 @@ border-radius: 5px;}
 
 
 .myrequestp3rd{
-  width: 100px !important;
+  width: 98px !important;
  
 }
  
@@ -871,7 +903,7 @@ border-radius: 5px;}
 .folderthreedots{
   width: 33px;
 }
-#dynamicPopup{z-index: 99999 !important;}
+#dynamicPopup{z-index: 1 !important;}
 .root-folder {
   background-color: #f0f8ff; /* Light blue for root folder */
 }
@@ -901,12 +933,40 @@ border-radius: 5px;}
   height: 107px; padding: 0.75rem; position: relative !important;
 }
 .search-container input:focus{outline: 1px solid #2c9942 !important;}
+
+@media(max-width:1920px){
+  .newdovvlose {right: 40%;}
+}
+@media(max-width:1800px){
+  .newdovvlose {right: 43%;}
+}
 @media(max-width:1660px){
   .footer{bottom: 0px; margin-top: 15px;}
   .librarydata{
     margin-bottom: 50px !important;
   }
+  .newdovvlose {right: 50%;}
 }
+@media(max-width:1440px){
+  .newdovvlose {right: 57%;}
+  .Airesponse .card {
+    width: 47.5% !important;
+}
+.p3rd {
+ 
+  width: 30% !important;
+}
+}
+@media(max-width:1280px){
+  .newdovvlose {right: 64%;}
+  .librarydata{
+    width: 79.4%;
+  }
+  .Airesponse .card {
+    width: 97.1% !important;
+}
+}
+
 @media(max-width:640px){
   .w90{width: 80% !important; float: left;}
   .w20{
@@ -979,16 +1039,42 @@ text-align: center;}
   padding-left: 0px;
 }
 .buttonstyle12{position: relative; top:-100px;}
+.newmobmodal  button:hover{
+  background: #c0d3e8 !important;;
+}
+.bg-class-name{background-image: url(../assets/Groupno.png);
+  height: 350px;
+  background-position: center;
+  background-repeat: no-repeat; background-color: #fff;
+}
+#dynamicPopup{
+  position: absolute !important; height: 100vh !important; align-items: start !important; padding-top: 70px;background: hsla(0, 0%, 96%, .87) !important;
+}
+.newmobmodal  button{padding:0px 10px ; font-size: 14px !important;}
 .btncolorCreate1{    background: #fff;
-  border-radius: 1000px;
-  height: 50px;
-  width: 50px;
+  border-radius: 1000px !important;
+  height: 50px !important;
+  width: 50px !important;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center;    box-shadow: 0 4px 8px rgba(0, 0, 0, .3);
   padding: 10px !important;}
   .btncolorCreate1:hover{
     background: #fff !important;
+  }
+  #renamefile-popup button{
+    align-items: center;
+    background: #fff !important;
+    border-radius: 1000px !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, .3);
+    display: flex;
+    height: 50px !important;
+    justify-content: center;
+    padding: 10px !important;
+    width: 50px !important;
+  }
+  .from8 .ms-DatePicker{
+    margin-top: -5px;
   }
   .cancelnewi{
     margin-left: 2px;
@@ -1002,11 +1088,11 @@ text-align: center;}
   .OneUpTextFileContainer{
     width: 100% !important;
   }
-.borderprev{border: 1px solid #2c9942;
+.borderprev{border: 10px solid #d9d9d9;
   //  height: 483px; 
-   height: 98% !important;  
   
-  border-radius: 20px; 
+  
+  border-radius: 0px; 
   
   // margin-top: 30px;
   margin-top: 0px !important;
@@ -1137,7 +1223,7 @@ text-align: center;}
 /* Add this attribute to the element that needs a tooltip */
  [data-tooltip] {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   cursor: pointer;
 }
 
@@ -1158,15 +1244,15 @@ text-align: center;}
   margin-left: -80px; /* Center the tooltip horizontally */
   padding: 7px;
   width: 120px; /* Adjusted width */
-  border-radius: 0px; /* Rounded corners */
-  background-color: #333; /* Dark background for visibility */
+  border-radius: 5px; /* Rounded corners */
+  background-color: #fa901d;/* Dark background for visibility */
   color: #fff; /* White text */
   content: attr(data-tooltip);
   text-align: center;
   font-size: 14px;
-  line-height: 1.2;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Add box shadow */
-  white-space: break-spaces;
+  line-height: 1.1;
+  box-shadow: 0 0px 4px rgba(0, 0, 0, .3);/* Add box shadow */
+  white-space: break-spaces;    font-weight: 600;
 }
 
 /* Triangle hack to make tooltip look like a speech bubble */
@@ -1176,9 +1262,9 @@ text-align: center;}
   left: 50%;
   margin-left: -5px;
   width: 0;
-  border-bottom: 5px solid #333; /* Match the tooltip background */
-  border-right: 5px solid transparent;
-  border-left: 5px solid transparent;
+  border-bottom: 10px solid #fa901d;/* Match the tooltip background */
+  border-right: 10px solid transparent;
+  border-left: 10px solid transparent;
   content: " ";
   font-size: 0;
   line-height: 0;
@@ -1215,28 +1301,28 @@ button [data-tooltip]:after{
   margin-top: 10px; /* Space between element and tooltip */
   margin-left: -80px; /* Center the tooltip horizontally */
   padding: 7px;
-  width: 160px; /* Adjusted width */
-  border-radius: 0px; /* Rounded corners */
-  background-color: #333; /* Dark background for visibility */
+  width: 120px; /* Adjusted width */
+  border-radius: 5px; /* Rounded corners */
+  background-color: #fa901d; /* Dark background for visibility */
   color: #fff; /* White text */
   content: attr(data-tooltip);
   text-align: center;
   font-size: 14px;
-  line-height: 1.2;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Add box shadow */
-  white-space: break-spaces;
+  line-height: 1.1;
+  box-shadow: 0 0px 4px rgba(0, 0, 0, .3); /* Add box shadow */
+  white-space: break-spaces;    font-weight: 600;
 }
 
 /* Triangle hack to make tooltip look like a speech bubble */
 .tool [data-tooltip]:after {
   position: absolute;
-  top: 25px;  /* Position the arrow above the tooltip */
+  top: 21px;  /* Position the arrow above the tooltip */
   left: 50%;
   margin-left: -5px;
   width: 0;
-  border-bottom: 5px solid #333; /* Match the tooltip background */
-  border-right: 5px solid transparent;
-  border-left: 5px solid transparent;
+  border-bottom: 10px solid #fa901d; /* Match the tooltip background */
+  border-right: 10px solid transparent;
+  border-left: 10px solid transparent;
   content: " ";
   font-size: 0;
   line-height: 0;
@@ -1248,7 +1334,45 @@ button [data-tooltip]:after{
   visibility: visible;
   opacity: 1;
 }
-.btn-group #dropdown-left .dropdown-toggle:after{
+.remoare:after{
   display: none !important;
 }
+.btncolorCreate1 [data-tooltip]:after{
+  top: 38px;
+}
+.alitool [data-tooltip]:after{
+  top: 42px;
+}
+#showfolderpermission .modal,#workflowdiv .modal{position: absolute !important; z-index: 2 !important; justify-content: center; display: flex !important; }
 .buttonalignment button{right:40px !important;    top: 22.6% !important;}
+.my-class{
+  position: absolute;
+  top: -8px !important;
+  right: 0px !important;
+  background: #fff;
+  width: 38px;
+  height: 38px;
+  border-radius: 1000px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;     margin-top: -172px !important;
+ 
+  margin-right: -35px !important;   box-shadow: 0 4px 8px rgba(0, 0, 0, .3);
+}
+.my-class:hover{background: transparent !important;}
+.my-class-new{margin-top: -81px; background: #fff;}
+.renamefile-popup button{
+  background: #fff;
+  width: 38px;
+  height: 38px;
+  border-radius: 1000px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;box-shadow: 0 4px 8px rgba(0, 0, 0, .3);
+}
+.my-class-new iframe{margin-top:60px !important;}
+.renamefile-popup button:hover{background: transparent !important;}
+
+.newdovvlose button:hover{background: transparent  !important;}

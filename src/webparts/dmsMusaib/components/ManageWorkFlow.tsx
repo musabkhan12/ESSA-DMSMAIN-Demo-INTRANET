@@ -401,7 +401,7 @@ const handleCreate = async(e: any) => {
                       <div className="" style={{ height: "auto", width: "100%" }}>
                       <div  className='row'>
                       <div className='col-sm-8 w90'>
-                                        <h5 className="mb-1 Permissionsectionstyle">
+                                        <h5 style={{color:'#838383'}} className="mb-0 Permissionsectionstyle fw-bold">
                                           Approval Hierarchy
                                         </h5>
                                         <p className="subheadernew font-14">
@@ -415,7 +415,7 @@ const handleCreate = async(e: any) => {
                                             <div className="mb-0">
                                           <div style={{height:'20px'}} className="col-12 d-flex justify-content-end">
                                             <a onClick={handleAddRow}>
-                                              <img className="bi bi-plus" src={require("../assets/plus.png")} alt="add" style={{ width: "50px", position:'relative', height: "50px", top:'0' }} />
+                                              <img className="" src={require("../assets/addnew.png")} alt="add" style={{  position:'relative',  top:'7px' }} />
                                             </a>
                                           </div>
                                         </div>
@@ -499,8 +499,8 @@ const handleCreate = async(e: any) => {
                                             <td style={{minWidth:'40px',maxWidth:'40px', textAlign:'center'}}>
                                             {row.id === 0 ? null : (
                                               <div style={{textAlign:'center', justifyContent:'center'}} className="d-flex align-items-end">
-                                                <a onClick={(e) => handleRemoveRow(row.id, e)} style={{ width: "50px", height: "50px", cursor: "pointer" }}>
-                                                  <img className="fas fa-trash" src={require("../assets/del.png")} alt="delete" />
+                                                <a onClick={(e) => handleRemoveRow(row.id, e)} style={{ width: "50px",  cursor: "pointer" }}>
+                                                  <img className="fas" src={require("../assets/delemodal.png")} alt="delete" />
                                                 </a>
                                               </div>
                                             )}
@@ -512,17 +512,19 @@ const handleCreate = async(e: any) => {
                                         </tbody>
                                         </table>
                                       </div>  </div>
-                                      <div className="modal-footer">
-                                      <button type="button" className="btn btn-primary" 
+                                      <div className="modal-footer d-flex justify-content-end">
+                                      <button type="button" className="btncolorCreate1" 
                                       onClick={handleCreate}
                                       >
-                                        Create
+                                                             <span className="mb-1 mt-2" data-tooltip="Submit">
+                                                             <img  src={require("../assets/submit-new.png")}/></span>
                                       </button>
-                                      <button type="button" className="btn btn-secondary" 
+                                      <button type="button" className="btncolorCreate1 alitool" 
                                       //   onClick={toggleModal}
                                       onClick={onReturnToMain}
                                       >
-                                          Cancel{" "}
+<span className="mb-1 mt-2" data-tooltip="Cancel">
+<img  src={require("../assets/cancelnew.png")}/></span>
                                       </button>
                                     </div> 
                   </div>) : 

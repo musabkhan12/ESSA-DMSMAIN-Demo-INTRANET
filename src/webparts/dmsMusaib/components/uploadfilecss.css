@@ -46,7 +46,7 @@
   width: 100%;
 }
 .UploadFileCont{
-  padding-top: 53px;
+  padding-top: 20px;
 }
 .ms-OverflowSet-item{
     display: none !important;
@@ -142,15 +142,15 @@ display: none !important;
 .main-containeruploadfile {
   display: flex;
   gap: 15px;
-  padding: 10px;
+  padding: 0px;
   background: #fff;
-  border-radius: 10px;    border: 1px solid #2c9942;
+  border-radius: 0px;    border: 0px solid #2c9942;
   }
 
   /* Child divs */
   .main-containeruploadfile .column {
-    border-radius: 10px;
-    padding: 15px;
+    border-radius: 0px;
+    padding: 0px;
     /* border: 1px solid #2c9942; */
     font-size: 16px;
   
@@ -169,15 +169,16 @@ display: none !important;
     width: 70%;
   }
 .newbulnup {list-style: none; padding: 0px; margin: 10px 0px 0px 0px;}
-.newbulnup li{    border: 1px solid #ccc;
-  border-radius: 30px;
+.newbulnup li{       align-items: center;
+  border: 2px dashed #ccc;
+  border-radius: 4px;
   display: flex;
-  margin: 3px;
-  padding: 2px 5px;
-  width: 32%;
   float: left;
   justify-content: space-around;
-  align-items: center;}
+  margin: 8px 0px 3px 6px;
+  padding: 2px 5px;
+  width: 32%;
+  position: relative;}
   .input-container {
     margin-bottom: 10px; /* Space between each input */
     display: flex;
@@ -186,7 +187,7 @@ display: none !important;
   .column1{padding-left: 0px !important;}
   label {
     font-weight: bold;
-    margin-bottom: 5px; font-size:14px; font-weight:700;
+    margin-bottom: 5px;  font-size:0.9rem !important; font-weight:500 !important;
   }
   
   input {
@@ -290,7 +291,7 @@ display: none !important;
   width: 100%;
 }
 .UploadFileCont{
-  padding-top: 53px;
+  padding-top: 20px;
 }
 .ms-OverflowSet-item{
     display: none !important;
@@ -386,16 +387,16 @@ display: none !important;
 .main-containeruploadfile {
   display: flex;
   gap: 15px;
-  padding: 10px;
+  padding: 0px;
   background: #fff;
-  border-radius: 10px;    border: 1px solid #2c9942;
+  border-radius: 0px;    border: 0px solid #2c9942;
   height: 100% !important;
   }
 
   /* Child divs */
   .main-containeruploadfile .column {
-    border-radius: 10px;
-    padding: 15px;
+    border-radius: 0px;
+    padding: 0px;
     /* border: 1px solid #2c9942; */
     font-size: 16px;
  
@@ -419,6 +420,7 @@ display: none !important;
     display: flex;
     flex-direction: column; /* Ensure label is on top of the input */
   }
+  .input-container input{height: 40px !important;}
   .input-container input[type="checkbox"]{
     width: 26px;
     height: 26px;
@@ -446,7 +448,7 @@ display: none !important;
   }
   label {
     font-weight: bold;
-    margin-bottom: 5px; font-size:14px; font-weight:700;
+    margin-bottom: 5px; font-size:0.9rem !important; font-weight:500 !important;
   }
   
   input {
@@ -527,32 +529,33 @@ display: none !important;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: #f2f2f2;
   -webkit-transition: .4s;
-  transition: .4s;
+  transition: .4s;    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .slider:before {
   position: absolute;
   content: "";
 
-  bottom: 5px;
+  background-color: #fbab56;
+  bottom: 2px;
   content: "";
-  height: 20px;
-  left: 4px;
-  width: 20px;
+  height: 25px;
+  left: 6px;
+  width: 25px;
 
-  background-color: white;
+
   -webkit-transition: .4s;
   transition: .4s;
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+  background-color: #f2f2f2;
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
+  box-shadow: 0 0 1px #f2f2f2;
 }
 
 input:checked + .slider:before {
@@ -569,27 +572,36 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
-#filePreview{height: 850px !important; border-radius: 20px !important;}
+#filePreview{height: 750px !important; border-radius: 0px !important;}
 div[class*=OneUpModalSizing]>div.ms-Dialog-main{
   background: #fff !important;
 }
-
+input[type=file]{
+  border: 3px dashed #ccc !important;
+  padding: 5px;
+}
+.clearall{
+  background: #f8f8f8;
+  border: 1px solid #dfdfdf;
+  padding: 2px 10px;
+  font-size: 14px;
+  color: #6a6a6a;}
 
 /* this css was added as file preview was coming oiut of dic  */
 
 
 .borderprev {
 
-  border: 1px solid #2c9942;
+  border: 10px solid #d9d9d9;
 
-  border-radius: 10px;
+  border-radius: 0px;
 
-  padding: 10px;
+  padding: 0px;
 
   overflow: hidden; 
 
   /* height: 400px;  */
-  height: 98% !important; 
+  height: 100% !important; 
 
   position: relative; 
   margin-top: 0px !important;

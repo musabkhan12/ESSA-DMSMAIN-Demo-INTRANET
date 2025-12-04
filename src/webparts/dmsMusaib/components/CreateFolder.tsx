@@ -12,6 +12,7 @@ import "./CreateFoldercss";
 import Select from "react-select";
 import Swal from "sweetalert2";
 let backnew = require('../assets/backnew.png')
+let info = require('../assets/infon.png')
 // import Form from "react-bootstrap/Form";
 
 // let selectedArrayForUserPermission:{
@@ -1345,10 +1346,31 @@ const validateFields = () => {
     <>
      
       <div className="mt-3 newsmart">
+
+      <div className="card cardbottom">
+        <div className="card-body paddn-0">
+          <div className="d-flex align-items-center justify-content-between">
+        <div className="d-flex align-items-center gap-2">
+        <img className="" src={info}></img>   <p id="breadCrumb" className="font-16 mb-0"></p>  
+          
+
+</div>
+        <div className="BackButton1 p-0 me-0 mb-1"
+         onClick={()=>{location.reload() ;onReturnToMain()}}
+      >
+ 
+ <span className="mb-1" data-tooltip='Back'>
+
+<img className="" src={backnew}></img> &nbsp;</span>
+      </div>
+      </div>
+
+      </div>
+      </div>
      
         <div className="card">
         <div className="card-body">
-          <div className="d-flex align-items-center justify-content-between">
+          {/* <div className="d-flex align-items-center justify-content-between">
           <p id="breadCrumb" className="fw-bold font-16"></p>
         <div className="BackButton1 p-0 me-0 mb-3"
          onClick={()=>{location.reload() ;onReturnToMain()}}
@@ -1358,7 +1380,7 @@ const validateFields = () => {
 
 <img className="" src={backnew}></img> &nbsp;</span>
       </div>
-      </div>
+      </div> */}
       {isLoading && (
       <div className='loaderOverlay'>
         <div className='loader'>
@@ -1369,7 +1391,7 @@ const validateFields = () => {
           <form>
             <div className="row mt-0">
               <h3 className="header-title text-dark font-16 mb-1 fw-bold">Basic Information</h3>
-              <p className="subheader font-14 mb-3">Specify Basic Information and create folder  </p>
+              <p className="subheader font-14 mb-3">Enter basic information to create the folder</p>
               <div className="col-12 col-md-6 mb-3">
                 <div className="form-group">
                   <label htmlFor="folderName" className="headerfont" style={{ display: "flex", alignItems: "center" }}>
@@ -1525,7 +1547,7 @@ const validateFields = () => {
               <div className="row mt-0" id="addFieldsButton">
                 <div className="col-md-10  w90">
                 <h3 className="header-title text-dark font-16 mb-1 fw-bold">List of tags</h3>
-                <p className="subheader font-14 mb-3">Specify sub folder and create list of tags to be prepared and submitted by team members.</p>
+                <p className="subheader font-14 mb-3">Specify the tag and create the list of tags that team members will prepare and submit.</p>
                 </div>
                
                 <div style={{position:'relative'}} className="col-md-2">
@@ -1533,7 +1555,7 @@ const validateFields = () => {
                   <div className="col-12 d-flex justify-content-end">
                       <a onClick={handleAddFields}>
                       <img 
-                            className="bi bi-plus"
+                            className="bi"
                             src={require("../assets/addnew.png")}
                             alt="add"
                             style={{ width: "auto", top:'5px', left:'auto', right:'5px', marginLeft:'16px', position:'absolute', height: "auto" }}
@@ -1621,8 +1643,8 @@ const validateFields = () => {
                     }}
                   >
                     <img style={{marginTop:'0px'}}
-                      className="fas fa-trash"
-                      src={require("../assets/del.png")}
+                      className="fas"
+                      src={require("../assets/delemodal.png")}
                       alt="delete"
                     />
                   </a>
@@ -1655,8 +1677,7 @@ const validateFields = () => {
               <h3 className="header-title text-dark font-16 mb-1 fw-bold">Approval Hierarchy</h3>
      
      <p className="subheader font-14 mb-3">
-       Define approval hierarchy for the documents submitted by Team
-       members in this folder.
+     Set permissions for documents submitted by team members in this folder.
      </p>
 
               </div>
@@ -1909,7 +1930,7 @@ const validateFields = () => {
                                       }}
                                     >
                                       <img
-                                        className="fas fa-trash"
+                                        className="fas"
                                         src={require("../assets/del.png")}
                                         alt="delete"
                                       />
@@ -1946,7 +1967,7 @@ const validateFields = () => {
           />
           </span>
         </button>
-        <button className=" btncolorCreate1 mt-0" onClick={clearForm}>
+        <button className=" btncolorCreate1 mt-0 alitool" onClick={clearForm}>
         <span className="mb-1 mt-2" data-tooltip='Cancel'>  <img
             className="cancelnewi" 
             src={require("../assets/cancelnew.png")}

@@ -382,7 +382,7 @@ const ManageFolderPermission : React.FC<ManageFolderPermissionProps> = ({
                                   {/* {row.id === 0 ? null : ( */}
                                     <div className="col-12 col-md-2 d-flex align-items-end">
                                       <a onClick={(e) => handleRemoveRow(row.id, e)} style={{ width: "50px",    height: "50px", cursor: "pointer" }}>
-                                        <img className="fas fa-trash" src={require("../assets/delete.png")} alt="delete" />
+                                        <img className="fas" src={require("../assets/delete.png")} alt="delete" />
                                       </a>
                                     </div>
                                   {/* )} */}
@@ -433,13 +433,15 @@ const ManageFolderPermission : React.FC<ManageFolderPermissionProps> = ({
                                     <button type="button" className="btn btn-primary" 
                                     onClick={handleCreate}
                                     >
-                                    Create
+                               <span className="mb-1 mt-2" data-tooltip="Submit">
+                               <img  src={require("../assets/submit-new.png")}/></span>
                                     </button>
                                     <button type="button" className="btn btn-secondary" 
                                     //   onClick={toggleModal}
                                     onClick={onReturnToMain}
                                     >
-                                        Cancel{" "}
+                                        <span className="mb-1 mt-2" data-tooltip="Cancel">
+                                        <img  src={require("../assets/cancelnew.png")}/></span>
                                     </button>
                             </div>
                       </div>

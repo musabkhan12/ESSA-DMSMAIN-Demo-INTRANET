@@ -44,11 +44,11 @@
           top: 10px;
           width: 35px;
           height: 35px;
-          border: 1px solid #ccc;
+          border: 1px solid var(--primary-color) !important;
           border-radius: 1000px;
           text-align: center;
           line-height: 35px;
-          color: #ccc;
+          color: var(--primary-color) !important;
       }
       .btn-primary{
         background:#2c9942; border-color:#2c9942;
@@ -373,17 +373,17 @@
    
   /* Pop-up container */
   .share-popup {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background-color:rgba(0, 0, 0, 0.7);
+    height: 100vh;
+    background-color:rgba(246,246,246,0.87);
     /* box-shadow:  rgba(0, 0, 0, 0.7); */
     display: flex;
     justify-content: center;
-    align-items: center;
-    z-index: 9999;
+    padding-top: 70px; align-items: start;
+    z-index: 1;
   }
    
   /* Popup content */
@@ -391,8 +391,8 @@
     display: flex;
     flex-direction: column;
     background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    border: 0px solid #ccc;
+    border-radius: 5px;
     padding: 20px;
     width: 500px;
   }
@@ -410,7 +410,7 @@
   .share-close-popup {
     cursor: pointer;
     font-size: 18px;
-    color: #333;
+    color:var(--primary-color);
     font-weight: bold;
   }
    #folderContainer2 ul li{font-weight:400; margin-top: 6px; }
@@ -575,12 +575,12 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 100ch;
     background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
-    align-items: center;
-    z-index: 10000;
+    align-items: start;
+    z-index: 1; padding-top: 70px;
   }
    
   .popup-content-auditHistory {
@@ -607,7 +607,7 @@
   .close-btn {
     cursor: pointer;
     font-size: 24px;
-    padding: 5px;
+    padding: 5px; color: #ec1c24;
   }
    
   .popup-details {
