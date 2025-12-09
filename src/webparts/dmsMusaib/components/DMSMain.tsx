@@ -162,7 +162,7 @@ let recyclebin = require('../assets/recyn.png')
 let sharewithothericon = require('../assets/shar12.png')
 let sharenew = require('../assets/Newshare.png')
 let starticon = require('../assets/myfav.png')
-let listicon = require('../assets/uploadfile.png')
+let listicon = require('../assets/upload-n.png')
 let create1 = require('../assets/uploafnew.png')
 let create2 = require('../assets/createnew.png')
 let listicon1 = require('../assets/link.png')
@@ -250,7 +250,8 @@ const ArgPoc = ({ props }: any) => {
   // console.log(sp, "sp");
   let locationPath=window.location.pathname.match(/\/sites\/[^\/]+/)[0];
   const [showDeletepopup, setShowDeletepopup] = useState(false);
- const [activeButton] = React.useState<string>("");
+//  const [activeButton] = React.useState<string>("");
+const [activeButton, setActiveButton] = React.useState<string>("MyRequest");
   const { useHide }: any = React.useContext(UserContext);
   const elementRef = React.useRef<HTMLDivElement>(null);
   const [showFirstDiv, setShowFirstDiv] = useState(true);
@@ -5908,6 +5909,7 @@ blurOverlay.id = "blurOverlay";
 
   // Create the popup dynamically
   const popupContainer = document.createElement("div");
+  popupContainer.className = "version-history-popup";
   popupContainer.style.cssText = `
     position: absolute;
     top: 20%;
@@ -8248,7 +8250,7 @@ const ShareWithOther = async (
 
       const nextButton = document.createElement("button");
       nextButton.textContent = "Next";
-      nextButton.className = "pagination-container-buttons2";
+      nextButton.className = "pagination-container-buttons2 rightalignpagination";
 
       const disablePrev = currentPage === 1;
       const disableNext = currentPage === totalPages;
@@ -8275,7 +8277,7 @@ const ShareWithOther = async (
 
       const pageInfo = document.createElement("span");
       pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-      pageInfo.style.margin = "12px 103px 0px 0px";
+      pageInfo.style.margin = "12px 95px 0px 0px";
       pageInfo.style.lineHeight = "30px";
       pageInfo.style.fontSize = "12px";
 
@@ -8288,7 +8290,7 @@ const ShareWithOther = async (
         button.style.border = "1px solid #ddd";
         button.style.backgroundColor = "#f8f9fa";
         button.style.borderRadius = "4px";
-        button.style.fontSize = "14px";
+        button.style.fontSize = "12px";
       };
 
       styleButton(prevButton);
@@ -9362,20 +9364,21 @@ const ShareWithMe = async (event: React.MouseEvent<HTMLButtonElement> = null, se
 
   const nextBtn = document.createElement("button");
   nextBtn.textContent = "Next";
-  nextBtn.className = "pagination-container-buttons2";
+  nextBtn.className = "pagination-container-buttons2 rightalignpagination";
 
   const pageInfo = document.createElement("span");
   pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-  pageInfo.style.margin = "12px 103px 0px 0px";
+  pageInfo.style.margin = "12px 95px 0px 0px";
   pageInfo.style.lineHeight = "30px";
   pageInfo.style.fontSize = "12";
+  pageInfo.style.right = "2px !important";
 
   // Disable/enable buttons with styles
   const styleButton = (button: HTMLButtonElement, disabled: boolean) => {
     button.style.border = "1px solid #ddd";
     button.style.backgroundColor = "#f8f9fa";
     button.style.borderRadius = "4px";
-    button.style.fontSize = "14px";
+    button.style.fontSize = "12px";
     button.style.opacity = disabled ? "0.6" : "1";
     button.style.cursor = disabled ? "not-allowed" : "pointer";
     button.disabled = disabled;
@@ -10354,16 +10357,17 @@ const Recyclebin = async (
       // Next button
       const nextButton = document.createElement("button");
       nextButton.textContent = "Next";
-      nextButton.className = "pagination-container-buttons2";
+      nextButton.className = "pagination-container-buttons2 rightalignpagination";
       nextButton.disabled = currentPage >= totalPages;
       nextButton.onclick = () => displayItems(currentPage + 1);
       
       // Page info
       const pageInfo = document.createElement("span");
       pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-      pageInfo.style.margin = "12px 103px 0px 0px";
+      pageInfo.style.margin = "12px 95px 0px 0px";
   pageInfo.style.lineHeight = "30px";
   pageInfo.style.fontSize = "12px";
+  pageInfo.style.right = "2px !important";
 
       // Apply disabled styles
       if (prevButton.disabled) {
@@ -13173,7 +13177,7 @@ const mycreatedfolders = async (event: any = null, searchText: any = null) => {
             // Next button
             const nextButton = document.createElement("button");
             nextButton.textContent = "Next";
-             nextButton.className = "pagination-container-buttons2"
+             nextButton.className = "pagination-container-buttons2 rightalignpagination"
             //  
             // nextButton.disabled = currentPage === totalPages;
             nextButton.addEventListener("click", () => {
@@ -13219,9 +13223,10 @@ if (disableNext) {
             const pageInfo = document.createElement("span");
             // pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
            pageInfo.textContent = `Page ${currentPage} of ${Math.max(totalPages, 1)}`;
-           pageInfo.style.margin = "12px 103px 0px 0px";
+           pageInfo.style.margin = "12px 95px 0px 0px";
            pageInfo.style.lineHeight = "30px";
            pageInfo.style.fontSize = "12px";
+           pageInfo.style.right = "2px !important";
   
             // Add controls to container
                   paginationContainer.appendChild(creatediv); 
@@ -13238,7 +13243,7 @@ if (disableNext) {
                 button.style.backgroundColor = "#f8f9fa";
                 button.style.borderRadius = "4px";
                 // button.style.cursor = "pointer";
-                button.style.fontSize = "14px";
+                button.style.fontSize = "12";
                 if (button.disabled) {
                     // button.style.opacity = "0.5";
                 }
@@ -17373,7 +17378,7 @@ const myRequest = async (
     // Next button
     const nextButton = document.createElement("button");
     nextButton.textContent = "Next";
-    nextButton.className = "pagination-container-buttons2";
+    nextButton.className = "pagination-container-buttons2 rightalignpagination";
     nextButton.disabled = currentPage === totalPages;
     nextButton.onclick = () => {
       if (currentPage < totalPages) {
@@ -17384,9 +17389,10 @@ const myRequest = async (
     // Page info
     const pageInfo = document.createElement("span");
     pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-    pageInfo.style.margin = "12px 103px 0px 0px";
+    pageInfo.style.margin = "12px 95px 0px 0px";
     pageInfo.style.lineHeight = "30px";
     pageInfo.style.fontSize = "12px";
+    pageInfo.style.right = "2px !important";
 
     // Add elements to container
     buttonsContainer.appendChild(prevButton);
@@ -17399,7 +17405,7 @@ const myRequest = async (
       button.style.border = "1px solid #ddd";
       button.style.backgroundColor = "#f8f9fa";
       button.style.borderRadius = "4px";
-      button.style.fontSize = "14px";
+      button.style.fontSize = "12px";
       button.style.padding = "5px 10px";
       button.style.margin = "0 5px";
       button.style.cursor = "pointer";
@@ -18319,6 +18325,7 @@ useEffect(() => {
       // Update dynamic content based on the button clicked
       switch (text) {
         case 'My Uploaded Files':
+          setActiveButton("MyRequest"); //Fix by Aman
           setDynamicContent('Mentioned below are the documents submitted by logged in user.');
           setFlowResponse(null);
           button.style.backgroundColor = "#6a6a6a";
@@ -18326,6 +18333,7 @@ useEffect(() => {
           // document.getElementById('Myrequestbutton').style.backgroundColor = "#959b95";
           break;
         case 'My Favourites':
+          setActiveButton("MyFavourite"); //Fix by Aman
           setDynamicContent('All the files and folder which is marked as Favourite.');
           setFlowResponse(null);
           button.style.backgroundColor = "#6a6a6a";
@@ -18333,6 +18341,7 @@ useEffect(() => {
           // document.getElementById('Myfavouritebutton').style.backgroundColor = "#959b95";
           break;
         case 'My Folders':
+          setActiveButton("MyFolder"); //Fix by Aman
           setDynamicContent('Manage All Folder Created By Me.');
           setFlowResponse(null);
           button.style.backgroundColor = "#6a6a6a";
@@ -18340,6 +18349,7 @@ useEffect(() => {
           // document.getElementById('Mycreatedfolderbutton').style.backgroundColor = "#959b95";
           break;
         case 'Shared with Others':
+          setActiveButton("ShareWithOther"); //Fix by Aman
           setDynamicContent('My files shared with other users.');
           setFlowResponse(null);
           button.style.backgroundColor = "#6a6a6a";
@@ -18347,6 +18357,7 @@ useEffect(() => {
           // document.getElementById('sharedwithotherbutton').style.backgroundColor = "#959b95";
           break;
         case 'Shared with me':
+          setActiveButton("ShareWithMe"); //Fix by Aman
           setDynamicContent('File upload by other team members and shared with me.');
           setFlowResponse(null);
           button.style.backgroundColor = "#fa901d";
@@ -18354,6 +18365,7 @@ useEffect(() => {
           // document.getElementById('sharedwithmebutton').style.backgroundColor = "#959b95";
           break;
         case 'Recycle Bin':
+          setActiveButton("RecycleBin"); //Fix by Aman
           setDynamicContent('below are the documents Deleted by logged in use.');
           setFlowResponse(null);
           button.style.backgroundColor = "#6a6a6a";
@@ -21287,6 +21299,108 @@ window.hideAuditHistoryPopup=()=> {
     workflowdiv.classList.add('workflowdivhide')
   }
  })
+ // Code Fix by Aman for Popup close
+   //  Global outside-click handler for all popups
+   useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target) return;
+      const isInsideAnyPopup = !!target.closest(
+        [
+          '.audit-history-popup',       // Audit History
+          '.popup-content-auditHistory',
+          '#share-popup',               // Share root
+          '.share-popup',               // Share class
+          '.share-popup-content',
+          '.edit-popup',                // Add Meta Data
+          '#rename-popup',              // Rename Folder
+          '#renamefile-popup',          // Rename File
+          '#renamePopup',               // Rename Meta Data
+          '.version-history-popup',     // Version History
+          '.popup-modal',               // Confirm delete / confirm undo etc.
+          '#dynamicPopup',              // Undo popup
+          '#workflowdiv',               // Manage Workflow React component wrapper
+          '#showfolderpermission'       // Manage Permission React component wrapper
+        ].join(', ')
+      );
+
+      if (isInsideAnyPopup) {
+        return; 
+      }
+
+      const isOnPopupTrigger = !!target.closest(
+        [
+          '.popup-menu',
+          '.three-dots'
+        ].join(', ')
+      );
+      if (isOnPopupTrigger) {
+        return;
+      }
+
+      // Audit History
+      // @ts-ignore
+      if (window.hideAuditHistoryPopup) {
+        // @ts-ignore
+        window.hideAuditHistoryPopup();
+      } else {
+        const audit = document.querySelector('.audit-history-popup') as HTMLElement | null;
+        audit?.parentNode?.removeChild(audit);
+      }
+
+      // Share popup
+      // @ts-ignore
+      if (window.hideSharePopUp) {
+        // @ts-ignore
+        window.hideSharePopUp();
+      } else {
+        const share = document.querySelector('.share-popup') as HTMLElement | null;
+        share?.parentNode?.removeChild(share);
+        const shareRoot = document.getElementById('share-popup');
+        shareRoot?.parentNode?.removeChild(shareRoot);
+      }
+
+      // Add Meta Data popup (.edit-popup)
+      const editPopup = document.querySelector('.edit-popup') as HTMLElement | null;
+      editPopup?.parentNode?.removeChild(editPopup);
+
+      // Rename Folder
+      const renameFolderPopup = document.getElementById('rename-popup');
+      renameFolderPopup?.parentNode?.removeChild(renameFolderPopup);
+
+      // Rename File
+      const renameFilePopup = document.getElementById('renamefile-popup');
+      renameFilePopup?.parentNode?.removeChild(renameFilePopup);
+
+      // Rename Meta Data
+      const renameMetaPopup = document.getElementById('renamePopup');
+      renameMetaPopup?.parentNode?.removeChild(renameMetaPopup);
+
+      // Version History + blur overlay
+      const versionHistoryPopup = document.querySelector('.version-history-popup') as HTMLElement | null;
+      const blurOverlayEl = document.getElementById('blurOverlay');
+      versionHistoryPopup?.parentNode?.removeChild(versionHistoryPopup);
+      blurOverlayEl?.parentNode?.removeChild(blurOverlayEl);
+
+      // Confirm delete / confirm undo (popup-modal)
+      const confirmModal = document.querySelector('.popup-modal') as HTMLElement | null;
+      confirmModal?.parentNode?.removeChild(confirmModal);
+
+      // Dynamic undo popup (dynamicPopup)
+      const undoPopup = document.getElementById('dynamicPopup');
+      undoPopup?.parentNode?.removeChild(undoPopup);
+
+      // React-based popups: Manage Workflow / Manage Permission
+      setShowWorkflow(false);
+      setShowfolderpermission(false);
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, []);
 
  const checkValidation=(message:any)=>{
   Swal.fire(`${message}`,``, "warning");
@@ -23211,7 +23325,7 @@ librarydiv.appendChild(mainContainer)
                         id="recyclebinbutton"
                            onClick={(e)=>{Recyclebin(e);handleShowContent(e)}}
                           className={`sidebardmsButton ${
-                            activeButton === "ShareWithMe" ? "active" : ""
+                            activeButton === "RecycleBin" ? "active" : "" //Fix by Aman
                           }`}
                         >
                           <span className="sidebarIcon">
@@ -23305,8 +23419,10 @@ librarydiv.appendChild(mainContainer)
                           type="text"
                           className="search-input"
                           placeholder="Search files..."
+                          value={currentSearchText}  //fix search Cross icon by Aman
+                          onChange={(e) => setcurrentSearchText(e.target.value)} 
                         />
-                        
+                          {currentSearchText && (
                            <a style={{right:'45px'}} className="searchbutton" onClick={clearSearch}>
                                    
                                    
@@ -23316,6 +23432,7 @@ librarydiv.appendChild(mainContainer)
        className="search-icon"
      />
    </a>
+   )}
                         {/* <a className="searchbutton" onClick={RemoveSSearchFile}>
                           <img
                             src={require("../assets/cross.png")}
@@ -23339,7 +23456,7 @@ librarydiv.appendChild(mainContainer)
                        {/* <div id="files-container" className="buttonalignment">
 
                        </div> */}
-                                     <div style={{ display: 'flex', gap: '2px', alignItems: 'flex-start' }}>
+                                     <div style={{ display: 'flex', gap: '2px',  alignItems: 'flex-start' }}>
 
 {/* LEFT SECTION */}
 <div id="files-container" className="buttonalignment" style={{ flex: 1 }}></div>
@@ -23354,6 +23471,8 @@ librarydiv.appendChild(mainContainer)
       justifyContent: "center",
       alignItems: "center",
       paddingTop: "40px",
+      flexDirection:'column',
+      
     }}
   >
     <img
@@ -23361,19 +23480,20 @@ librarydiv.appendChild(mainContainer)
       src={require("../assets/ESSAROLLER.gif")}
       alt="Loading..."
     />
-    <h1>Generating AI Response…</h1>
+    <h1 className="font-16 fw-bold mt-0">Generating AI Response…</h1>
   </div>
+  
 )}
 
 {/* POWER AUTOMATE RESPONSE PANEL */}
 {!AILoading && flowResponse && (
-  <div id="ai-response-panel" style={{ width: "35%", minWidth: "320px" }}>
+  <div id="ai-response-panel" style={{ width: "35%", background:'#fff', minWidth: "320px", border: "2px dotted #c9c9c9", height:'86vh',  marginTop: "5px",}}>
     <div
       className="pa-response-box"
       style={{
-        marginTop: "5px",
+       
         padding: "15px",
-        border: "2px dotted #c9c9c9",
+       
         borderRadius: "0px",
         background: "#fff",
       }}
@@ -23389,7 +23509,7 @@ librarydiv.appendChild(mainContainer)
                                                                          <span className="mt-2 mb-1" data-tooltip='Close Document Summary'>
 
                                                                          
-                                  <img className="sidebariconssmall"  src={require("../assets/exitf.png")}></img> </span>
+                                  <img className="sidebariconssmall"  src={require("../assets/redc.png")}></img> </span>
                               
                                 </button>
                                 <p style={{fontSize:'14px'}} className="mb-0 mt-0"> Close</p>
@@ -23412,7 +23532,7 @@ librarydiv.appendChild(mainContainer)
           padding: "0px",
           borderRadius: "0px",
           border: "0px solid #ddd",
-        height: 'calc(100vh - 88px)',
+        height: 'auto',
           overflow: "auto",
           marginTop: "5px", fontSize:'12px', lineHeight:'20px', color:'#101010'
         }}

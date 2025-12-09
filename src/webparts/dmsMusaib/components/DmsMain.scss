@@ -90,9 +90,9 @@ button:hover{
   background-color:var( --primary-color) !important;
 }
 .mainsidebardms button:hover{
-  background-color: #959b95 !important; color: #fff !important;
+  background-color: var(--secondary-color) !important; color: #fff !important;
 }
-.mainsidebardms button:hover img{ filter: brightness(0) invert(1);}
+.mainsidebardms button:hover img,.mainsidebardms button.active img{ filter: brightness(0) invert(1);}
 
 
 .modal.show{background:rgb(0,0,0,0.3)}
@@ -965,8 +965,26 @@ border-radius: 5px;}
   .Airesponse .card {
     width: 97.1% !important;
 }
-}
 
+#files-container .card{
+  width: 31.9%;
+}
+.sidebardmsButton{
+  padding: 8px 11px; font-size: 13px;
+}
+p.folder {
+  font-size: 12px;
+}
+.p2nd, .p3rd{
+  font-size: 10px;
+}
+.p1st {
+  
+  font-size: 12px;
+ 
+  height: 17px;
+}
+}
 @media(max-width:640px){
   .w90{width: 80% !important; float: left;}
   .w20{
@@ -1117,8 +1135,8 @@ text-align: center;}
 }
 
 .sidebardmsButton.active {
-  background-color: #e0f0ff;
-  border-left: 4px solid #0078d4;
+  background-color: var(--secondary-color) !important;
+  border-left: 0px solid #0078d4;
   font-weight: bold;
 }
 #OneUpCommandBar{
@@ -1133,11 +1151,7 @@ text-align: center;}
 
 }
 
-.sidebardmsButton.active {
-  background-color: #e0f0ff;
-  border-left: 4px solid #0078d4;
-  font-weight: bold;
-}
+
 #OneUpCommandBar{
   display: none !important;
 }
@@ -1376,3 +1390,4 @@ button [data-tooltip]:after{
 .renamefile-popup button:hover{background: transparent !important;}
 
 .newdovvlose button:hover{background: transparent  !important;}
+button.rightalignpagination{right: 3px !important;}
