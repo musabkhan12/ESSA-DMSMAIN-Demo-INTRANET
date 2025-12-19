@@ -190,6 +190,8 @@ let Htmlicon = require("../assets/HTML.png");
 
 
 let AddMetaData = require("../assets/Add-Meta-Data.svg");
+let AuditHistoryIcon = require("../assets/audith.png");
+let VHIcon = require('../assets/vh.png');
 let DeleteFolder = require("../assets/Delete-Folder.svg");
 let FilePreview = require("../assets/File-Preview.svg");
 let ManagePermissionFolder = require("../assets/Manage-Permission.svg");
@@ -213,8 +215,11 @@ let editIcon =  require('../assets/Edit.svg')
 let deleteIcon =  require('../assets/Delete.svg')
 // import deleteIcon from '../assets/Delete.svg';
 let FillFavouriteFile = require('../assets/FillFavourite.svg')
-let ShareFile = require('../assets/Edit.svg')
+let ShareFile = require('../assets/share_new.png')
 let UnFillFavouriteFile = require('../assets/UnFillFavourite.svg')
+let RenameFileIcon = require("../assets/rename_f.png");
+let AIIcon = require("../assets/AI.png");
+let DocumentSummaryIcon = require("../assets/Document_summary.png");
 let myfolderdata:any = []
 
 let currentDocumentLibrary = "";
@@ -5601,7 +5606,7 @@ const createFileCardForDocumentLibrary=(file:any,fileIcon:any,siteID:string,IsHa
                   Delete
           </li>
           <li onclick="auditHistory('${file.UniqueId}', '${siteID}','${currentDocumentLibrary}','${currentEntity}')">
-          <img src=${editIcon} alt="Edit"/>
+          <img src=${AuditHistoryIcon} alt="Audit History"/>
                       Audit History
           </li>
           <li onclick="PreviewFile('${file.ServerRelativeUrl}', '${siteID}' , '${docLibName}','${file.ListItemAllFields.Status}')">
@@ -5618,7 +5623,7 @@ const createFileCardForDocumentLibrary=(file:any,fileIcon:any,siteID:string,IsHa
           </li>
             ${file.ListItemAllFields.Status === 'Auto Approved' ? `   
                <li onclick="versionHistory('${file.Name}', '${file.ServerRelativeUrl}', '${siteID}' ,'DocumentLibrary','${file.UniqueId}')">
-                  <img src=${editIcon} alt="Preview"/>
+                  <img src=${VHIcon} alt="Version History"/>
                     Version History
                </li>
               ` : ` `}
@@ -5642,7 +5647,7 @@ const createFileCardForDocumentLibrary=(file:any,fileIcon:any,siteID:string,IsHa
           </li>
             ${file.ListItemAllFields.Status === 'Auto Approved' ? `   
                <li onclick="versionHistory('${file.Name}', '${file.ServerRelativeUrl}', '${siteID}' ,'DocumentLibrary','${file.UniqueId}')">
-                  <img src=${editIcon} alt="Preview"/>
+                  <img src=${VHIcon} alt="Version History"/>
                     Version History
                </li>
               ` : ` `}
@@ -7496,7 +7501,7 @@ const searchFiles = async (event: React.FormEvent) => {
                     Delete
                   </li>
                   <li onclick="auditHistory('${file.UniqueId}', '${currentsiteID}','${file.Title}')">
-                    <img src=${editIcon} alt="Edit"/>
+                    <img src=${AuditHistoryIcon} alt="Audit History"/>
                     Audit History
                   </li>
                   <li onclick="PreviewFile('${fileserverrelativeurl}', '${currentsiteID}' , '${currentDocumentLibrary}')">
@@ -14455,11 +14460,19 @@ const myFavorite = async (event: any = null, siteIdToUpdate: string = null, sear
   setMyreqormyfav((previous) => 'Myfavourite');
 
   // Show/hide view buttons
-  const hidegidvewlistviewbutton2 = document.getElementById("hidegidvewlistviewbutton2");
-  const hidegidvewlistviewbutton = document.getElementById('hidegidvewlistviewbutton');
-  if (hidegidvewlistviewbutton2) hidegidvewlistviewbutton2.style.display = 'flex';
-  if (hidegidvewlistviewbutton) hidegidvewlistviewbutton.style.display = 'none';
+  // const hidegidvewlistviewbutton2 = document.getElementById("hidegidvewlistviewbutton2");
+  // const hidegidvewlistviewbutton = document.getElementById('hidegidvewlistviewbutton');
+  // if (hidegidvewlistviewbutton2) hidegidvewlistviewbutton2.style.display = 'flex';
+  // if (hidegidvewlistviewbutton) hidegidvewlistviewbutton.style.display = 'none';
+  const hidegidvewlistviewbutton = document.getElementById("hidegidvewlistviewbutton");
+  if (hidegidvewlistviewbutton) {
+    hidegidvewlistviewbutton.style.display = "flex"; 
+  }
 
+  const hidegidvewlistviewbutton2 = document.getElementById("hidegidvewlistviewbutton2");
+  if (hidegidvewlistviewbutton2) {
+    hidegidvewlistviewbutton2.style.display = "none"; 
+  }
   if (event) {
     event.preventDefault();
     event.stopPropagation();
@@ -17266,7 +17279,7 @@ const myRequest = async (
       menu.innerHTML = `
         <ul>
           <li onclick="auditHistory('${file.FileUID}', '${file.SiteID}','${file?.DocumentLibraryName}','${file?.SiteName}')">
-            <img src=${editIcon} alt="Edit"/> Audit History
+            <img src=${AuditHistoryIcon} alt="Audit History"/> Audit History
           </li>
           <li onclick="shareFile('${file.FileUID}', '${file.SiteID}','${file.CurrentFolderPath}','${file.FileName}','MyRequest','${file.FileVersion}','${file.FileSize}','${file.Status}','${file.FilePreviewURL}','${file.DocumentLibraryName}')">
             <img src=${ShareFile} alt="Share"/> Share
@@ -17278,16 +17291,16 @@ const myRequest = async (
             <img src=${downloadicon} alt="Download File"/> Download File
           </li>
           <li onclick="versionHistory('${file.FileName}', '${file.CurrentFolderPath}', '${file.SiteID}' ,'MyRequest','${file.FileUID}')">
-            <img src=${editIcon} alt="Version History"/> Version History
+            <img src=${VHIcon} alt="Version History"/> Version History
           </li>
           <li onclick="RenameFile('${file.FileName}', '${file.CurrentFolderPath}', '${file.SiteID}' ,'MyRequest','${file.FileUID}' , '${file.SiteName}') ">
-            <img src=${editIcon} alt="Version History"/> Rename File
+            <img src=${RenameFileIcon} alt="Rename File"/> Rename File
           </li>
           <li onclick="triggerPowerAutomateFlow('${file.FileName}', '${file.CurrentFolderPath}', '${file.FilePreviewURL}' ) ">
-            <img src=${editIcon} alt="Document Summary"/> Document Summary
+            <img src=${DocumentSummaryIcon} alt="Document Summary"/> Document Summary
           </li>
            <li onclick="triggerPowerAutomateversionFlow('${file.FileName}', '${file.CurrentFolderPath}', '${file.FilePreviewURL}' ) ">
-            <img src=${editIcon} alt="Document Summary"/> AI Version Compare
+            <img src=${AIIcon} alt="AI Version Compare"/> AI Version Compare
           </li>
           ${file.Status === "Rework" ? `
             <li onclick="rework('${file.FileUID}', '${file.SiteID}','${file?.DocumentLibraryName}','${file?.SiteName}','${file.CurrentFolderPath}/${file.FileName}')">
@@ -23149,7 +23162,7 @@ librarydiv.appendChild(mainContainer)
 
                           } */}
             
-                          {showMyfavButtons && ( <div id="hidegidvewlistviewbutton2"  className="view-buttons mt-2">
+                          {/* {showMyfavButtons && ( <div id="hidegidvewlistviewbutton2"  className="view-buttons mt-2">
                                   <button className="btn btngridview grid-view active"    
                                   onClick={(e)=>myFavorite(e)}>
                                     <a className="listviewfonticon">          
@@ -23162,7 +23175,7 @@ librarydiv.appendChild(mainContainer)
                                     List View
                                   </button>
                           </div>) 
-                          }
+                          } */}
                           {/* {showFolderListviewgridviewbutton && ( <div id="hidegidvewlistviewbutton3"  className="view-buttons mt-2">
                                   <button className="btn btngridview grid-view active"    
                                   onClick={(e)=>mycreatedfolders(e)}>
