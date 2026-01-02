@@ -847,23 +847,23 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
                 <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th style={{minWidth:'70px'}}>SNo</th>
-                            <th>Deliverables</th>
-                            <th>Area</th>
-                            <th>Organisation</th>
+                            <th style={{minWidth:'70px',maxWidth:'70px'}}>SNo</th>
+                            <th style={{minWidth:'220px',maxWidth:'220px'}}>Deliverables</th>
+                            <th style={{minWidth:'180px',maxWidth:'180px'}}>Area</th>
+                            <th style={{minWidth:'180px',maxWidth:'180px'}}>Organisation</th>
                             <th>Document Type</th>
                             <th>Seq. No</th>
                             <th className={styles.wrapText}>Doc. No</th>
                             <th>Due Date*</th>
                             <th>Assigned To*</th>
-                            <th style={{minWidth:'80px'}}>Action</th>
+                            <th style={{minWidth:'80px',maxWidth:'80px'}}>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {deliverables.map((row, index) => (
                             <tr key={index}>
-                                <td style={{minWidth:'70px'}}>{index + 1}</td>
-                                <td>
+                                <td style={{minWidth:'70px',maxWidth:'70px'}}>{index + 1}</td>
+                                <td style={{minWidth:'220px',maxWidth:'220px'}}>
                                     <Dropdown
                                         options={DeliverablesOptions}
                                         selectedKey={row.deliverable}
@@ -873,7 +873,7 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
                                         placeholder="Select Deliverable"
                                     />
                                 </td>
-                                <td>
+                                <td style={{minWidth:'180px',maxWidth:'180px'}}>
                                     <Dropdown
                                         options={AreaOptions}
                                         selectedKey={row.area}
@@ -883,7 +883,7 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
                                         placeholder="Select Area"
                                     />
                                 </td>
-                                <td>
+                                <td style={{minWidth:'180px',maxWidth:'180px'}}>
                                     <Dropdown
                                         options={OrganizationOptions}
                                         selectedKey={row.organisation}
@@ -937,7 +937,7 @@ const NewRequest: React.FC<INewRequestProps> = (props) => {
                                         />
                                     </div>
                                 </td>
-                                <td style={{minWidth:'80px'}}>
+                                <td style={{minWidth:'80px',maxWidth:'80px'}}>
                                     <IconButton
                                         iconProps={{ iconName: 'Delete' }}
                                         title="Delete Row"

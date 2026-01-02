@@ -822,7 +822,7 @@ const Dashboard: React.FC<IDashboardProps> = ({ context }) => {
                     <thead>
                       <tr>
                         <th>Deliverables</th>
-                        <th>Area</th>
+                        <th >Area</th>
                         <th style={{minWidth:'100px'}}>Assigned To</th>
                         <th>Document Number</th>
                         <th>Organization</th>

@@ -17,6 +17,8 @@ declare global {
     RenameFile : (FileName:string ,CurrentFolderPath:string  ,SiteID:string ,myrequest:any,FileUID:string , SiteName:any) =>void;
     triggerPowerAutomateFlow : (siteID:string,documentLibraryName:string,folderPath:string,fileName:string,actionType:string) => void;
     triggerPowerAutomateversionFlow : (siteID:string,documentLibraryName:string,folderPath:string,fileName:string,actionType:string) => void;
+    showDocumentSummary?: (FileName: string, CurrentFolderPath: string, SiteID: string, FileUID: string) => Promise<void>;
+    showAIVersionCompare?: (FileName: string, CurrentFolderPath: string, SiteID: string, FileUID: string) => Promise<void>;
   }
 
 }
@@ -249,6 +251,31 @@ let routeToDiffSideBar="";
 // end
   let graph: GraphFI;
 
+  const formatDocumentSummaryText = (rawText: string): string => {
+  if (!rawText) return "";
+
+  // normalize line breaks
+  const cleaned = rawText
+    .replace(/\r\n/g, "\n")
+    .replace(/\n{2,}/g, "\n")
+    .trim();
+
+  // split into readable points
+  const points = cleaned
+    .split(/\n|•|-|–/)
+    .map(p => p.trim())
+    .filter(p => p.length > 0);
+
+  // return formatted HTML (existing renderer compatible)
+  return `
+    <div class="doc-summary-content">
+      <ul>
+        ${points.map(p => `<li>${p}</li>`).join("")}
+      </ul>
+    </div>
+  `;
+};
+
 
 const ArgPoc = ({ props }: any) => {
   const sp: SPFI = getSP();
@@ -270,6 +297,36 @@ const [activeButton, setActiveButton] = React.useState<string>("MyRequest");
     const [showBulkUpload, setshowBulkUpload] = useState(false);
     const [flowResponse, setFlowResponse] = useState<any>(null); 
     const [AILoading, setAILoading] = useState(false); 
+    const [askAI, setAskAI] = useState(false); // srs 12/12/25
+    const [rightPanelMode, setRightPanelMode] =
+  useState<"AI" | "DOC_SUMMARY" | null>(null);
+
+const [docSummaryLoading, setDocSummaryLoading] = useState(false);
+const [docSummaryHtml, setDocSummaryHtml] = useState<string | null>(null);
+
+// aman 30-12-25
+const closeRightSidePanels = () => {
+  setRightPanelMode(null);
+  setDocSummaryHtml(null);
+  setDocSummaryLoading(false);
+};
+useEffect(() => {
+  const element = document.querySelector(".buttonalignment");
+  if (!element) return;
+
+  if (rightPanelMode === null) {
+    element.classList.remove("Airesponse"); // 3-3
+  } else {
+    element.classList.add("Airesponse"); // 2-2
+  }
+}, [rightPanelMode]);
+// aman 30-12-25
+React.useEffect(() => {
+  setRightPanelMode(null);
+  setDocSummaryHtml(null);
+  setDocSummaryLoading(false);
+}, [activeButton]);
+
     // useEffect(() => {
     //   const element = document.querySelector(".buttonalignment");
     
@@ -281,15 +338,15 @@ const [activeButton, setActiveButton] = React.useState<string>("MyRequest");
     //     element.classList.remove("Airesponse");
     //   }
     // }, [flowResponse, AILoading]);
-    useEffect(() => {
-      const element = document.querySelector(".buttonalignment");
+    // useEffect(() => {
+    //   const element = document.querySelector(".buttonalignment");
     
-      if (!element) return;
+    //   if (!element) return;
     
-      if (!flowResponse) {
-        element.classList.remove("Airesponse");
-      } 
-    }, [flowResponse]);
+    //   if (!flowResponse) {
+    //     element.classList.remove("Airesponse");
+    //   } 
+    // }, [flowResponse]);
   let cleanUrlInMyRequest=false;
   // const handleButtonClickShow = () => {
   //   setShowFirstDiv(false);
@@ -419,11 +476,13 @@ const [activeButton, setActiveButton] = React.useState<string>("MyRequest");
   }, [dropdownClicked]);
   // Function to handle dropdown toggle click
   const handleDropdownToggle = () => {
+    closeRightSidePanels();
     setDropdownClicked(prev => !prev);
   };
 
   // Function to handle dropdown item click
   const handleDropdownItemClick = () => {
+    closeRightSidePanels();
     setDropdownClicked(prev => !prev);
   };
 
@@ -658,6 +717,7 @@ const getdocumentcategory = async ()=>{
   setNavItems(navItem)
 }
 const handlecategoryselect = async  (DocumentCategory:any)=>{
+  closeRightSidePanels();
  const files = await sp.web.lists
   .getByTitle("Document Template")
   .rootFolder.files
@@ -1008,6 +1068,7 @@ const myrequestbuttonclick =()=>{
           folderElement.appendChild(childFolderList);
 
           folderElement.addEventListener("click", (event) => {
+            closeRightSidePanels();
             event.stopPropagation();
             // currentFolder = folder.FolderName;
             toggleVisibility(childFolderList);
@@ -1193,6 +1254,7 @@ const myrequestbuttonclick =()=>{
 
             // Handle click to toggle the visibility of the folder list
             docLibElement.addEventListener("click", (event:any) => {
+              closeRightSidePanels();
               
              if (data.isProcessRelated === 'Yes') {
               // alert("This is Process Related Folder, Please Click on + to see the folders");
@@ -1226,6 +1288,7 @@ const myrequestbuttonclick =()=>{
             IOCfolderList.appendChild(folderElement);
 
             folderElement.addEventListener("click", (event) => {
+              closeRightSidePanels();
               updateBreadcrumb(folder.ServerRelativeUrl);
            
               isprocessfolder = true;
@@ -1379,6 +1442,7 @@ const myrequestbuttonclick =()=>{
                     folderElement.appendChild(subFolderList);
 
                     folderElement.addEventListener("click", (event:any) => {
+                      closeRightSidePanels();
                          
                            isprocessfolder = false
 
@@ -1483,6 +1547,7 @@ const myrequestbuttonclick =()=>{
             });
 
             docLibElement.addEventListener("click", (event) => {
+              closeRightSidePanels();
               isprocessfolder = false;
               console.log(devisionValue, "devisionValue");
               event.stopPropagation();
@@ -1544,6 +1609,7 @@ const myrequestbuttonclick =()=>{
             departmentElement.appendChild(documentList);
 
             departmentElement.addEventListener("click", (event) => {
+              closeRightSidePanels();
               isprocessfolder = false;
               currentEntityURL = value.siteURL;
                     currentsiteID = value.siteID
@@ -1682,6 +1748,7 @@ const myrequestbuttonclick =()=>{
                   docLibElement.appendChild(folderList);
 
                   docLibElement.addEventListener("click", (event) => {
+                    closeRightSidePanels();
               
                     isprocessfolder = false;
                     event.stopPropagation();
@@ -1766,6 +1833,7 @@ const myrequestbuttonclick =()=>{
                           folderElement.appendChild(subFolderList);
 
                           folderElement.addEventListener("click", (event) => {
+                            closeRightSidePanels();
                             isprocessfolder = false;
                             currentEntityURL = value.siteURL;
                             currentEntity = value.entityTitle;
@@ -1872,6 +1940,7 @@ const myrequestbuttonclick =()=>{
                 docLibElement.appendChild(folderList);
 
                 docLibElement.addEventListener("click", (event) => {
+                  closeRightSidePanels();
                  isprocessfolder = false;
                   event.stopPropagation();
                   currentEntityURL = value.siteURL; // Use the SiteURL from entitiesMap
@@ -2045,6 +2114,8 @@ const myrequestbuttonclick =()=>{
           ///End: display all Document libraries under Devision directly if Department null with nested folder //////
 
           devisionElement.addEventListener("click", (event) => {
+            closeRightSidePanels();
+            
  isprocessfolder = false;
             const breadcrumbElement=document.getElementById("breadcrumb");
             if(breadcrumbElement){
@@ -2223,6 +2294,7 @@ const myrequestbuttonclick =()=>{
 
         let clickTimer:any;
         titleElement.addEventListener("click" , async (event)=>{
+          closeRightSidePanels();
         
           // this i updated when new requirement came , they said when click on entity my request should hide and entity higlight in breadcrumb
           const getselectedText = document.getElementById("selectedText");
@@ -2309,6 +2381,7 @@ const myrequestbuttonclick =()=>{
                 // }
         })
         titleElement.addEventListener("click", async(event) => {
+          closeRightSidePanels();
           // if(entityclicktext !== ''){
        
           //   const breadcrumbElement=document.getElementById("breadcrumb");
@@ -17296,10 +17369,10 @@ const myRequest = async (
           <li onclick="RenameFile('${file.FileName}', '${file.CurrentFolderPath}', '${file.SiteID}' ,'MyRequest','${file.FileUID}' , '${file.SiteName}') ">
             <img src=${RenameFileIcon} alt="Rename File"/> Rename File
           </li>
-          <li onclick="triggerPowerAutomateFlow('${file.FileName}', '${file.CurrentFolderPath}', '${file.FilePreviewURL}' ) ">
+          <li onclick="showDocumentSummary('${file.FileName}', '${file.CurrentFolderPath}', '${file.SiteID}', '${file.FileUID}')">
             <img src=${DocumentSummaryIcon} alt="Document Summary"/> Document Summary
           </li>
-           <li onclick="triggerPowerAutomateversionFlow('${file.FileName}', '${file.CurrentFolderPath}', '${file.FilePreviewURL}' ) ">
+           <li onclick="showAIVersionCompare('${file.FileName}', '${file.CurrentFolderPath}', '${file.SiteID}', '${file.FileUID}')">
             <img src=${AIIcon} alt="AI Version Compare"/> AI Version Compare
           </li>
           ${file.Status === "Rework" ? `
@@ -17494,7 +17567,13 @@ const myRequest = async (
 const fileNotFound=(fileName:any)=>{
   Swal.fire(`No results found`,`${fileName}`, "warning");
 }
-const POWER_AUTOMATE_URL  = 'https://62fe413aac9fe8f9abf4ad8c89c177.dd.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/98a7abb60acd4d1fa6c36edd3a7bf859/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Zu-Gf4C-_sPd9nxRF1xqla42wt-3YQJUiQfVttic3GE'
+// const POWER_AUTOMATE_URL  = 'https://62fe413aac9fe8f9abf4ad8c89c177.dd.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/98a7abb60acd4d1fa6c36edd3a7bf859/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Zu-Gf4C-_sPd9nxRF1xqla42wt-3YQJUiQfVttic3GE'
+
+//Officeindia  Document summary url
+// const POWER_AUTOMATE_URL  = 'https://62fe413aac9fe8f9abf4ad8c89c177.dd.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/b5ae0caafb5448faa7754bce13d6b2ef/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=BmH0e78wn974FjK4PoZ3AEwWwqkYbOoErxdtp2C-c-A'
+
+//Multiverse Document summary url
+const POWER_AUTOMATE_URL  = 'https://default54c8cf561cca43aa99721f9875d3ac.9d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/00b8e964c5444db79d11db0e2fcd3f3f/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=xunI6iXtKSkAfn84r65qjEPIfALn-3-ImJBDmUDMFwI'
 window.triggerPowerAutomateFlow = async (
   FileName: string,
   folderPath: string,
@@ -17539,6 +17618,151 @@ window.triggerPowerAutomateFlow = async (
     throw error;
   }
 };
+
+//
+//const POWER_AUTOMATE_VERSION_URL  = 'https://62fe413aac9fe8f9abf4ad8c89c177.dd.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1b6dbcfe07964343a4ea5b293dbbdbe7/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=qTAUaBnlv-OuOp53EJeAHf42jvPUxvlA6oJNF1Qvnks'
+
+// office india version compare url
+//const POWER_AUTOMATE_VERSION_URL  = 'https://62fe413aac9fe8f9abf4ad8c89c177.dd.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/b5ae0caafb5448faa7754bce13d6b2ef/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=BmH0e78wn974FjK4PoZ3AEwWwqkYbOoErxdtp2C-c-A'
+
+//  Multiverse version compare url
+
+// Show Document Summary modal by fetching `Documentsummry` column from
+// list `DMSHuman ResourcesFileMaster` in the `Intranetdemos` site.
+// window.showDocumentSummary = async (FileName: string, CurrentFolderPath: string, SiteID: string, FileUID: string) => {
+//   try {
+//     const siteUrl = `${window.location.origin}/sites/Intranetdemos`;
+//     const api = `${siteUrl}/_api/web/lists/getbytitle('DMSHuman ResourcesFileMaster')/items?$filter=FileUID eq '${FileUID}'&$select=Documentsummry`;
+
+//     const res = await fetch(api, {
+//       method: 'GET',
+//       headers: {
+//         Accept: 'application/json;odata=verbose'
+//       },
+//       credentials: 'same-origin'
+//     });
+
+//     if (!res.ok) {
+//       console.error('Failed to fetch document summary', res.status, res.statusText);
+//       alert('Unable to load document summary.');
+//       return;
+//     }
+
+//     const json = await res.json();
+//     // Support both verbose and odata v4 shapes
+//     const items = (json.d && json.d.results) ? json.d.results : (json.value || (json.d ? [json.d] : []));
+//     const summary = items && items[0] ? items[0].Documentsummry : null;
+
+//     // Remove existing modal if present
+//     const existing = document.getElementById('document-summary-modal');
+//     if (existing) existing.remove();
+
+//     const modal = document.createElement('div');
+//     modal.id = 'document-summary-modal';
+//     modal.style.position = 'fixed';
+//     modal.style.top = '0';
+//     modal.style.left = '0';
+//     modal.style.width = '100%';
+//     modal.style.height = '100%';
+//     modal.style.zIndex = '9999';
+//     modal.innerHTML = `
+//       <div style="position: absolute; inset:0; background: rgba(0,0,0,0.5);"></div>
+//       <div style="position: relative; max-width:860px; margin:60px auto; background:#fff; padding:20px; border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,0.2);">
+//         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+//           <h3 style="margin:0; font-size:16px;">Document Summary</h3>
+//           <button id="ds-close" style="border:0; background:#eee; padding:6px 10px; border-radius:4px; cursor:pointer;">Close</button>
+//         </div>
+//         <div id="ds-content" style="max-height:60vh; overflow:auto; font-size:13px; color:#222;">${summary ? summary : '<em>No summary found</em>'}</div>
+//       </div>
+//     `;
+
+//     document.body.appendChild(modal);
+
+//     const closeBtn = document.getElementById('ds-close');
+//     if (closeBtn) closeBtn.addEventListener('click', () => modal.remove());
+
+//   } catch (error) {
+//     console.error('showDocumentSummary error', error);
+//     alert('Error loading document summary');
+//   }
+// };
+window.showDocumentSummary = async (
+  FileName: string,
+  CurrentFolderPath: string,
+  SiteID: string,
+  FileUID: string
+) => {
+  //aman 30-12-25
+  document.getElementById("files-container")
+  ?.classList.add("Airesponse");
+  try {
+    setRightPanelMode("DOC_SUMMARY");
+    setDocSummaryLoading(true);
+    setDocSummaryHtml(null);
+
+    const siteUrl = `${window.location.origin}/sites/Intranetdemos`;
+    const api = `${siteUrl}/_api/web/lists/getbytitle('DMSHuman ResourcesFileMaster')/items?$filter=FileUID eq '${FileUID}'&$select=Documentsummry`;
+
+    const res = await fetch(api, {
+      method: "GET",
+      headers: { Accept: "application/json;odata=verbose" },
+      credentials: "same-origin",
+    });
+
+    const json = await res.json();
+    const items =
+      json.d?.results ?? json.value ?? [];
+
+    setDocSummaryHtml(formatDocumentSummaryText(items[0]?.Documentsummry ?? ""));
+
+  } catch (e) {
+    console.error("Document Summary error", e);
+  } finally {
+    setDocSummaryLoading(false);
+  }
+};
+
+window.showAIVersionCompare = async (
+  FileName: string,
+  CurrentFolderPath: string,
+  SiteID: string,
+  FileUID: string
+) => {
+  //aman 30-12-25
+  document
+    .getElementById("files-container")
+    ?.classList.add("Airesponse");
+  try {
+    setRightPanelMode("DOC_SUMMARY");
+    setDocSummaryLoading(true);
+    setDocSummaryHtml(null);
+
+    const siteUrl = `${window.location.origin}/sites/Intranetdemos`;
+
+    
+    const api = `${siteUrl}/_api/web/lists/getbytitle('DMSHuman ResourcesFileMaster')/items?$filter=FileUID eq '${FileUID}'&$select=AIVersion`;
+
+    const res = await fetch(api, {
+      method: "GET",
+      headers: { Accept: "application/json;odata=verbose" },
+      credentials: "same-origin",
+    });
+
+    const json = await res.json();
+    const items = json.d?.results ?? json.value ?? [];
+
+    
+    setDocSummaryHtml(
+      formatDocumentSummaryText(items[0]?.AIVersion ?? "")
+    );
+
+  } catch (e) {
+    console.error("AI Version Compare error", e);
+  } finally {
+    setDocSummaryLoading(false);
+  }
+};
+
 
 const POWER_AUTOMATE_VERSION_URL  = 'https://62fe413aac9fe8f9abf4ad8c89c177.dd.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1b6dbcfe07964343a4ea5b293dbbdbe7/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=qTAUaBnlv-OuOp53EJeAHf42jvPUxvlA6oJNF1Qvnks'
 window.triggerPowerAutomateversionFlow = async (
@@ -17697,6 +17921,7 @@ useEffect(() => {
   const Newrequestpw = (e:any)=>{
     e.preventDefault();
     e.stopPropagation();
+    closeRightSidePanels();
     const wait = document.getElementById('files-container')
     wait.classList.add('hidemydatacards')
     setlistorgriddata('NewRequest');
@@ -22939,6 +23164,17 @@ librarydiv.appendChild(mainContainer)
 
 
 }
+
+// srs 12/12/25
+const ASKAI = () => {
+  closeRightSidePanels();
+  setAskAI(true);
+  //aman 30-12-25
+  document
+  .getElementById("files-container")
+  ?.classList.add("Airesponse");
+};
+
   // end
   return (
     <div id="wrapper" ref={elementRef}>
@@ -23036,6 +23272,25 @@ librarydiv.appendChild(mainContainer)
 )
 
 }
+
+
+{/* srs 12/12/25 */}
+
+
+ <div className="missing-link">
+ <div className="d-flex justify-content-center gap-3 mt-2">      <button style={{marginTop:'0px'}}  type="button" className="btn   grid-view notactive"    
+                               onClick={ASKAI}>
+                                    <span className="mt-2 mb-1" data-tooltip='ASK AI'>    
+                                  <img className="sidebariconssmall" src={listicon2}></img> </span>  
+                                </button>
+                                </div>
+   <p style={{fontSize:'14px'}} className="mb-0 mt-2">Ask AI</p>
+                                </div>
+                              
+{/* srs 12/12/25 END*/}
+
+
+
                                <div className="newright">
 
                                <div className="d-flex justify-content-center gap-3 mt-2">
@@ -23475,7 +23730,7 @@ librarydiv.appendChild(mainContainer)
 <div id="files-container" className="buttonalignment" style={{ flex: 1 }}></div>
 
 {/* LOADER ONLY FOR POWER AUTOMATE */}
-{AILoading && (
+{(AILoading || docSummaryLoading) && (
   <div
     style={{
       width: "420px",
@@ -23499,7 +23754,7 @@ librarydiv.appendChild(mainContainer)
 )}
 
 {/* POWER AUTOMATE RESPONSE PANEL */}
-{!AILoading && flowResponse && (
+{!AILoading && rightPanelMode === "AI" && flowResponse && (
   <div id="ai-response-panel" style={{ width: "35%", background:'#fff', minWidth: "320px", border: "2px dotted #c9c9c9", height:'86vh',  marginTop: "5px",}}>
     <div
       className="pa-response-box"
@@ -23510,6 +23765,8 @@ librarydiv.appendChild(mainContainer)
         borderRadius: "0px",
         background: "#fff",
       }}
+
+      
     >
          {/* ❌ CLOSE BUTTON */}
          
@@ -23557,6 +23814,107 @@ librarydiv.appendChild(mainContainer)
     </div>
   </div>
 )}
+{/* DOCUMENT SUMMARY PANEL */}
+{!docSummaryLoading &&
+  rightPanelMode === "DOC_SUMMARY" &&
+  docSummaryHtml && (
+    <div
+      id="ai-response-panel"
+      style={{
+        width: "35%",
+        background: "#fff",
+        minWidth: "320px",
+        border: "2px dotted #c9c9c9",
+        height: "86vh",
+        marginTop: "5px",
+      }}
+    >
+      <div
+        className="pa-response-box"
+        style={{
+          padding: "15px",
+          background: "#fff",
+        }}
+      >
+        {/* CLOSE BUTTON */}
+       <div className="missing-link newdovvlose">
+          <button
+            type="button"
+            className="btn grid-view notactive mt-2"
+            onClick={() => {
+              setDocSummaryHtml(null);
+              setRightPanelMode(null);
+            }}
+          >
+            <span className="mt-2 mb-1">
+              <img
+                className="sidebariconssmall"
+                src={require("../assets/redc.png")}
+                alt="close"
+              />
+            </span>
+          </button>
+          <p style={{ fontSize: "14px" }} className="mb-0 mt-0">
+            Close
+          </p>
+        </div> 
+        
+
+        {/* DOCUMENT SUMMARY CONTENT */}
+        <div dangerouslySetInnerHTML={{ __html: docSummaryHtml }} />
+      </div>
+    </div>
+  )}
+
+{/* srs 12/12/25 */}
+{askAI && (
+  <div
+    style={{
+      position: "relative",
+      width: "35%",
+      height: "613px",
+      border: "2px dotted #ccc",
+      borderRadius: "0px",
+      marginTop:"5px",
+      overflow: "hidden"
+    }}
+  >
+    {/* ❌ Close button */}
+    <button
+      onClick={() => setAskAI(false)}
+      style={{
+        position: "absolute",
+        top: "-9px",
+        right: "8px",
+        zIndex: 10,
+        background: "red",
+        color: "white",
+        border: "none",
+        borderRadius: "50%",
+        width: "28px",
+        height: "28px",
+        cursor: "pointer",
+        fontWeight: "bold",
+        fontSize: "16px",
+        lineHeight: "17px",
+        textAlign: "center"
+      }}
+    >
+      ×
+    </button>
+
+    {/* The Chatbot iframe */}
+    <iframe
+      src="https://copilotstudio.microsoft.com/environments/Default-54c8cf56-1cca-43aa-9972-1f9875d3ac9d/bots/cr0b4_agentNew/webchat?__version__=2"
+      style={{
+        width: "100%",
+        height: "100%",
+        border: "none"
+      }}
+    ></iframe>
+  </div>
+)}
+
 
 </div>
                          </div>

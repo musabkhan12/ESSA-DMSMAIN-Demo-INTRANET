@@ -24,14 +24,33 @@
   --border-color:#ededed;
 
 }
-
+.ms-MessageBar-icon i{
+  font-family: FabricMDL2Icons !important;
+}
 .sidebariconssmall{
   width: 14px; 
+}
+.topButton-198{
+  top: -7px !important; padding: 0px 24px 0px 0px !important;
+}
+.css-t3ipsp-control{
+  position: absolute !important;
+}
+.ms-Dialog-actionsRight{
+  align-items: center !important;
+  display: flex !important;
+
+  justify-content: flex-end !important;
+  margin-right: -4px;
+}
+.ms-Dialog-actionsRight button{
+  margin: 0px;    padding: 8px 0;
+  width: auto !important; margin-left: 10px;
 }
 .newdovvlose {
   position: absolute;
   margin-top: -194px;
-  right: 56%;
+  right: 66%;
 }
 .newdovvlose .sidebariconssmall{
   width: 17px; 
@@ -936,20 +955,20 @@ border-radius: 5px;}
 .search-container input:focus{outline: 1px solid #2c9942 !important;}
 
 @media(max-width:1920px){
-  .newdovvlose {right: 40%;}
+  .newdovvlose {right: 47%;}
 }
 @media(max-width:1800px){
-  .newdovvlose {right: 43%;}
+  .newdovvlose {right: 51%;}
 }
 @media(max-width:1660px){
   .footer{bottom: 0px; margin-top: 15px;}
   .librarydata{
     margin-bottom: 50px !important;
   }
-  .newdovvlose {right: 50%;}
+  .newdovvlose {right: 59%;}
 }
 @media(max-width:1440px){
-  .newdovvlose {right: 57%;}
+  .newdovvlose {right: 67%;}
   .Airesponse .card {
     width: 47.5% !important;
 }
@@ -959,7 +978,7 @@ border-radius: 5px;}
 }
 }
 @media(max-width:1280px){
-  .newdovvlose {right: 64%;}
+  .newdovvlose {right: 75%;}
   .librarydata{
     width: 79.4%;
   }
@@ -984,6 +1003,12 @@ p.folder {
   font-size: 12px;
  
   height: 17px;
+}
+}
+@media(max-width:1200px){
+  .newdovvlose {
+    right: 89%;
+    top: 106px;
 }
 }
 @media(max-width:640px){
@@ -1392,3 +1417,21 @@ button [data-tooltip]:after{
 
 .newdovvlose button:hover{background: transparent  !important;}
 button.rightalignpagination{right: 3px !important;}
+
+#ai-response-panel .doc-summary-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1e1e1e;
+  max-height: calc(100vh - 180px);
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+#ai-response-panel .doc-summary-content ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+#ai-response-panel .doc-summary-content li {
+  margin-bottom: 8px;
+}

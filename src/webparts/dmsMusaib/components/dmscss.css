@@ -920,7 +920,7 @@ top: 0;
 }
 .input-container input{height: 36px;}
 .main-containeruploadfile h1{font-size: 20px; text-align: center;}
-.p3rd,.p2nd{margin-bottom: 5px !important; font-size: 12px; color: #6b6b6b;}
+.p3rd,.p2nd{margin-bottom: 5px !important; font-size: 11px; color: #6b6b6b;}
 
 .p1st{-webkit-line-clamp: 1;
   -webkit-box-orient: vertical;

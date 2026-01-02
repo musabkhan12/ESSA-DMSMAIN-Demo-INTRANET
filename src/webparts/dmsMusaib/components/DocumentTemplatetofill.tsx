@@ -1284,9 +1284,10 @@ const [newRequestNo, setNewRequestNo] = useState<string>("");
     // --- Copy File Function ---
 const copyFile = async () => {
     try {
-        const sourceFileUrl = "/sites/Intranetdemos/Document Template/Transmittal.docx";
-        const destinationFolderUrl = "/sites/Intranetdemos/Location/TRANSMITTAL";
-        const siteID = "9f942ad9-f2b6-4d4a-b99c-80f1171b57e3";
+        const sourceFileUrl = "/sites/multiverseintranetportal/Document Template/Transmittal.docx";
+        const destinationFolderUrl = "/sites/multiverseintranetportal/Location/TRANSMITTAL";
+        // const siteID = "9f942ad9-f2b6-4d4a-b99c-80f1171b57e3";
+        const siteID = "931e8b14-6d73-412e-a411-720ab18bd124";
 
         Swal.fire({
             title: "Preparing Document...",
@@ -1323,8 +1324,8 @@ const copyFile = async () => {
         setNewRequestNo(requestNo);
 
         // Build edit URL
-        const editFileUrl = `https://officeindia.sharepoint.com/:w:/r/sites/Intranetdemos${encodeURIComponent(
-            response.data.ServerRelativeUrl.split("/sites/Intranetdemos")[1]
+        const editFileUrl = `https://multiverse.sharepoint.com/sites/multiverseintranetportal${encodeURIComponent(
+            response.data.ServerRelativeUrl.split("/sites/multiverseintranetportal")[1]
         )}?web=1`;
 
         setEditUrl(editFileUrl);
@@ -1638,13 +1639,14 @@ const handleSubmit = async () => {
             didOpen: () => Swal.showLoading(),
         });
 
-        const siteID = "9f942ad9-f2b6-4d4a-b99c-80f1171b57e3";
+        // const siteID = "9f942ad9-f2b6-4d4a-b99c-80f1171b57e3";
+          const siteID = "931e8b14-6d73-412e-a411-720ab18bd124";
         const subsiteWeb = await sp.site.openWebById(siteID);
         
         // Build preview URL
         const encodeSharePointURL = (url: string) => encodeURIComponent(url);
         const parentFolder = fileServerRelativeUrl.substring(0, fileServerRelativeUrl.lastIndexOf("/"));
-        const previewUrl = `https://officeindia.sharepoint.com/sites/Intranetdemos/Location/TRANSMITTAL/Forms/AllItems.aspx?id=${encodeSharePointURL(
+        const previewUrl = `https://multiverse.sharepoint.com/sites/multiverseintranetportal/Location/TRANSMITTAL/Forms/AllItems.aspx?id=${encodeSharePointURL(
             fileServerRelativeUrl
         )}&parent=${encodeSharePointURL(parentFolder)}`;
            
@@ -1659,7 +1661,7 @@ const handleSubmit = async () => {
             FileName: String(uploadedFileResponse.data.Name),
             FileSize: String(uploadedFileResponse.data.Length),
             FileVersion: String(uploadedFileResponse.data.MajorVersion),
-            CurrentFolderPath: "/sites/Intranetdemos/Location/TRANSMITTAL",
+            CurrentFolderPath: "/sites/multiverseintranetportal/Location/TRANSMITTAL",
             FileUID: String(uploadedFileResponse.data.UniqueId),
             CurrentUser: String(currentUserEmail),
             SiteID: siteID,
@@ -1681,7 +1683,7 @@ const handleSubmit = async () => {
             FileUID: String(uploadedFileResponse.data.UniqueId),
             FilePreviewUrl: previewUrl,
             Status: "Pending",
-            FolderPath: "/sites/Intranetdemos/Location/TRANSMITTAL",
+            FolderPath: "/sites/multiverseintranetportal/Location/TRANSMITTAL",
             ApproveAction: "Submitted",
             ApprovedLevel: 1,
             RequestNo: newRequestNo,
