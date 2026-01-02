@@ -453,7 +453,7 @@ const HorizontalNavbar = ({ _context, siteUrl,context }: any) => {
                 cursor: 'pointer',
               }}
             >
-              Click Here For Advance Search
+              Click here for advance search
             </span>
             )}
           </div>

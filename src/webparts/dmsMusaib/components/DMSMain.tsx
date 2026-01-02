@@ -17,8 +17,8 @@ declare global {
     RenameFile : (FileName:string ,CurrentFolderPath:string  ,SiteID:string ,myrequest:any,FileUID:string , SiteName:any) =>void;
     triggerPowerAutomateFlow : (siteID:string,documentLibraryName:string,folderPath:string,fileName:string,actionType:string) => void;
     triggerPowerAutomateversionFlow : (siteID:string,documentLibraryName:string,folderPath:string,fileName:string,actionType:string) => void;
-    showDocumentSummary?: (FileName: string, CurrentFolderPath: string, SiteID: string, FileUID: string) => Promise<void>;
-    showAIVersionCompare?: (FileName: string, CurrentFolderPath: string, SiteID: string, FileUID: string) => Promise<void>;
+    showDocumentSummary?: (FileName: string, CurrentFolderPath: string, SiteID: string, FileUID: string , SiteName: string) => Promise<void>;
+    showAIVersionCompare?: (FileName: string, CurrentFolderPath: string, SiteID: string, FileUID: string , SiteName: string) => Promise<void>;
   }
 
 }
@@ -17369,10 +17369,10 @@ const myRequest = async (
           <li onclick="RenameFile('${file.FileName}', '${file.CurrentFolderPath}', '${file.SiteID}' ,'MyRequest','${file.FileUID}' , '${file.SiteName}') ">
             <img src=${RenameFileIcon} alt="Rename File"/> Rename File
           </li>
-          <li onclick="showDocumentSummary('${file.FileName}', '${file.CurrentFolderPath}', '${file.SiteID}', '${file.FileUID}')">
+          <li onclick="showDocumentSummary('${file.FileName}', '${file.CurrentFolderPath}', '${file.SiteID}', '${file.FileUID}' , '${file.SiteName}')">
             <img src=${DocumentSummaryIcon} alt="Document Summary"/> Document Summary
           </li>
-           <li onclick="showAIVersionCompare('${file.FileName}', '${file.CurrentFolderPath}', '${file.SiteID}', '${file.FileUID}')">
+           <li onclick="showAIVersionCompare('${file.FileName}', '${file.CurrentFolderPath}', '${file.SiteID}', '${file.FileUID}' , '${file.SiteName}')">
             <img src=${AIIcon} alt="AI Version Compare"/> AI Version Compare
           </li>
           ${file.Status === "Rework" ? `
@@ -17690,7 +17690,8 @@ window.showDocumentSummary = async (
   FileName: string,
   CurrentFolderPath: string,
   SiteID: string,
-  FileUID: string
+  FileUID: string,
+  SiteName: string
 ) => {
   //aman 30-12-25
   document.getElementById("files-container")
@@ -17700,8 +17701,8 @@ window.showDocumentSummary = async (
     setDocSummaryLoading(true);
     setDocSummaryHtml(null);
 
-    const siteUrl = `${window.location.origin}/sites/Intranetdemos`;
-    const api = `${siteUrl}/_api/web/lists/getbytitle('DMSHuman ResourcesFileMaster')/items?$filter=FileUID eq '${FileUID}'&$select=Documentsummry`;
+    const siteUrl = `${window.location.origin}/sites/multiverseintranetportal`;
+    const api = `${siteUrl}/_api/web/lists/getbytitle('DMS${SiteName}FileMaster')/items?$filter=FileUID eq '${FileUID}'&$select=AISummary`;
 
     const res = await fetch(api, {
       method: "GET",
@@ -17713,7 +17714,7 @@ window.showDocumentSummary = async (
     const items =
       json.d?.results ?? json.value ?? [];
 
-    setDocSummaryHtml(formatDocumentSummaryText(items[0]?.Documentsummry ?? ""));
+    setDocSummaryHtml(formatDocumentSummaryText(items[0]?.AISummary ?? ""));
 
   } catch (e) {
     console.error("Document Summary error", e);
@@ -17726,7 +17727,8 @@ window.showAIVersionCompare = async (
   FileName: string,
   CurrentFolderPath: string,
   SiteID: string,
-  FileUID: string
+  FileUID: string,
+  SiteName: string
 ) => {
   //aman 30-12-25
   document
@@ -17737,10 +17739,10 @@ window.showAIVersionCompare = async (
     setDocSummaryLoading(true);
     setDocSummaryHtml(null);
 
-    const siteUrl = `${window.location.origin}/sites/Intranetdemos`;
+    const siteUrl = `${window.location.origin}/sites/multiverseintranetportal`;
 
     
-    const api = `${siteUrl}/_api/web/lists/getbytitle('DMSHuman ResourcesFileMaster')/items?$filter=FileUID eq '${FileUID}'&$select=AIVersion`;
+    const api = `${siteUrl}/_api/web/lists/getbytitle('DMS${SiteName}FileMaster')/items?$filter=FileUID eq '${FileUID}'&$select=AIVersion`;
 
     const res = await fetch(api, {
       method: "GET",
