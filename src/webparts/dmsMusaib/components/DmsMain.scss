@@ -17,7 +17,7 @@
 
 
 :root {
-  --primary-color: #ec1d25;
+  --primary-color: #0351a4;
   --secondary-color: #6a6a6a;
   --light-color: #f6f7fb;
   --bg-color:#ededed;
@@ -49,8 +49,11 @@
 }
 .newdovvlose {
   position: absolute;
-  margin-top: -194px;
+  margin-top: -192px;
   right: 66%;
+}
+.body--sidebar-open .newdovvlose {
+  right: 57%;
 }
 .newdovvlose .sidebariconssmall{
   width: 17px; 
@@ -956,9 +959,15 @@ border-radius: 5px;}
 
 @media(max-width:1920px){
   .newdovvlose {right: 47%;}
+  .body--sidebar-open .newdovvlose {
+    right: 42.5%;
+  }
 }
 @media(max-width:1800px){
   .newdovvlose {right: 51%;}
+  .body--sidebar-open .newdovvlose {
+    right: 44.5%;
+  }
 }
 @media(max-width:1660px){
   .footer{bottom: 0px; margin-top: 15px;}
@@ -966,9 +975,15 @@ border-radius: 5px;}
     margin-bottom: 50px !important;
   }
   .newdovvlose {right: 59%;}
+  .body--sidebar-open .newdovvlose {
+    right: 52%;
+  }
 }
 @media(max-width:1440px){
   .newdovvlose {right: 67%;}
+  .body--sidebar-open .newdovvlose {
+    right: 58%;
+  }
   .Airesponse .card {
     width: 47.5% !important;
 }
@@ -979,6 +994,9 @@ border-radius: 5px;}
 }
 @media(max-width:1280px){
   .newdovvlose {right: 75%;}
+  .body--sidebar-open .newdovvlose {
+    right: 65%;
+  }
   .librarydata{
     width: 79.4%;
   }
@@ -1009,6 +1027,9 @@ p.folder {
   .newdovvlose {
     right: 89%;
     top: 106px;
+}
+.body--sidebar-open .newdovvlose {
+  right: 75%;
 }
 }
 @media(max-width:640px){
@@ -1163,7 +1184,7 @@ text-align: center;}
 .sidebardmsButton.active {
   background-color: var(--secondary-color) !important;
   border-left: 0px solid #0078d4;
-  font-weight: bold;
+  
 }
 #OneUpCommandBar{
   display: none !important;

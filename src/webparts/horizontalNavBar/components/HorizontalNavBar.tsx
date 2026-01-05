@@ -190,11 +190,26 @@ const HorizontalNavbar = ({ _context, siteUrl,context }: any) => {
   };
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
+  // const handleSidebarToggle = (bol: boolean) => {
+  //   debugger
+  //   setIsSidebarOpen(prevState => !prevState);
+  //   setHide(!bol);
+  //   document.querySelector(".sidebar")?.classList.toggle("close");
+  // };
   const handleSidebarToggle = (bol: boolean) => {
-    debugger
-    setIsSidebarOpen(prevState => !prevState);
-    setHide(!bol);
-    document.querySelector(".sidebar")?.classList.toggle("close");
+    const nextState = !bol; // true = sidebar closed
+  
+    setIsSidebarOpen(prev => !prev);
+    setHide(nextState);
+  
+    const sidebar = document.querySelector(".sidebar");
+    sidebar?.classList.toggle("close", nextState);
+
+    if (nextState) {
+      document.body.classList.add("body--sidebar-open");
+    } else {
+      document.body.classList.remove("body--sidebar-open");
+    }
   };
   const handleThemeToggle = () => {
     setIsDarkMode((prevState: any) => !prevState);

@@ -309,6 +309,7 @@ const closeRightSidePanels = () => {
   setRightPanelMode(null);
   setDocSummaryHtml(null);
   setDocSummaryLoading(false);
+  setAskAI(false);
 };
 useEffect(() => {
   const element = document.querySelector(".buttonalignment");
@@ -325,6 +326,7 @@ React.useEffect(() => {
   setRightPanelMode(null);
   setDocSummaryHtml(null);
   setDocSummaryLoading(false);
+  setAskAI(false);
 }, [activeButton]);
 
     // useEffect(() => {
@@ -360,83 +362,107 @@ React.useEffect(() => {
        myRequest();
     }
   }, [showBulkUpload]);
-  React.useEffect(() => {
-    // console.log("This function is called only once", useHide);
-   graph = graphfi().using(graphSPFx(props.context));
-    const showNavbar = (
-      toggleId: string,
-      navId: string,
-      bodyId: string,
-      headerId: string
-    ) => {
-      const toggle = document.getElementById(toggleId);
-      const nav = document.getElementById(navId);
-      const bodypd = document.getElementById(bodyId);
-      const headerpd = document.getElementById(headerId);
+  // React.useEffect(() => {
+  //   const handleSidebarToggle = (e: MouseEvent) => {
+  //     const target = e.target as HTMLElement;
+  
+  //     if (target.closest(".sidebar-openBa")) {
+  //       if (document.body.classList.contains("body--sidebar-open")) {
+  //         document.body.classList.remove("body--sidebar-open");
+  //       } else {
+  //         document.body.classList.add("body--sidebar-open");
+  //       }
+  //     }
+  //   };
+  
+  //   document.addEventListener("click", handleSidebarToggle);
+  
+  //   return () => {
+  //     document.removeEventListener("click", handleSidebarToggle);
+  //   };
+  // }, []);
 
-      if (toggle && nav && bodypd && headerpd) {
-        toggle.addEventListener("click", () => {
-          nav.classList.toggle("show");
-          toggle.classList.toggle("bx-x");
-          bodypd.classList.toggle("body-pd");
-          headerpd.classList.toggle("body-pd");
-        });
-      }
-    };
+  // React.useEffect(() => {
+  //   // console.log("This function is called only once", useHide);
+  //  graph = graphfi().using(graphSPFx(props.context));
+  //   const showNavbar = (
+  //     toggleId: string,
+  //     navId: string,
+  //     bodyId: string,
+  //     headerId: string
+  //   ) => {
+  //     const toggle = document.querySelector(".sidebar-openBa");
+  //     const nav = document.getElementById(navId);
+  //     const bodypd = document.getElementById(bodyId);
+  //     const headerpd = document.getElementById(headerId);
 
-    showNavbar("header-toggle", "nav-bar", "body-pd", "header");
+  //     if (toggle && nav && bodypd && headerpd) {
+  //       toggle.addEventListener("click", () => {
+  //         nav.classList.toggle("show");
+  //         // toggle.classList.toggle("bx-x");
+  //         bodypd.classList.toggle("body-pd");
+  //         headerpd.classList.toggle("body-pd");
+  //          document.body.classList.toggle("body--sidebar-open");
+  //          alert("BODY CLASSES => " + document.body.className);
+  //       });
+  //     }
+  //   };
 
-    const linkColor = document.querySelectorAll(".nav_link");
+  //   showNavbar("header-toggle", "nav-bar", "body-pd", "header");
 
-    function colorLink(this: HTMLElement) {
-      if (linkColor) {
-        linkColor.forEach((l) => l.classList.remove("active"));
-        this.classList.add("active");
-      }
-    }
+  //   const linkColor = document.querySelectorAll(".nav_link");
 
-    linkColor.forEach((l) => l.addEventListener("click", colorLink));
-  }, [useHide]);
+  //   function colorLink(this: HTMLElement) {
+  //     if (linkColor) {
+  //       linkColor.forEach((l) => l.classList.remove("active"));
+  //       this.classList.add("active");
+  //     }
+  //   }
+
+  //   linkColor.forEach((l) => l.addEventListener("click", colorLink));
+  // }, [useHide]);
   // Media query to check if the screen width is less than 768px
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
 
-  React.useEffect(() => {
-    // console.log("This function is called only once", useHide);
+  // React.useEffect(() => {
+  //   // console.log("This function is called only once", useHide);
 
-    const showNavbar = (
-      toggleId: string,
-      navId: string,
-      bodyId: string,
-      headerId: string
-    ) => {
-      const toggle = document.getElementById(toggleId);
-      const nav = document.getElementById(navId);
-      const bodypd = document.getElementById(bodyId);
-      const headerpd = document.getElementById(headerId);
+  //   const showNavbar = (
+  //     toggleId: string,
+  //     navId: string,
+  //     bodyId: string,
+  //     headerId: string
+  //   ) => {
+  //     const toggle = document.getElementById(toggleId);
+  //     const nav = document.getElementById(navId);
+  //     const bodypd = document.getElementById(bodyId);
+  //     const headerpd = document.getElementById(headerId);
 
-      if (toggle && nav && bodypd && headerpd) {
-        toggle.addEventListener("click", () => {
-          nav.classList.toggle("show");
-          toggle.classList.toggle("bx-x");
-          bodypd.classList.toggle("body-pd");
-          headerpd.classList.toggle("body-pd");
-        });
-      }
-    };
+  //     if (toggle && nav && bodypd && headerpd) {
+  //       toggle.addEventListener("click", () => {
+  //         nav.classList.toggle("show");
+  //         toggle.classList.toggle("bx-x");
+  //         bodypd.classList.toggle("body-pd");
+  //         headerpd.classList.toggle("body-pd");
+  //         document.body.classList.toggle("sidebar-openBa");
+  //          alert(document.body.className);
+  //       });
+  //     }
+  //   };
 
-    showNavbar("header-toggle", "nav-bar", "body-pd", "header");
+  //   showNavbar("header-toggle", "nav-bar", "body-pd", "header");
 
-    const linkColor = document.querySelectorAll(".nav_link");
+  //   const linkColor = document.querySelectorAll(".nav_link");
 
-    function colorLink(this: HTMLElement) {
-      if (linkColor) {
-        linkColor.forEach((l) => l.classList.remove("active"));
-        this.classList.add("active");
-      }
-    }
+  //   function colorLink(this: HTMLElement) {
+  //     if (linkColor) {
+  //       linkColor.forEach((l) => l.classList.remove("active"));
+  //       this.classList.add("active");
+  //     }
+  //   }
 
-    linkColor.forEach((l) => l.addEventListener("click", colorLink));
-  }, [useHide]);
+  //   linkColor.forEach((l) => l.addEventListener("click", colorLink));
+  // }, [useHide]);
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -17697,6 +17723,7 @@ window.showDocumentSummary = async (
   document.getElementById("files-container")
   ?.classList.add("Airesponse");
   try {
+    setAskAI(false);
     setRightPanelMode("DOC_SUMMARY");
     setDocSummaryLoading(true);
     setDocSummaryHtml(null);
@@ -17735,6 +17762,7 @@ window.showAIVersionCompare = async (
     .getElementById("files-container")
     ?.classList.add("Airesponse");
   try {
+    setAskAI(false);
     setRightPanelMode("DOC_SUMMARY");
     setDocSummaryLoading(true);
     setDocSummaryHtml(null);
@@ -21546,7 +21574,8 @@ window.hideAuditHistoryPopup=()=> {
       const target = event.target as HTMLElement;
       if (!target) return;
       const isInsideAnyPopup = !!target.closest(
-        [
+        [ '#ai-response-panel',          // Document Summary + AI Version Compare
+          '.ask-ai-panel',               // Ask AI
           '.audit-history-popup',       // Audit History
           '.popup-content-auditHistory',
           '#share-popup',               // Share root
@@ -21567,6 +21596,17 @@ window.hideAuditHistoryPopup=()=> {
       if (isInsideAnyPopup) {
         return; 
       }
+      //  CLOSE DOCUMENT SUMMARY / AI VERSION COMPARE
+if (rightPanelMode !== null) {
+  setRightPanelMode(null);
+  setDocSummaryHtml(null);
+  setDocSummaryLoading(false);
+}
+
+//  CLOSE ASK AI
+if (askAI) {
+  setAskAI(false);
+}
 
       const isOnPopupTrigger = !!target.closest(
         [
@@ -23168,13 +23208,19 @@ librarydiv.appendChild(mainContainer)
 }
 
 // srs 12/12/25
+// const ASKAI = () => {
+//   closeRightSidePanels();
+//   setAskAI(true);
+//   //aman 30-12-25
+//   document
+//   .getElementById("files-container")
+//   ?.classList.add("Airesponse");
+// };
+// Class Add by aman 2-01-26
 const ASKAI = () => {
   closeRightSidePanels();
   setAskAI(true);
-  //aman 30-12-25
-  document
-  .getElementById("files-container")
-  ?.classList.add("Airesponse");
+  setRightPanelMode("AI");
 };
 
   // end
@@ -23871,6 +23917,7 @@ const ASKAI = () => {
 {/* srs 12/12/25 */}
 {askAI && (
   <div
+   className="ask-ai-panel"
     style={{
       position: "relative",
       width: "35%",
@@ -23883,7 +23930,11 @@ const ASKAI = () => {
   >
     {/* ❌ Close button */}
     <button
-      onClick={() => setAskAI(false)}
+      onClick={() => {
+        setAskAI(false);
+        setRightPanelMode(null);
+        
+      }}
       style={{
         position: "absolute",
         top: "-9px",
