@@ -1315,13 +1315,33 @@ const copyFile = async () => {
         // await listItem.update({ Status: "Pending" });
 
         // Generate a request number from counter list
-        const counterItem = await sp.web.lists.getByTitle("DMSFileCounterList").items.getById(1)();
-        const fileCounter = counterItem.FileCount + 1;
-        await sp.web.lists.getByTitle("DMSFileCounterList").items.getById(1).update({
-            FileCount: fileCounter,
-        });
-        const requestNo = `File${String(fileCounter).padStart(2, "0")}`;
-        setNewRequestNo(requestNo);
+        // const counterItem = await sp.web.lists.getByTitle("DMSFileCounterList").items.getById(1)();
+        // const fileCounter = counterItem.FileCount + 1;
+        // await sp.web.lists.getByTitle("DMSFileCounterList").items.getById(1).update({
+        //     FileCount: fileCounter,
+        // });
+        // const requestNo = `File${String(fileCounter).padStart(2, "0")}`;
+        // setNewRequestNo(requestNo);
+        const counterItem = await sp.web.lists
+  .getByTitle("DMSFileCounterList")
+  .items.getById(1)();
+
+const fileCounter = counterItem.FileCount + 1;
+
+await sp.web.lists
+  .getByTitle("DMSFileCounterList")
+  .items.getById(1)
+  .update({ FileCount: fileCounter });
+
+const now = new Date();
+const month = String(now.getMonth() + 1).padStart(2, "0"); // 01–12
+const year = now.getFullYear();
+const increment = String(fileCounter).padStart(4, "0");
+
+const requestNo = `TR_${month}_${year}_${increment}`;
+console.log("Generated Request No:", requestNo);
+setNewRequestNo(requestNo);
+
 
         // Build edit URL
         const editFileUrl = `https://multiverse.sharepoint.com/sites/multiverseintranetportal${encodeURIComponent(
@@ -1798,6 +1818,7 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
     };
 
     useEffect(() => {
+        // alert("this file")
         // Call copyFile when component mounts
         copyFile();
         getApprovals();

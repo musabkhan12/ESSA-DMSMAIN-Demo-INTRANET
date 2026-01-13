@@ -45,8 +45,41 @@
   margin-right: 0rem;
   width: 100%;
 }
+/* Positioning and styling the button */
+.popover-btn1 {
+  font-size: 16px;
+  background: transparent !important;
+  padding: 0px 0px;
+  border: 0px solid #ccc !important;
+  color: #000;
+  margin-top: 7px;
+}
+button.popover-btn1:hover{
+  background: transparent !important; 
+}
+/* Hidden by default */
+.popover-content1 {
+  display: none;
+  position: absolute;
+  top: 50px;
+  left: 0;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  max-width: 100%;
+  z-index: 1000;
+  font-size: 14px;    top: 73px;
+}
+
+/* Show the popover when hovering over the button */
+.popover-btn1:hover + .popover-content1 {
+  display: block;
+}
+
 .UploadFileCont{
-  padding-top: 20px;
+  padding-top: 0px;
 }
 .ms-OverflowSet-item{
     display: none !important;
@@ -290,9 +323,7 @@ display: none !important;
   margin-right: 0rem;
   width: 100%;
 }
-.UploadFileCont{
-  padding-top: 20px;
-}
+
 .ms-OverflowSet-item{
     display: none !important;
 }
@@ -420,7 +451,7 @@ display: none !important;
     display: flex;
     flex-direction: column; /* Ensure label is on top of the input */
   }
-  .input-container input{height: 40px !important;}
+  .input-container input{height: 42px !important;}
   .input-container input[type="checkbox"]{
     width: 26px;
     height: 26px;
@@ -436,7 +467,25 @@ display: none !important;
 	content: none;	
   margin-bottom: 10px;
   }
-  
+  .dms-breadcrumb{
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px
+  }
+  #submitBtn{    align-items: center;
+    background: #fff;
+    border-radius: 1000px !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, .3);
+    display: flex;
+    height: 50px !important;
+    justify-content: center;
+    padding: 10px !important;
+    width: 50px !important;}
+    #submitBtn:hover{
+      background: #fff !important;
+    }
+    #submitBtn img{width: auto !important; margin-top: 3px; height: auto !important; margin-right: 0px !important;}
   .input-container input[type="checkbox"]::before{
     border: 1px solid #dee2e6 !important;
   }
@@ -578,8 +627,24 @@ div[class*=OneUpModalSizing]>div.ms-Dialog-main{
 }
 input[type=file]{
   border: 3px dashed #ccc !important;
-  padding: 5px;
+  padding: 3px 5px;
 }
+.bloptable tbody td{border-bottom: 1px solid #ededed;}
+.bloptable thead th:nth-child(1),.bloptable tbody td:nth-child(1){min-width:60px !important; text-align: center; max-width: 60px !important;width: 60px !important;}
+.bloptable thead th:nth-child(2),.bloptable tbody td:nth-child(2),.bloptable thead th:nth-child(8),.bloptable tbody td:nth-child(8),
+  .bloptable thead th:nth-child(9),.bloptable tbody td:nth-child(9){
+    
+  min-width:80px !important; max-width:80px !important;width:80px !important;
+}
+
+.bloptable thead th:nth-child(3),.bloptable tbody td:nth-child(3){
+  min-width:100px !important; max-width:100px !important;width:100px !important;
+}
+.bloptable th {
+  background:#d9ede5 !important;
+}
+.bloptable tbody tr:nth-child(even) td{background: #efefef;}
+.mtable tr{margin-bottom: 0px !important;}
 .clearall{
   background: #f8f8f8;
   border: 1px solid #dfdfdf;
@@ -601,7 +666,7 @@ input[type=file]{
   overflow: hidden; 
 
   /* height: 400px;  */
-  height: 100% !important; 
+  height: 650px !important; 
 
   position: relative; 
   margin-top: 0px !important;

@@ -400,8 +400,8 @@ const handleCreate = async(e: any) => {
                   (<div>
                       <div className="" style={{ height: "auto", width: "100%" }}>
                       <div  className='row'>
-                      <div className='col-sm-8 w90'>
-                                        <h5 style={{color:'#838383'}} className="mb-0 Permissionsectionstyle fw-bold">
+                      <div className='col-sm-9 w90'>
+                                        <h5 style={{color:'#4c4c4c', fontWeight:'600'}} className="mb-1 Permissionsectionstyle">
                                           Approval Hierarchy
                                         </h5>
                                         <p className="subheadernew font-14">
@@ -410,7 +410,7 @@ const handleCreate = async(e: any) => {
                                         </p>
 
                                         </div>
-                                        <div className='col-sm-4 w20'>
+                                        <div className='col-sm-3 w20'>
                                       
                                             <div className="mb-0">
                                           <div style={{height:'20px'}} className="col-12 d-flex justify-content-end">

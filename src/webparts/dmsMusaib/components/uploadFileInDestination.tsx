@@ -5,7 +5,26 @@ import Swal from "sweetalert2";
 import { Modal } from 'react-bootstrap';
 let folderdes = require('../assets/folderdes.png');
 import '../components/uploadfilecss.css';
-
+// srs new
+import * as XLSX from 'xlsx';
+const COLUMNS = [
+    "S.No",
+    "Location",
+    "Department",
+    "DocumentType",
+    "Discipline",
+    "Template",
+    "FileName",
+    "External Party",
+    "From",
+    "Issued Date",
+    "Year",
+    "Subject",
+    "Project",
+    "Tag No.",
+    "Area"
+  ];
+  
 interface FolderNode {
     name: string;
     children?: FolderNode[];
@@ -26,6 +45,15 @@ const uploadFileInDestination = () => {
 
 
     const [breadcrumbs, setBreadcrumbs] = React.useState<string[]>([]);
+// srs 8/1/26
+    const [previewUrl, setPreviewUrl] = React.useState<string>("");
+const [isPreviewLoading, setIsPreviewLoading] = React.useState<boolean>(false);
+
+// srs new 
+const [excelData, setExcelData] = React.useState<any[]>([]);
+// Add this with your other useState hooks
+const [localFiles, setLocalFiles] = React.useState<File[]>([]);
+const [uploadProgress, setUploadProgress] = React.useState({ current: 0, total: 0 });
 
     const folderData: FolderNode[] = [
         {
@@ -53,7 +81,7 @@ const uploadFileInDestination = () => {
                     ]
                 },
                  {
-                    name: "CIV",
+                    name: "CIVIL",
                     children: [
                         // { name: "DOCUMENT DRAWINGS" },
                         // { name: "DOCUMENT REPORTS" }
@@ -315,8 +343,221 @@ const uploadFileInDestination = () => {
         );
     };
 
+// srs new
+// const handleFileSelection = async (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files && e.target.files[0];
+//     if (!file) {
+//         setSelectedFile(null);
+//         setPreviewUrl(""); 
+//         return;
+//     }
+//     // if (!file) return;
+
+//     setSelectedFile(file);
+//     setIsPreviewLoading(true);
+//     setPreviewUrl(""); // Clear previous preview
+
+//     try {
+//         // --- 1. UPLOAD TO TEMP LIB FOR PREVIEW ---
+//         // We must upload it so SharePoint's iframe can "see" it
+//         const folder = sp.web.getFolderByServerRelativePath("TepmBulkUploadLib");
+//         const uploadResult = await folder.files.addChunked(file.name, file);
+        
+//         // Construct the Preview URL
+//         const siteUrl = window.location.origin;
+//         const serverRelUrl = uploadResult.data.ServerRelativeUrl;
+//         const encodedPath = encodeURIComponent(serverRelUrl);
+        
+//         // Extract /sites/sitename logic
+//         const locationPath = window.location.pathname.match(/\/sites\/[^\/]+/)[0];
+        
+//         // This specific URL format is required for the iframe to render Excel online
+//         const finalUrl = `${siteUrl}${locationPath}/TepmBulkUploadLib/Forms/AllItems.aspx?id=${encodedPath}&parent=${encodeURIComponent(serverRelUrl.substring(0, serverRelUrl.lastIndexOf('/')))}`;
+        
+//         setPreviewUrl(finalUrl);
+
+//         // --- 2. READ EXCEL DATA ---
+//         const reader = new FileReader();
+//         reader.onload = (evt) => {
+//             const bstr = evt.target?.result;
+//             const wb = XLSX.read(bstr, { type: 'binary' });
+//             const wsname = wb.SheetNames[0];
+//             const data = XLSX.utils.sheet_to_json(wb.Sheets[wsname]);
+//             setExcelData(data); 
+//             console.log("Excel Mapping Loaded:", data);
+//         };
+//         reader.readAsBinaryString(file);
+
+//     } catch (error) {
+//         console.error("Preview failed:", error);
+//         Swal.fire("Error", "Could not generate preview. Check if 'TepmBulkUploadLib' exists.", "error");
+//     } finally {
+//         setIsPreviewLoading(false);
+//     }
+// };
+const handleFileSelection = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) {
+        setSelectedFile(null);
+        setExcelData([]);
+        return;
+    }
+
+    setSelectedFile(file);
+    setIsPreviewLoading(true);
+
+    try {
+        // --- 1. UPLOAD TO TEMP LIB FOR BACKEND LOGIC ---
+        const folder = sp.web.getFolderByServerRelativePath("TepmBulkUploadLib");
+        await folder.files.addChunked(file.name, file);
+        console.log("File uploaded to TepmBulkUploadLib for backend processing.");
+
+        // --- 2. READ EXCEL DATA LOCALLY FOR HTML TABLE PREVIEW ---
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            const bstr = evt.target?.result;
+            const wb = XLSX.read(bstr, { type: 'binary' });
+            const wsname = wb.SheetNames[0];
+            const data: any[] = XLSX.utils.sheet_to_json(wb.Sheets[wsname]);
+            setExcelData(data); 
+            setIsPreviewLoading(false);
+        };
+        reader.readAsBinaryString(file);
+
+    } catch (error) {
+        console.error("Operation failed:", error);
+        Swal.fire("Error", "Check if 'TepmBulkUploadLib' exists or permissions are correct.", "error");
+        setIsPreviewLoading(false);
+    }
+};
+// srs new
+// Final Submit Logic
+// const handleFinalSubmit = async () => {
+//     // Check if Excel data and Local Files are loaded
+//     if (!selectedFile || excelData.length === 0 || localFiles.length === 0) {
+//         Swal.fire("Error", "Please select the Excel mapping and the local source folder.", "error");
+//         return;
+//     }
+    
+//     setLoading(true);
+//     // Initialize progress
+//     setUploadProgress({ current: 0, total: excelData.length });
+//     let successCount = 0;
+
+//     try {
+//         // 1. Get the subsite connection
+//         const ehoResult = await sp.site.openWebById("7cef7a05-41ed-4ef8-b247-8e9f1d2b9962");
+        
+//         // 2. Access the .web property for folder operations
+//         const ehoWeb = ehoResult.web; 
+
+//         // for (const row of excelData) {
+//         //     const fileNameFromExcel = row["FileName"];
+//         //     const docType = row["DocumentType"]; 
+
+//         //     // Explicitly type 'f' as File to resolve the 'any' error
+//         //     const matchedFile = localFiles.find((f: File) => f.name === fileNameFromExcel);
+
+//         //     if (matchedFile) {
+//         //         // Ensure the path starts from the library level. 
+//         //         // If 'Civil' is a folder inside 'Shared Documents', use 'Shared Documents/Civil/...'
+//         //         const targetFolderPath = `Civil/${docType}`;
+                
+//         //         console.log(`Uploading ${matchedFile.name} to ${targetFolderPath}`);
+
+//         //         await ehoWeb.getFolderByServerRelativePath(targetFolderPath)
+//         //             .files.addChunked(matchedFile.name, matchedFile);
+                
+//         //         successCount++;
+//         //     }
+//         // }
+//         for (let i = 0; i < excelData.length; i++) {
+//             const row = excelData[i];
+//             const fileNameFromExcel = row["FileName"];
+//             const docType = row["DocumentType"]; 
+
+//             // Update progressive count for the UI
+//             setUploadProgress(prev => ({ ...prev, current: i + 1 }));
+
+//             const matchedFile = localFiles.find((f: File) => f.name === fileNameFromExcel);
+
+//             if (matchedFile) {
+//                 const targetFolderPath = `Civil/${docType}`;
+//                 await ehoWeb.getFolderByServerRelativePath(targetFolderPath)
+//                     .files.addChunked(matchedFile.name, matchedFile);
+                
+//                 successCount++;
+//             }
+//         }
+//         setLoading(false);
+//         Swal.fire("Success", `Processed ${successCount} files successfully.`, "success").then(() => {
+//             window.location.reload();
+//         });
+//     } catch (error) {
+//         console.error("Upload error:", error);
+//         Swal.fire("Error", "Upload failed. Verify that folders 'Civil/CORRESPONDENCE' and 'Civil/DOCUMENT DRAWINGS' exist in the EHO site.", "error");
+//     } 
+// };
+const handleFinalSubmit = async () => {
+    // 1. Basic Validation
+    if (!selectedFile || excelData.length === 0 || localFiles.length === 0) {
+        Swal.fire("Error", "Please select the Excel mapping and the local source files.", "error");
+        return;
+    }
+    
+    setLoading(true);
+
+    // 2. FILTER the data so the progress bar is accurate
+    // Only count rows where the FileName in Excel exists in the files you manually picked
+    const filesToUpload = excelData.filter(row => 
+        localFiles.some((f: File) => f.name === row["FileName"])
+    );
+
+    // 3. Set the progress bar total to the actual match count (e.g., 12)
+    setUploadProgress({ current: 0, total: filesToUpload.length });
+    
+    let successCount = 0;
+
+    try {
+        const ehoResult = await sp.site.openWebById("7cef7a05-41ed-4ef8-b247-8e9f1d2b9962");
+        const ehoWeb = ehoResult.web; 
+
+        // 4. Loop through the filtered list only
+        for (let i = 0; i < filesToUpload.length; i++) {
+            const row = filesToUpload[i];
+            const fileNameFromExcel = row["FileName"];
+            const docType = row["DocumentType"]; 
+
+            // Update progress count: 1 of 12, 2 of 12, etc.
+            setUploadProgress(prev => ({ ...prev, current: i + 1 }));
+
+            const matchedFile = localFiles.find((f: File) => f.name === fileNameFromExcel);
+
+            if (matchedFile) {
+                const targetFolderPath = `Civil/${docType}`;
+                await ehoWeb.getFolderByServerRelativePath(targetFolderPath)
+                    .files.addChunked(matchedFile.name, matchedFile);
+                
+                successCount++;
+            }
+        }
+
+        setLoading(false);
+        Swal.fire("Success", `Processed ${successCount} files successfully.`, "success").then(() => {
+            window.location.reload();
+        });
+
+    } catch (error) {
+        setLoading(false);
+        console.error("Upload error:", error);
+        Swal.fire("Error", "Upload failed. Verify folder paths in SharePoint.", "error");
+    } 
+};
+
+
 
     return (
+        <>
         <div>
            
 
@@ -326,6 +567,10 @@ const uploadFileInDestination = () => {
                 <div className='loaderOverlay'>
                     <div className='loader'>
                         <img style={{ width: '116px', margin: '31px' }} src={require("../assets/ESSAROLLER.gif")} alt="Loading..." />
+                        {/* srs progressive count */}
+            <div style={{ color: '#000', fontWeight: 'bold', fontSize: '18px', marginTop: '-20px', paddingBottom: '20px' }}>
+                Uploading {uploadProgress.current} of {uploadProgress.total}...
+            </div>
                     </div>
                 </div>
             )}
@@ -337,11 +582,53 @@ const uploadFileInDestination = () => {
                     <div className="row">
 
                     <div className="col-sm-12">
-                            <div style={{  marginBottom: "20px" }}>
+                           
+
+
+                        </div>
+
+                        {/* <div className="col-sm-6"> */}
+{/* srs 8/1/26 */}
+                            {/* <div className="borderprev" style={{ border: "1px solid #ccc", height: "400px", position: "relative" }}>
+    {isPreviewLoading && (
+        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
+            <img src={require("../assets/ESSAROLLER.gif")} style={{ width: "50px" }} />
+            <p>Loading Preview...</p>
+        </div>
+    )}
+    {previewUrl ? (
+        <iframe src={previewUrl} width="100%" height="100%" style={{ border: "none" }} />
+    ) : (
+        !isPreviewLoading && <div style={{ textAlign: "center", paddingTop: "180px" }}>Select a file to preview</div>
+    )}
+</div> */}
+{/* srs 8/1/26 */}
+                            {/* 🔹 Source Folder Dropdown */}
+                            {/* <label>Insert source folder path : </label>
+                            <input style={{height:'60px'}} type="text" className="form-control" value={selectedSource} onChange={(e) => setSelectedSource(e.target.value)} /> */}
+{/* srs new */}
+                            {/* <label>Select Source Folder containing the actual files:</label>
+<input 
+    type="file" 
+    multiple 
+    // @ts-ignore
+    webkitdirectory="true" 
+    onChange={(e) => {
+        const files = Array.from(e.target.files);
+        setLocalFiles(files);
+    }} 
+/> */}
+                        
+                        {/* </div> */}
+
+     
+      
+                        <div  className="col-sm-6 mt-3">
+                        <div style={{  marginBottom: "20px" }}>
                                 <div>
                                     <label htmlFor="file-upload">Select file:</label>
 
-                                    <input
+                                    {/* <input
                                         type="file"
                                         id="file-upload"
                                         accept=".xlsx, .xls,.csv"
@@ -349,36 +636,24 @@ const uploadFileInDestination = () => {
                                             const file = e.target.files && e.target.files[0];
                                             setSelectedFile(file || null);
                                         }}
-                                    />
+                                    /> */}
+                                    {/* srs 8/1/26 */}
+                                    <input   style={{height:'40px', padding:'5px 10px'}}  className="form-control"
+    type="file"
+    id="file-upload"
+    multiple
+                    // @ts-ignore
+                    // webkitdirectory="true"
+                    accept=".pdf, .doc, .docx, .xlsx, .xls, .csv, .txt"
+    onChange={handleFileSelection}
+/>
                                 </div>
 
                             </div>
-
-
-                        </div>
-
-                        <div className="col-sm-6">
-                            {/* 🔹 Source Folder Dropdown */}
-                            <label>Insert source folder path : </label>
-                            <input style={{height:'60px'}} type="text" className="form-control" value={selectedSource} onChange={(e) => setSelectedSource(e.target.value)} />
-                            {/* <select className="form-select"
-                                value={selectedSource}
-                                onChange={(e) => setSelectedSource(e.target.value)}
-                            >
-                                <option value="">-- Select Source --</option>
-                                {sourceItems.map((item, idx) => (
-                                    <option key={idx} value={item}>
-                                        {item}
-                                    </option>
-                                ))}
-                            </select> */}
-                        </div>
-                        <div style={{textAlign:'right'}} className="col-sm-6 mt-3">
-
                             {/* 🔹 Destination Folder Dropdown */}
                             <button className="newselc" type="button" onClick={() => setShowModal(true)}>  <img className="sidebariconssmall" src={folderdes}></img> Select Destination Folder</button>
                             {/* Breadcrumbs */}
-                            <div style={{ marginBottom: 10  ,marginTop: 10  , display: "flex", justifyContent:'end'}}>
+                            <div style={{ marginBottom: 10  ,marginTop: 10  , display: "flex", justifyContent:'start'}}>
                                 {selectedPath.length === 0 ? (
                                     <span style={{ color: "#666" }}>No folder selected</span>
                                 ) : (
@@ -417,6 +692,190 @@ const uploadFileInDestination = () => {
 
                         </div>
 
+                        <div className="col-sm-6 mt-3">
+                        <div className="" style={{ 
+                border: " 0px solid #ccc", 
+               
+                overflow: "auto", 
+                background: "#fff",
+                borderRadius: "0px"
+            }}>
+    
+      <div>
+           
+               
+            
+            <div className="p-2 pt-0">
+                <label className="mb-1">Select Source Folder containing the actual files:</label>
+                <input  style={{height:'40px', padding:'5px 10px'}}
+                    className="form-control"
+                    type="file" 
+                    multiple 
+                  
+                     // @ts-ignore
+                    // webkitdirectory="true"
+                    accept=".pdf, .doc, .docx, .xlsx, .xls, .csv, .txt"
+                   
+                    onChange={(e) => {
+                        const files = Array.from(e.target.files);
+                        setLocalFiles(files);
+                    }} 
+                />
+                {localFiles.length > 0 && (
+                    <small className="text-success fw-bold">
+                        {localFiles.length} files detected in local folder.
+                    </small>
+                )}
+            </div>
+            </div>
+        
+
+     </div>
+    
+</div>
+
+                        <div className="col-sm-12">
+                        {/* {isPreviewLoading ? (
+                    <div style={{ textAlign: "center", paddingTop: "150px" }}>
+                        <img src={require("../assets/ESSAROLLER.gif")} style={{ width: "50px" }} />
+                        <p className="mt-2">Uploading & Processing...</p>
+                    </div>
+                ) : (
+                    
+
+<div style={{ width: "100%", overflowX: "auto", maxHeight: "500px", overflowY: "auto" }}>
+  <table
+    className="mtable table-sm table-hover bloptable"
+    style={{
+      fontSize: "13px",
+      width: "100%",
+      borderCollapse: "collapse"
+    }}
+  >
+    
+    <thead
+      className="table-light"
+      style={{ position: "sticky", top: 0, zIndex: 1 }}
+    >
+      <tr>
+        {COLUMNS.map((col:any, i:any) => (
+          <th
+            key={i}
+            style={{
+              whiteSpace: "nowrap",
+              padding: "8px 12px",
+              borderBottom: "1px solid #dee2e6",
+              fontWeight: 600
+            }}
+          >
+            {col}
+          </th>
+        ))}
+      </tr>
+    </thead>
+
+   
+    <tbody>
+      {excelData.length > 0 ? (
+        excelData.map((row, rIndex) => (
+          <tr key={rIndex}>
+            {COLUMNS.map((col:any, cIndex:any) => (
+              <td
+                key={cIndex}
+                style={{
+                  padding: "8px 12px",
+                  borderBottom: "1px solid #dee2e6",
+                  whiteSpace: "nowrap"
+                }}
+              >
+                {row[col] ?? "\u00A0"}
+              </td>
+            ))}
+          </tr>
+        ))
+      ) : (
+        <tr>
+          <td colSpan={COLUMNS.length} style={{ textAlign: "center", padding: 20 }}>
+            No data found in sheet.
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>
+
+                )} */}
+                {isPreviewLoading && (
+  <div style={{ textAlign: "center", paddingTop: "150px" }}>
+    <img src={require("../assets/ESSAROLLER.gif")} style={{ width: "50px" }} />
+    <p className="mt-2">Uploading & Processing...</p>
+  </div>
+)}
+
+{/* ✅ SHOW TABLE ONLY WHEN FILE IS SELECTED */}
+{!isPreviewLoading && selectedFile && (
+  <div style={{ width: "100%",  overflowY: "auto", display:'grid' }}>
+    <table
+      className="mtable table-sm table-hover bloptable"
+      style={{
+        fontSize: "13px",
+        width: "100%", borderRadius:'0px',
+        borderCollapse: "collapse",overflow: "auto", maxHeight: "500px",
+      }}
+    >
+      <thead
+        className="table-light"
+        style={{ position: "sticky", top: 0, zIndex: 1 }}
+      >
+        <tr>
+          {COLUMNS.map((col, i) => (
+            <th
+              key={i}
+              style={{
+                whiteSpace: "nowrap",
+                padding: "8px 12px",
+                borderBottom: "1px solid #dee2e6",
+                fontWeight: 600
+              }}
+            >
+              {col}
+            </th>
+          ))}
+        </tr>
+      </thead>
+
+      <tbody style={{overflow:'visible',maxHeight:'50000px'}}>
+        {excelData.length > 0 ? (
+          excelData.map((row, rIndex) => (
+            <tr key={rIndex}>
+              {COLUMNS.map((col, cIndex) => (
+                <td
+                  key={cIndex}
+                  style={{
+                    padding: "8px 12px",
+                    borderBottom: "1px solid #dee2e6",
+                    whiteSpace: "nowrap"
+                  }}
+                >
+                  {row[col] ?? "\u00A0"}
+                </td>
+              ))}
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan={COLUMNS.length} style={{ textAlign: "center", padding: 20 }}>
+              No data found in sheet.
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+)}
+
+                        </div>
+
                         
 
 
@@ -431,11 +890,13 @@ const uploadFileInDestination = () => {
                 <div style={{ flex: 1, display: "flex", gap: '10px', justifyContent: "end", alignItems: 'center' }} className="newrequ">
                             <button className="btncolorCreate1"
                                 type="button"
-                                onClick={() => {
-                                    handleFile((document.getElementById("file-upload") as HTMLInputElement).files![0]);
-                                }}
+                                // onClick={() => {
+                                //     handleFile((document.getElementById("file-upload") as HTMLInputElement).files![0]);
+                                // }}
+                                // srs new 
+                                onClick={handleFinalSubmit}
                                 style={{ height: "36px" }}
-                                disabled={!selectedFile || !selectedSource.trim() || !selectedPath.length}
+                                // disabled={!selectedFile || !selectedSource.trim() || !selectedPath.length}
                             >
                                 
  <span className="mb-1 mt-2" data-tooltip="Submit">
@@ -494,7 +955,7 @@ const uploadFileInDestination = () => {
             </Modal>
 
         </div>
-
+      </>
     )
 }
 

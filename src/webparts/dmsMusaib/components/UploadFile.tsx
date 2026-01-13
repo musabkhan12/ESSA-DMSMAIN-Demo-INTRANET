@@ -12,6 +12,7 @@ import './uploadfilecss'
 import Swal from 'sweetalert2';
 let info = require('../assets/infon.png')
 let back = require('../assets/backnew.png')
+let infoupload = require('../assets/info_upload.png')
 let showbulkupload : any;
 let IsApproval : any
 let status :any;
@@ -2066,7 +2067,7 @@ const breadcrumbParts = useMemo(() => {
            <span className="mb-1" data-tooltip='Back'>
            <img  src={back}></img> &nbsp;</span>
           </div>
-          <div className="mt-3 UploadFileCont">
+          <div className="mt-0 UploadFileCont">
               <div className='row'>
               <div className='col-lg-6'>
               <nav className="dms-breadcrumb" aria-label="Breadcrumb" style={{marginBottom:12}}>
@@ -2134,14 +2135,23 @@ const breadcrumbParts = useMemo(() => {
                       </div>
                      
                       <div className='col-lg-6'>
-                          <form id='formSelector'>
-                              <h1 className="font-16 fw-bold text-dark mb-0">Upload file</h1>
+                          <form id='formSelector' className="mt-3 position-relative">
+                              <h1 className="font-16 fw-bold text-dark mb-0 pt-3">Upload file</h1>
                               {/* <label className="switch">
                               <input type="checkbox"/>
                               <span className="slider round"></span>
                             </label> */}
                             {showBulkUpload === true && ( 
-                              <p style={{color:'#6c757d'}} className="font-14"> Files uploaded to this folder require approval. After submission, your request will be reviewed, and the file will become visible only after it has been approved.
+                              <p style={{color:'#6c757d'}} className="font-14"> 
+                              <button className="popover-btn1"><img  src={infoupload} className="me-1"></img> information</button>
+<div className="popover-content1">
+Files uploaded to this folder require approval and will be visible only after approval.
+</div>
+                              {/* <button type="button"   className="btn btn-dark" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="  " data-bs-original-title="Exciting Features!">
+                              <img  src={infoupload}></img> information
+                                </button> */}
+
+                             
  </p>
                              )}
                              <div>
@@ -2205,7 +2215,7 @@ const breadcrumbParts = useMemo(() => {
   ))}
 </ul>
 <div style={{display:'flex', justifyContent:'right'}}>
-        <div style={{display:'none', marginTop:'0px'}} id="submitBtn2" className="btncolorCreate1" onClick={handleSubmitBulk}> 
+        <div style={{display:'none', marginTop:'10px'}} id="submitBtn2" className="btncolorCreate1" onClick={handleSubmitBulk}> 
         <span className="mb-1" data-tooltip='Bulk Submit'> <img src={require("../assets/submit-new.png")}    alt="delete" /> </span> </div> 
         </div>
         </div>

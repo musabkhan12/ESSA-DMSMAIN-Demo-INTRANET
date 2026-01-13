@@ -1070,7 +1070,7 @@ const ManageFolderPermission : React.FC<ManageFolderPermissionProps> = ({
                           <div  className='row'>
                             <div className='col-sm-8 w90'>
                             <h5 className="mb-3 " style={{
-                              display:'block', color:'#838383', fontWeight:'700', margin:'inherit',
+                              display:'block', color:'#4c4c4c', fontWeight:'600', margin:'inherit',
                              
                           }}>
                               Manage Permission

@@ -44,11 +44,11 @@
           top: 10px;
           width: 35px;
           height: 35px;
-          border: 1px solid var(--primary-color) !important;
+          border: 1px solid  #ec1c24!important;
           border-radius: 1000px;
           text-align: center;
           line-height: 35px;
-          color: var(--primary-color) !important;
+          color:  #ec1c24 !important;
       }
       .btn-primary{
         background:#2c9942; border-color:#2c9942;
@@ -66,7 +66,7 @@
     position: relative;
     overflow: hidden;
     display: inline-block;
-    border-radius: 10px;
+    border-radius: 0px;
   }
   .mtable thead {
   width: 100%;
@@ -81,7 +81,7 @@
   margin-bottom: 4px;
   }
   .mtable th {
-  background: rgba(0, 135, 81, 0.15) !important;
+    background:#d9ede5 !important;
   font-weight: 600 !important;
   color: #008751;
   font-size: 14px;
@@ -377,12 +377,12 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 555px;
     background-color:rgba(246,246,246,0.87);
     /* box-shadow:  rgba(0, 0, 0, 0.7); */
     display: flex;
     justify-content: center;
-    padding-top: 70px; align-items: start;
+  
     z-index: 1;
   }
    
@@ -444,12 +444,10 @@
    
   /* Share button */
   .share-popup-footer button {
-    background-color: #69797E;
-    color: white;
-    padding: 10px 20px;
     border: none;
     cursor: pointer;
-    border-radius: 4px;
+    background: transparent !important;
+   margin-top: 5px !important;
     font-size: 14px;
     transition: background-color 0.3s;
   }
@@ -571,16 +569,23 @@
   
   /* audit history popup */
   .audit-history-popup {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
+    
     width: 100%;
-    height: 100ch;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: start;
-    z-index: 1; padding-top: 70px;
+  
+    
+    /* FIX */
+
+   
+    
+    background: rgba(246, 246, 246, 0.87);
+    border: 0;
+    z-index: 1;
+    
+    overflow-y: auto;
+    border-radius: 0;
   }
    
   .popup-content-auditHistory {
@@ -642,6 +647,7 @@
     gap: 10px;
     margin-bottom: 20px;
   }
+
    
   .detail-label, .detail-label-approver {
     font-weight: bold;

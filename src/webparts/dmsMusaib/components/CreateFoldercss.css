@@ -74,6 +74,13 @@ label{font-weight:500;}
 .form-control .fieldmargin .multilinetextWidth{
     width: 100%;
 }
+.spfx-select__menu-portal {
+    z-index: 100000 !important;
+  }
+  
+  .spfx-select__menu {
+    z-index: 100000 !important;
+  }
 .p-3{
 
 border-radius: 8px;

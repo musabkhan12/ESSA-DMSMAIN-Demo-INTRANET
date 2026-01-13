@@ -1264,7 +1264,7 @@ const validateFields = () => {
         // Clear form on successful submission
         Swal.fire({
           title: "Success",
-          text: "Your request to create a folder has been submitted successfully. The folder will appear shortly as we complete the setup process.",
+          text: "Your request was submitted successfully. The folder will appear shortly.",
           icon: "success",
           // showCancelButton: true,
           confirmButtonText: 'OK',
@@ -1744,22 +1744,18 @@ const validateFields = () => {
                 <td>
                   {/* start */}
                   <Select
-                    isMulti
-                    options={users}
-                    // value={Approver}
-                    onChange={(selected: any) =>
-                      handleUserSelect(selected, row.id)
-                    }
-                    placeholder="Enter names or email addresses..."
-                    noOptionsMessage={() => "No User Found..."}
-                  />
-                  {/* {errors.selectedUsers && (
-                    <span className="text-danger">{errors.selectedUsers}</span>
-                  )} */}
-                  {errorsForUserSelection[row.id]?.userSelect && (
-                      <span className="text-danger">{errorsForUserSelection[row.id].userSelect}</span>
-                  )}
-                  {/* end */}
+  isMulti
+  options={users}
+  onChange={(selected: any) =>
+    handleUserSelect(selected, row.id)
+  }
+  placeholder="Enter names or email addresses..."
+  noOptionsMessage={() => "No User Found..."}
+  menuPortalTarget={document.body}
+  maxMenuHeight={180} 
+  menuPosition="fixed"
+  classNamePrefix="spfx-select"
+/>
                 </td>
                 {/* start */}
                 <td style={{textAlign:'center', minWidth:'70px', maxWidth:'70px'}}>

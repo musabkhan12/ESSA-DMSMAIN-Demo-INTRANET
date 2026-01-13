@@ -17,14 +17,21 @@ declare global {
     RenameFile : (FileName:string ,CurrentFolderPath:string  ,SiteID:string ,myrequest:any,FileUID:string , SiteName:any) =>void;
     triggerPowerAutomateFlow : (siteID:string,documentLibraryName:string,folderPath:string,fileName:string,actionType:string) => void;
     triggerPowerAutomateversionFlow : (siteID:string,documentLibraryName:string,folderPath:string,fileName:string,actionType:string) => void;
-    showDocumentSummary?: (FileName: string, CurrentFolderPath: string, SiteID: string, FileUID: string , SiteName: string) => Promise<void>;
-    showAIVersionCompare?: (FileName: string, CurrentFolderPath: string, SiteID: string, FileUID: string , SiteName: string) => Promise<void>;
+    showDocumentSummary?: (FileName: string, CurrentFolderPath: string, SiteID: string, FileUID: string ,  SiteName: string , FolderPath:string) => Promise<void>;
+    showAIVersionCompare?: (FileName: string, CurrentFolderPath: string, SiteID: string, FileUID: string , SiteName: string , FolderPath:string) => Promise<void>;
   }
 
 }
 interface IFile {
   // other properties...
   rename(newName: string): Promise<void>;
+}
+interface CreateFolderProps {
+  Currentbuttonclick: { 
+    buttonclickis: string;
+    documentLibraryData?: any[]; // ✅ Add this optional property
+  };
+  onReturnToMain: () => void;
 }
 interface IFileWithListItem {
   Name: string;
@@ -154,7 +161,7 @@ import { FormComponent } from "../EDCprocessComponent/FormComponent/Form";
 import { Listing } from "../EDCprocessComponent/ListingComponent/Listing";
 import { GraphFI, graphfi, SPFx as graphSPFx } from "@pnp/graph";
 import { blue, brown } from "@mui/material/colors";
-
+let paginatedFiles: any[] = [];
 let documenttemplatetofill : any;
 let isprocessfolder :any;
 let folderpathbacktodmsfrompreviewisprocessfolder :any
@@ -201,6 +208,7 @@ let ManageWorkflowFolder = require("../assets/Manage-Workflow.svg");
 let RenameFolder = require("../assets/Rename-Folder.svg");
 let RenameMetaData = require("../assets/Rename-Meta-Data.svg");
 let RevokeAccess= require("../assets/Rvoke-Access.svg");
+let isMetaValidationErrorActive = false;
 let routefrommail = false;
 let mailsharefilewithpreview :any
 let MainRounteVariable = 'MyRequest'
@@ -220,8 +228,10 @@ let FillFavouriteFile = require('../assets/FillFavourite.svg')
 let ShareFile = require('../assets/share_new.png')
 let UnFillFavouriteFile = require('../assets/UnFillFavourite.svg')
 let RenameFileIcon = require("../assets/rename_f.png");
+let SubmitIcon = require('../assets/submit-new.png');
 let AIIcon = require("../assets/AI.png");
 let DocumentSummaryIcon = require("../assets/Document_summary.png");
+let sharedoc = require("../assets/share-with.png");
 let myfolderdata:any = []
 
 let currentDocumentLibrary = "";
@@ -250,6 +260,15 @@ const folderDetailsMap: Record<string, any> = {};
 let routeToDiffSideBar="";
 // end
   let graph: GraphFI;
+  
+  const getfilecontainerforonceandhide = () => {  
+    const filePreviewContainer = document.getElementById('files-container');
+    if (filePreviewContainer) {
+      // alert("in file preview container")
+      filePreviewContainer.innerHTML = ''; // Clear the container
+    }
+
+  }
 
   const formatDocumentSummaryText = (rawText: string): string => {
   if (!rawText) return "";
@@ -300,6 +319,13 @@ const [activeButton, setActiveButton] = React.useState<string>("MyRequest");
     const [askAI, setAskAI] = useState(false); // srs 12/12/25
     const [rightPanelMode, setRightPanelMode] =
   useState<"AI" | "DOC_SUMMARY" | null>(null);
+  
+  // Add this state at the top with other states
+const [documentLibraryDataForTable, setDocumentLibraryDataForTable] = React.useState<any[]>([]);
+  // musaib added this code for buttons file and folder
+  const [showCreateFileButton, setShowCreateFileButton] = React.useState(false);
+  const [showCreateFolderButton, setShowCreateFolderButton] = React.useState(false);
+  const [showEditviewgridviewButtons, setEditviewgridviewButtons] = React.useState(false);
 
 const [docSummaryLoading, setDocSummaryLoading] = useState(false);
 const [docSummaryHtml, setDocSummaryHtml] = useState<string | null>(null);
@@ -311,16 +337,33 @@ const closeRightSidePanels = () => {
   setDocSummaryLoading(false);
   setAskAI(false);
 };
+// useEffect(() => {
+//   const element = document.querySelector(".buttonalignment");
+//   if (!element) return;
+
+//   if (rightPanelMode === null) {
+//     element.classList.remove("Airesponse"); // 3-3
+//   } else {
+//     element.classList.add("Airesponse"); // 2-2
+//   }
+// }, [rightPanelMode]);
+
+// Class add on librarydata for Document summary Ai version compare and Ask Ai by Aman
 useEffect(() => {
-  const element = document.querySelector(".buttonalignment");
-  if (!element) return;
+  const buttonAlignment = document.querySelector(".buttonalignment");
+  const libraryData = document.querySelector(".librarydata");
+
+  if (!buttonAlignment || !libraryData) return;
 
   if (rightPanelMode === null) {
-    element.classList.remove("Airesponse"); // 3-3
+    buttonAlignment.classList.remove("Airesponse");
+    libraryData.classList.remove("librarydata-hide");
   } else {
-    element.classList.add("Airesponse"); // 2-2
+    buttonAlignment.classList.add("Airesponse");
+    libraryData.classList.add("librarydata-hide");
   }
 }, [rightPanelMode]);
+
 // aman 30-12-25
 React.useEffect(() => {
   setRightPanelMode(null);
@@ -1688,10 +1731,14 @@ const myrequestbuttonclick =()=>{
                     IsFolderDeligationUser=false;
                   console.log(`User is a member of the group: ${currentEntity}_Admin`);
                   if(createFileButton){
-                    createFileButton.style.display=  "none";
+                    // createFileButton.style.display=  "none";
+                    setShowCreateFileButton(false);
                   }
                   if(CreateFolder){
-                    CreateFolder.style.display="block";
+                    // musaib create file and folder button change
+                        // CreateFolder.style.display="block";
+                        setShowCreateFolderButton(true);
+                   // CreateFolder.style.display="block";
                   }
                   // if(CreateRoot){
                   //   CreateRoot.style.display="none";
@@ -1700,18 +1747,26 @@ const myrequestbuttonclick =()=>{
                     IsFolderDeligationUser=true;
                     console.log(`User is a member of the group: ${currentEntity}_FolderDeligation`);
                     if(createFileButton){
-                      createFileButton.style.display=  "none";
+                      // createFileButton.style.display=  "none";
+                      setShowCreateFileButton(false);
                     }
                     if(CreateFolder){
-                      CreateFolder.style.display="block";
+                      // CreateFolder.style.display="block";
+                      // musaib create file and folder button change
+                        // CreateFolder.style.display="block";
+                        setShowCreateFolderButton(true);
                     }
                  }else {
                     console.log(`User is not a member of the group: ${currentEntity}_Admin`);
                     if(createFileButton){
-                      createFileButton.style.display="none";
+                      // createFileButton.style.display="none";
+                      setShowCreateFileButton(false);
                     }
                     if(CreateFolder){
-                      CreateFolder.style.display="none";
+                      // CreateFolder.style.display="none";
+                      // musaib create file and folder button change
+                        // CreateFolder.style.display="none";
+                        setShowCreateFolderButton(false);
                     }
                   
               
@@ -1719,10 +1774,14 @@ const myrequestbuttonclick =()=>{
                 } catch (error) {
                   console.log(`User is not a member of the group: ${currentEntity}_Admin`);
                   if(createFileButton){
-                    createFileButton.style.display="none";
+                    // createFileButton.style.display="none";
+                    setShowCreateFileButton(false);
                   }
                   if(CreateFolder){
-                    CreateFolder.style.display="none";
+                    // CreateFolder.style.display="none";
+                    // musaib create file and folder button change
+                        // CreateFolder.style.display="none";
+                        setShowCreateFolderButton(false);
                   }
               
                  
@@ -2202,10 +2261,14 @@ const myrequestbuttonclick =()=>{
                 IsFolderDeligationUser=false;
               console.log(`User is a member of the group: ${currentEntity}_Admin`);
               if(createFileButton){
-                createFileButton.style.display=  "none";
+                // createFileButton.style.display=  "none";
+                setShowCreateFileButton(false);
               }
               if(CreateFolder){
-                CreateFolder.style.display="block";
+                // CreateFolder.style.display="block";
+                // musaib create file and folder button change
+                        // CreateFolder.style.display="block";
+                        setShowCreateFolderButton(true);
               }
               // if(CreateRoot){
               //   CreateRoot.style.display="none";
@@ -2214,18 +2277,26 @@ const myrequestbuttonclick =()=>{
                 IsFolderDeligationUser=true;
                 console.log(`User is a member of the group: ${currentEntity}_FolderDeligation`);
                 if(createFileButton){
-                  createFileButton.style.display=  "none";
+                  // createFileButton.style.display=  "none";
+                  setShowCreateFileButton(false);
                 }
                 if(CreateFolder){
-                  CreateFolder.style.display="block";
+                  // CreateFolder.style.display="block";
+                  // musaib create file and folder button change
+                        // CreateFolder.style.display="block";
+                        setShowCreateFolderButton(true);
                 }
              }else {
                 console.log(`User is not a member of the group: ${currentEntity}_Admin`);
                 if(createFileButton){
-                  createFileButton.style.display="none";
+                  // createFileButton.style.display="none";
+                  setShowCreateFileButton(false);
                 }
                 if(CreateFolder){
-                  CreateFolder.style.display="none";
+                  // CreateFolder.style.display="none";
+                  // musaib create file and folder button change
+                        // CreateFolder.style.display="none";
+                        setShowCreateFolderButton(false);
                 }
               
           
@@ -2233,10 +2304,14 @@ const myrequestbuttonclick =()=>{
             } catch (error) {
               console.log(`User is not a member of the group: ${currentEntity}_Admin`);
               if(createFileButton){
-                createFileButton.style.display="none";
+                // createFileButton.style.display="none";
+                setShowCreateFileButton(false);
               }
               if(CreateFolder){
-                CreateFolder.style.display="none";
+                // CreateFolder.style.display="none";
+                // musaib create file and folder button change
+                        // CreateFolder.style.display="none";
+                        setShowCreateFolderButton(false);
               }
           
              
@@ -2274,10 +2349,14 @@ const myrequestbuttonclick =()=>{
                   IsFolderDeligationUser=false;
                 console.log(`User is a member of the group: ${currentEntity}_Admin`);
                 if(createFileButton){
-                  createFileButton.style.display=  "none";
+                  // createFileButton.style.display=  "none";
+                  setShowCreateFileButton(false);
                 }
                 if(CreateFolder){
-                  CreateFolder.style.display="block";
+                  // CreateFolder.style.display="block";.
+                  // musaib create file and folder button change
+                        // CreateFolder.style.display="block";
+                        setShowCreateFolderButton(true);
                 }
                 // if(CreateRoot){
                 //   CreateRoot.style.display="none";
@@ -2286,18 +2365,26 @@ const myrequestbuttonclick =()=>{
                   IsFolderDeligationUser=true;
                   console.log(`User is a member of the group: ${currentEntity}_FolderDeligation`);
                   if(createFileButton){
-                    createFileButton.style.display=  "none";
+                    // createFileButton.style.display=  "none";
+                    setShowCreateFileButton(false);
                   }
                   if(CreateFolder){
-                    CreateFolder.style.display="block";
-                  }
+                    // CreateFolder.style.display="block";
+
+// musaib create file and folder button change
+                        // CreateFolder.style.display="block";
+                        setShowCreateFolderButton(true);                  }
                }else {
                   console.log(`User is not a member of the group: ${currentEntity}_Admin`);
                   if(createFileButton){
-                    createFileButton.style.display="none";
+                    // createFileButton.style.display="none";
+                    setShowCreateFileButton(false);
                   }
                   if(CreateFolder){
-                    CreateFolder.style.display="none";
+                    // CreateFolder.style.display="none";
+                    // musaib create file and folder button change
+                        // CreateFolder.style.display="none";
+                        setShowCreateFolderButton(false);
                   }
                 
             
@@ -2305,10 +2392,14 @@ const myrequestbuttonclick =()=>{
               } catch (error) {
                 console.log(`User is not a member of the group: ${currentEntity}_Admin`);
                 if(createFileButton){
-                  createFileButton.style.display="none";
+                  // createFileButton.style.display="none";
+                  setShowCreateFileButton(false);
                 }
                 if(CreateFolder){
-                  CreateFolder.style.display="none";
+                  // CreateFolder.style.display="none";
+                  // musaib create file and folder button change
+                        // CreateFolder.style.display="none";
+                        setShowCreateFolderButton(false);
                 }
             
                
@@ -2322,6 +2413,7 @@ const myrequestbuttonclick =()=>{
         titleElement.addEventListener("click" , async (event)=>{
           closeRightSidePanels();
         
+          setEditviewgridviewButtons(false);
           // this i updated when new requirement came , they said when click on entity my request should hide and entity higlight in breadcrumb
           const getselectedText = document.getElementById("selectedText");
           if(getselectedText){
@@ -2408,6 +2500,7 @@ const myrequestbuttonclick =()=>{
         })
         titleElement.addEventListener("click", async(event) => {
           closeRightSidePanels();
+          setEditviewgridviewButtons(false);
           // if(entityclicktext !== ''){
        
           //   const breadcrumbElement=document.getElementById("breadcrumb");
@@ -2534,10 +2627,14 @@ const myrequestbuttonclick =()=>{
                     IsFolderDeligationUser=false;
                   console.log(`User is a member of the group: ${currentEntity}_Admin`);
                   if(createFileButton){
-                    createFileButton.style.display=  "none";
+                    // createFileButton.style.display=  "none";
+                    setShowCreateFileButton(false);
                   }
                   if(CreateFolder){
-                    CreateFolder.style.display="block";
+                    // CreateFolder.style.display="block";
+                    // musaib create file and folder button change
+                        // CreateFolder.style.display="block";
+                        setShowCreateFolderButton(true);
                   }
                   // if(CreateRoot){
                   //   CreateRoot.style.display="none";
@@ -2546,18 +2643,26 @@ const myrequestbuttonclick =()=>{
                     IsFolderDeligationUser=true;
                     console.log(`User is a member of the group: ${currentEntity}_FolderDeligation`);
                     if(createFileButton){
-                      createFileButton.style.display=  "none";
+                      // createFileButton.style.display=  "none";
+                      setShowCreateFileButton(false);
                     }
                     if(CreateFolder){
-                      CreateFolder.style.display="block";
+                      // CreateFolder.style.display="block";
+                      // musaib create file and folder button change
+                        // CreateFolder.style.display="block";
+                        setShowCreateFolderButton(true);
                     }
                  }else {
                     console.log(`User is not a member of the group: ${currentEntity}_Admin`);
                     if(createFileButton){
-                      createFileButton.style.display="none";
+                      // createFileButton.style.display="none";
+                      setShowCreateFileButton(false);
                     }
                     if(CreateFolder){
-                      CreateFolder.style.display="none";
+                      // CreateFolder.style.display="none";
+                      // musaib create file and folder button change
+                        // CreateFolder.style.display="none";
+                        setShowCreateFolderButton(false);
                     }
                   
               
@@ -2565,10 +2670,14 @@ const myrequestbuttonclick =()=>{
                 } catch (error) {
                   console.log(`User is not a member of the group: ${currentEntity}_Admin`);
                   if(createFileButton){
-                    createFileButton.style.display="none";
+                    // createFileButton.style.display="none";
+                    setShowCreateFileButton(false);
                   }
                   if(CreateFolder){
-                    CreateFolder.style.display="none";
+                    // CreateFolder.style.display="none";
+                    // musaib create file and folder button change
+                        // CreateFolder.style.display="none";
+                        setShowCreateFolderButton(false);
                   }
               
                  
@@ -2595,6 +2704,7 @@ const myrequestbuttonclick =()=>{
         
         titleElement.addEventListener("dblclick", async (event) => {
           const breadcrumbElement=document.getElementById("breadcrumb");
+          setEditviewgridviewButtons(false);
           if(breadcrumbElement){
             breadcrumbElement.style.display="none";
           }
@@ -2616,27 +2726,39 @@ const myrequestbuttonclick =()=>{
                 IsFolderDeligationUser=false;
               console.log(`User is a member of the group: ${currentEntity}_Admin`);
               if(createFileButton){
-                createFileButton.style.display=  "none";
+                // createFileButton.style.display=  "none";
+                setShowCreateFileButton(false);
               }
               if(CreateFolder){
-                CreateFolder.style.display="block";
+                // CreateFolder.style.display="block";
+                // musaib create file and folder button change
+                        // CreateFolder.style.display="block";
+                        setShowCreateFolderButton(true);
               }
              }else if(isMemberOfDeligation){
               IsFolderDeligationUser=true;
               console.log(`User is a member of the group: ${currentEntity}_FolderDeligation`);
               if(createFileButton){
-                createFileButton.style.display=  "none";
+                // createFileButton.style.display=  "none";
+                setShowCreateFileButton(false);
               }
               if(CreateFolder){
-                CreateFolder.style.display="block";
+                // CreateFolder.style.display="block";
+                // musaib create file and folder button change
+                        // CreateFolder.style.display="block";
+                        setShowCreateFolderButton(true);
               }
            }else {
                 console.log(`User is not a member of the group: ${currentEntity}_Admin`);
                 if(createFileButton){
-                  createFileButton.style.display="none";
+                  // createFileButton.style.display="none";
+                  setShowCreateFileButton(false);
                 }
                 if(CreateFolder){
-                  CreateFolder.style.display="none";
+                  // CreateFolder.style.display="none";
+                  // musaib create file and folder button change
+                        // CreateFolder.style.display="none";
+                        setShowCreateFolderButton(false);
                 }
               
           
@@ -2644,10 +2766,14 @@ const myrequestbuttonclick =()=>{
             } catch (error) {
               console.log(`User is not a member of the group: ${currentEntity}_Admin`);
               if(createFileButton){
-                createFileButton.style.display="none";
+                // createFileButton.style.display="none";
+                setShowCreateFileButton(false);
               }
               if(CreateFolder){
-                CreateFolder.style.display="none";
+                // CreateFolder.style.display="none";
+                // musaib create file and folder button change
+                        // CreateFolder.style.display="none";
+                        setShowCreateFolderButton(false);
               }
           
              
@@ -4020,20 +4146,114 @@ const myrequestbuttonclick =()=>{
 //   };
 
 // pagination
+ // Add this function to prepare data for table
+ const prepareDocumentLibraryDataForTable = async () => {
+  if (!paginatedFiles || paginatedFiles.length === 0) return [];
+
+  const siteId = currentsiteID;
+  const { web } = await sp.site.openWebById(siteId);
+  
+  // Get visible fields dynamically (same as audit history)
+  const list = await web.lists.getByTitle(currentDocumentLibrary);
+  const listFields = await list.fields.select('Title', 'InternalName', 'TypeAsString', 'Hidden')();
+  
+  const visibleFields = listFields.filter(field => 
+    !field.Hidden && 
+    field.InternalName !== 'ContentType' && 
+    field.InternalName !== 'Attachments' &&
+    field.InternalName !== 'Edit' &&
+    field.InternalName !== 'DocIcon' &&
+    field.InternalName !== 'FileLeafRef' &&
+    field.InternalName !== 'FileRef' &&
+    !field.InternalName.startsWith('_') &&
+    field.TypeAsString !== 'Computed' &&
+    field.TypeAsString !== 'Threading' &&
+    field.TypeAsString !== 'Guid'
+  );
+
+  const excludedFieldsByTitle = [
+    "Checked Out To",
+    "Item Child Count",
+    "Folder Child Count",
+    "App Created By",
+    "App Modified By",
+    "Source Version (Converted Document)",
+    "Source Name (Converted Document)",
+    "Title",
+    "IsDeleted",
+    "Compliance Asset Id"
+  ];
+
+  // Prepare data rows
+  const preparedData = paginatedFiles.map(file => {
+    const rowData: any = {
+      ID: file.UniqueId,
+      FileName: file.Name,
+      FileSize: ((file.Length as unknown as number) / (1024 * 1024)).toFixed(2) + ' MB',
+      Status: file.ListItemAllFields.Status || ''
+    };
+
+    visibleFields
+      .filter(field => !excludedFieldsByTitle.includes(field.Title))
+      .forEach(field => {
+        let columnValue = file.ListItemAllFields[field.InternalName];
+        
+        // Format date values
+        if (columnValue && typeof columnValue === 'string' && 
+            columnValue.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
+          columnValue = new Date(columnValue).toLocaleString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          });
+        }
+        
+        // Handle boolean values
+        if (typeof columnValue === 'boolean') {
+          columnValue = columnValue ? 'Yes' : 'No';
+        }
+        
+        // Handle user fields
+        if (field.TypeAsString === 'User' && columnValue) {
+          columnValue = columnValue.Title || columnValue.Email || columnValue;
+        }
+        
+        // Handle lookup fields
+        if (field.TypeAsString === 'Lookup' && columnValue) {
+          columnValue = columnValue.LookupValue || columnValue;
+        }
+        
+        rowData[field.Title] = columnValue !== undefined && columnValue !== null ? columnValue.toString() : "";
+      });
+
+    return rowData;
+  });
+
+  return preparedData;
+};
 const getdoclibdata = async (FolderPath: any, siteID: any, docLibName: any, searchText: any = null) => {
     // console.log(searchText.value + "searchText text")
+    setEditviewgridviewButtons(true);
+    setMyreqormyfav('DocumentLibrary');
+    setFlowResponse(null);
+                                setAILoading(false);
    routeToDiffSideBar="documentLibrary";
     const site = await sp.site.select("Url")();
     const fullUrl = site.Url;
     const relativeUrl = new URL(fullUrl).pathname;
     console.log(relativeUrl + "relativeUrl");
+    console.log(docLibName + "docLibName");
+    console.log(FolderPath + "FolderPath");
     setlistorgriddata('');
 
     // Pagination variables
     const itemsPerPage = 12; // Number of items per page
     let currentPage = 1;
     let totalItems = 0;
-    let paginatedFiles: any[] = [];
+ 
     let favouriteMap: Map<string, boolean>;
 
     // Function to render pagination controls
@@ -4180,7 +4400,7 @@ const renderPagination = (totalItems: number) => {
 
 
     // Function to display paginated files
-    const displayPaginatedFiles = () => {
+    const displayPaginatedFiles = async () => {
         const container = document.getElementById("files-container");
         container.innerHTML = "";
 
@@ -4219,7 +4439,9 @@ const renderPagination = (totalItems: number) => {
                 }
             });
         }
-
+ // ✅ Prepare data for table view
+ const tableData = await prepareDocumentLibraryDataForTable();
+ setDocumentLibraryDataForTable(tableData);
         renderPagination(totalItems);
     };
 
@@ -4257,8 +4479,10 @@ const renderPagination = (totalItems: number) => {
                         noFileMessage.style.textAlign = "center";
                         const CreateFolder = document.getElementById("CreateFolder")
                         const createFileButton = document.getElementById("createFileButton")
-                        if (createFileButton) { createFileButton.style.display = "none" }
-                        if (CreateFolder) { CreateFolder.style.display = "none" }
+                        // if (createFileButton) { createFileButton.style.display = "none" }
+                        if (createFileButton) { setShowCreateFileButton(false); }
+                        // if (CreateFolder) { CreateFolder.style.display = "none" }
+                        setShowCreateFolderButton(false);
                         container.appendChild(noFileMessage);
                         console.error("Error fetching files:", error)
                     }
@@ -4303,33 +4527,45 @@ const renderPagination = (totalItems: number) => {
             if (isMemberOfSuperAdmin || isMemberOfGroup) {
                 console.log(`Current User is  admin or super admin`);
                 IsFolderDeligationUser = !1;
-                if (createFileButton) { createFileButton.style.display = "block" }
-                if (CreateFolder) { CreateFolder.style.display = "block" }
+                // if (createFileButton) { createFileButton.style.display = "block" }
+                if (createFileButton) { setShowCreateFileButton(true);}
+                // if (CreateFolder) { CreateFolder.style.display = "block" }
+                if (CreateFolder) { setShowCreateFolderButton(true); }
             } else if (userPermissions.hasFullControl) {
                 console.log(`Current User has full control on the library/Folder and user does not belong to admin or super admin group`);
-                if (createFileButton) { createFileButton.style.display = "block" }
-                if (CreateFolder) { CreateFolder.style.display = "block" }
+                // if (createFileButton) { createFileButton.style.display = "block" }
+                if (createFileButton) { setShowCreateFileButton(true); }
+                // if (CreateFolder) { CreateFolder.style.display = "block" }
+                if (CreateFolder) { setShowCreateFolderButton(true); }
                 if (isMemberOfDeligation) { IsFolderDeligationUser = !0 } else { IsFolderDeligationUser = !1 }
             } else if (userPermissions.hasContribute || userPermissions.hasEdit) {
                 console.log(`Current User has Contribute/Edit permission on the library/Folder`);
-                if (createFileButton) { createFileButton.style.display = "block" }
-                if (CreateFolder) { CreateFolder.style.display = "none" }
+                // if (createFileButton) { createFileButton.style.display = "block" }
+                if (createFileButton) { setShowCreateFileButton(true); }
+                // if (CreateFolder) { CreateFolder.style.display = "none" }
+                if (CreateFolder) { setShowCreateFolderButton(false); }
                 if (isMemberOfDeligation) {
                     IsFolderDeligationUser = !0;
-                    CreateFolder.style.display = "block"
+                    // CreateFolder.style.display = "block"
+                    setShowCreateFolderButton(true);
                 } else {
                     IsFolderDeligationUser = !1;
-                    CreateFolder.style.display = "none"
+                    // CreateFolder.style.display = "none"
+                    setShowCreateFolderButton(false);
                 }
             } else if (isMemberOfDeligation) {
                 IsFolderDeligationUser = !0;
                 console.log(`User is a member of the group: ${currentEntity}_FolderDeligation`);
-                if (createFileButton) { createFileButton.style.display = "block" }
-                if (CreateFolder) { CreateFolder.style.display = "block" }
+                // if (createFileButton) { createFileButton.style.display = "block" }
+                if (createFileButton) { setShowCreateFileButton(true);}
+                // if (CreateFolder) { CreateFolder.style.display = "block" }
+                if (CreateFolder) { setShowCreateFolderButton(true); }
             } else {
                 console.log(`Current User has no permission on the library/Folder`);
-                if (createFileButton) { createFileButton.style.display = "none" }
-                if (CreateFolder) { CreateFolder.style.display = "none" }
+                // if (createFileButton) { createFileButton.style.display = "none" }
+                if (createFileButton) { setShowCreateFileButton(false); }
+                // if (CreateFolder) { CreateFolder.style.display = "none" }
+                if (CreateFolder) { setShowCreateFolderButton(false); }
             }
             ismyrequordoclibforfilepreview = "getdoclibdata"
             updateBreadcrumb(FolderPath);
@@ -4360,8 +4596,10 @@ const renderPagination = (totalItems: number) => {
         } catch (error) {
             const CreateFolder = document.getElementById("CreateFolder")
             const createFileButton = document.getElementById("createFileButton")
-            if (createFileButton) { createFileButton.style.display = "none" }
-            if (CreateFolder) { CreateFolder.style.display = "none" }
+            // if (createFileButton) { createFileButton.style.display = "none" }
+            if (createFileButton) { setShowCreateFileButton(false); }
+            // if (CreateFolder) { CreateFolder.style.display = "none" }
+            if (CreateFolder) { setShowCreateFolderButton(false); }
             console.error("Error fetching Doclib data:", error)
         }
     } else {
@@ -4425,7 +4663,49 @@ const renderPagination = (totalItems: number) => {
                     response = await sp.web(nextLink)
                 } else {
                     try {
-                        response = await testidsub.web.getFolderByServerRelativePath(FolderPath).files.select("Name", "Length", "ServerRelativeUrl", "UniqueId", "MajorVersion", "ListItemAllFields/Status", "ListItemAllFields/IsDeleted").expand("ListItemAllFields").orderBy("ListItemAllFields/Modified", !1).filter(`ListItemAllFields/IsDeleted eq ${null} and ListItemAllFields/Status ne 'Pending'`).top(batchSize)();
+                        // response = await testidsub.web.getFolderByServerRelativePath(FolderPath).files.select("Name", "Length", "ServerRelativeUrl", "UniqueId", "MajorVersion", "ListItemAllFields/Status", "ListItemAllFields/IsDeleted").expand("ListItemAllFields").orderBy("ListItemAllFields/Modified", !1).filter(`ListItemAllFields/IsDeleted eq ${null} and ListItemAllFields/Status ne 'Pending'`).top(batchSize)();
+                        if(FolderPath === "/sites/multiverseintranetportal/EHO/Civil/DOCUMENT DRAWINGS" || FolderPath === "/sites/multiverseintranetportal/EHO/Civil/CORRESPONDENCE" ){
+                          // response = await testidsub.web.getFolderByServerRelativePath(FolderPath).files
+                          // .select(
+                          //   "Name", 
+                          //   "Length", 
+                          //   "ServerRelativeUrl", 
+                          //   "UniqueId", 
+                          //   "MajorVersion", 
+                          //   "ListItemAllFields/Status", 
+                          //   "ListItemAllFields/IsDeleted",
+                          //   "ListItemAllFields/DocumentType",
+                          //   "ListItemAllFields/Project",
+                          //   "ListItemAllFields/Template",
+                          //   "ListItemAllFields/TagNo",
+                          //   "ListItemAllFields/Area",
+                          //   "ListItemAllFields/Year",
+                          //   "ListItemAllFields/Subject",
+                          //   "ListItemAllFields/ExternalParty",
+                          //   "ListItemAllFields/IssuedDate",
+                          //   "ListItemAllFields/Discipline",
+                          //   "ListItemAllFields/From",
+                          //   "ListItemAllFields/Created",
+                          //   "ListItemAllFields/Author",
+                          //   "ListItemAllFields/Modified",
+                          //   "ListItemAllFields/Editor"
+                          // )
+                          // .expand("ListItemAllFields", "ListItemAllFields/Author", "ListItemAllFields/Editor")
+                          // .orderBy("ListItemAllFields/Modified", !1)
+                          // .filter(`ListItemAllFields/IsDeleted eq ${null} and ListItemAllFields/Status ne 'Pending'`)
+                          // .top(batchSize)();
+                          response = await testidsub.web
+  .getFolderByServerRelativePath(FolderPath)
+  .files
+  .expand("ListItemAllFields")
+  .orderBy("ListItemAllFields/Modified", false)
+  .filter(`ListItemAllFields/IsDeleted eq null and ListItemAllFields/Status ne 'Pending'`)
+  .top(batchSize)();
+  console.log("Special folder response:", response);
+                        }else{
+                          response = await testidsub.web.getFolderByServerRelativePath(FolderPath).files.select("Name", "Length", "ServerRelativeUrl", "UniqueId", "MajorVersion", "ListItemAllFields/Status", "ListItemAllFields/IsDeleted" , "ListItemAllFields/DocumentNumber").expand("ListItemAllFields").orderBy("ListItemAllFields/Modified", !1).filter(`ListItemAllFields/IsDeleted eq ${null} and ListItemAllFields/Status ne 'Pending'`).top(batchSize)();
+                        }
+                        
                         myfolderdata = response
                         console.log(response, "response")
                     } catch (error) {
@@ -4437,8 +4717,10 @@ const renderPagination = (totalItems: number) => {
                         noFileMessage.style.textAlign = "center";
                         const CreateFolder = document.getElementById("CreateFolder")
                         const createFileButton = document.getElementById("createFileButton")
-                        if (createFileButton) { createFileButton.style.display = "none" }
-                        if (CreateFolder) { CreateFolder.style.display = "none" }
+                        // if (createFileButton) { createFileButton.style.display = "none" }
+                        if (createFileButton) { setShowCreateFileButton(false); }
+                        // if (CreateFolder) { CreateFolder.style.display = "none" }
+                        if (CreateFolder) { setShowCreateFolderButton(false);}
                         container.appendChild(noFileMessage);
                         console.error("Error fetching files:", error)
                     }
@@ -4479,33 +4761,45 @@ const renderPagination = (totalItems: number) => {
             if (isMemberOfSuperAdmin || isMemberOfGroup) {
                 console.log(`Current User is  admin or super admin`);
                 IsFolderDeligationUser = !1;
-                if (createFileButton) { createFileButton.style.display = "block" }
-                if (CreateFolder) { CreateFolder.style.display = "block" }
+                // if (createFileButton) { createFileButton.style.display = "block" }
+                if (createFileButton) {setShowCreateFileButton(true);}
+                // if (CreateFolder) { CreateFolder.style.display = "block" }
+                if (CreateFolder) { setShowCreateFolderButton(true); }
             } else if (userPermissions.hasFullControl) {
                 console.log(`Current User has full control on the library/Folder and user does not belong to admin or super admin group`);
-                if (createFileButton) { createFileButton.style.display = "block" }
-                if (CreateFolder) { CreateFolder.style.display = "block" }
+                // if (createFileButton) { createFileButton.style.display = "block" }
+                if (createFileButton) { setShowCreateFileButton(true); }
+                // if (CreateFolder) { CreateFolder.style.display = "block" }
+                if (CreateFolder) { setShowCreateFolderButton(true); }
                 if (isMemberOfDeligation) { IsFolderDeligationUser = !0 } else { IsFolderDeligationUser = !1 }
             } else if (userPermissions.hasContribute || userPermissions.hasEdit) {
                 console.log(`Current User has Contribute/Edit permission on the library/Folder`);
-                if (createFileButton) { createFileButton.style.display = "block" }
-                if (CreateFolder) { CreateFolder.style.display = "none" }
+                // if (createFileButton) { createFileButton.style.display = "block" }
+                if (createFileButton) { setShowCreateFileButton(true); }
+                // if (CreateFolder) { CreateFolder.style.display = "none" }
+                if (CreateFolder) { setShowCreateFolderButton(false); }
                 if (isMemberOfDeligation) {
                     IsFolderDeligationUser = !0;
-                    CreateFolder.style.display = "block"
+                    // CreateFolder.style.display = "block"
+                   setShowCreateFolderButton(true)
                 } else {
                     IsFolderDeligationUser = !1;
-                    CreateFolder.style.display = "none"
+                    // CreateFolder.style.display = "none"
+                    setShowCreateFolderButton(false)
                 }
             } else if (isMemberOfDeligation) {
                 IsFolderDeligationUser = !0;
                 console.log(`User is a member of the group: ${currentEntity}_FolderDeligation`);
-                if (createFileButton) { createFileButton.style.display = "block" }
-                if (CreateFolder) { CreateFolder.style.display = "block" }
+                // if (createFileButton) { createFileButton.style.display = "block" }
+                if (createFileButton) { setShowCreateFileButton(true);}
+                // if (CreateFolder) { CreateFolder.style.display = "block" }
+                if (CreateFolder) { setShowCreateFolderButton(true) }
             } else {
                 console.log(`Current User has no permission on the library/Folder`);
-                if (createFileButton) { createFileButton.style.display = "none" }
-                if (CreateFolder) { CreateFolder.style.display = "none" }
+                // if (createFileButton) { createFileButton.style.display = "none" }
+                if (createFileButton) { setShowCreateFileButton(false); }
+                // if (CreateFolder) { CreateFolder.style.display = "none" }
+                if (CreateFolder) { setShowCreateFolderButton(false) }
             }
             ismyrequordoclibforfilepreview = "getdoclibdata"
             updateBreadcrumb(FolderPath);
@@ -4536,12 +4830,14 @@ const renderPagination = (totalItems: number) => {
         } catch (error) {
             const CreateFolder = document.getElementById("CreateFolder")
             const createFileButton = document.getElementById("createFileButton")
-            if (createFileButton) { createFileButton.style.display = "none" }
-            if (CreateFolder) { CreateFolder.style.display = "none" }
+            // if (createFileButton) { createFileButton.style.display = "none" }
+            if (createFileButton) { setShowCreateFileButton(false); }
+            // if (CreateFolder) { CreateFolder.style.display = "none" }
+            if (CreateFolder) { setShowCreateFolderButton(false) }
             console.error("Error fetching Doclib data:", error)
         }
     }
-};
+  };
 
 
 
@@ -5648,6 +5944,7 @@ const formatSize = (bytes: number): string => {
 };
 const createFileCardForDocumentLibrary=(file:any,fileIcon:any,siteID:string,IsHardDelete:boolean,docLibName:string,displayPropertyforUnFillFavourite:any,displayPropertyforFillFavourite:any,favouriteText:any,permission:any,FolderPath:any)=>{
   // console.log("permission",permission);
+  console.log("file of doclibdata",file);
   const extensionHtml=createFileExtensionHtml(file.Name);
   const card = document.createElement("div");
   card.className = "card";
@@ -5660,7 +5957,11 @@ const createFileCardForDocumentLibrary=(file:any,fileIcon:any,siteID:string,IsHa
          <div class="col-md-10 pe-0">
          <div class="CardTextContainer">
         <p style="cursor: pointer;" class="p1st" title="${file.Name}" onclick="PreviewFile('${file.ServerRelativeUrl}', '${siteID}' , '${docLibName}','${file.ListItemAllFields.Status}')">${file.Name}</p>
-            <p class="p3rd">${fixSize(file.Length as unknown as number)}</p>
+         <div class="d-flex justify-content-between align-items-center">
+          <p class="p3rd">${fixSize(file.Length as unknown as number)}</p>
+          ${file.ListItemAllFields?.DocumentNumber && file.ListItemAllFields.DocumentNumber.trim() !== '' ? `<p style="text-align: right;font-size:11px;margin-bottom:5px" class="doctext"><span style="font-weight:600" class="text-dark">DOC.NO:</span> ${file.ListItemAllFields.DocumentNumber}</p>` : ''}
+           
+            </div>
          </div>
          </div>
          </div>
@@ -5700,52 +6001,59 @@ const createFileCardForDocumentLibrary=(file:any,fileIcon:any,siteID:string,IsHa
       if( isprocessfolder === false ||  isprocessfolder === null ||  isprocessfolder === undefined){
       menu.innerHTML = `
         <ul>
-          <li onclick="confirmDeleteFile('${file.UniqueId}', '${siteID}', '${IsHardDelete}', '${null}')">
+          <li onclick="confirmDeleteFile('${file.UniqueId}', '${siteID}', '${IsHardDelete}', '${null}'); closeMenuByFileId('${file.UniqueId}');">
                   <img src=${deleteIcon} alt="Delete"/>
                   Delete
           </li>
-          <li onclick="auditHistory('${file.UniqueId}', '${siteID}','${currentDocumentLibrary}','${currentEntity}')">
+          <li onclick="auditHistory('${file.UniqueId}', '${siteID}','${currentDocumentLibrary}','${currentEntity}'); closeMenuByFileId('${file.UniqueId}');">
           <img src=${AuditHistoryIcon} alt="Audit History"/>
                       Audit History
           </li>
-          <li onclick="PreviewFile('${file.ServerRelativeUrl}', '${siteID}' , '${docLibName}','${file.ListItemAllFields.Status}')">
+          <li onclick="PreviewFile('${file.ServerRelativeUrl}', '${siteID}' , '${docLibName}','${file.ListItemAllFields.Status}'); closeMenuByFileId('${file.UniqueId}');">
           <img src=${FilePreview} alt="Preview"/>
                       Preview File
           </li>
-          <li id="favouriteToggle-${file.UniqueId}" onclick="toggleFavourite('${file.UniqueId}', '${siteID}')">
+          <li id="favouriteToggle-${file.UniqueId}" onclick="toggleFavourite('${file.UniqueId}', '${siteID}'); closeMenuByFileId('${file.UniqueId}');">
           <img src=${UnFillFavouriteFile} alt="Mark as Favourite" class="mark-as-favourite" style="display:${displayPropertyforUnFillFavourite};"/>
           <img src=${FillFavouriteFile} alt="Unmark as Favourite" class="unmark-as-favourite" style="display:${displayPropertyforFillFavourite};"/>
           <span class="favourite-text">${favouriteText}</span>
           </li>
-          <li onclick="shareFile('${file.UniqueId}','${siteID}','${FolderPath}','${file.Name}','DocumentLibrary','${file.MajorVersion}','${((file.Length as unknown as number) / (1024 * 1024)).toFixed(2)}','${file.ListItemAllFields.Status}','','${currentDocumentLibrary}')">
+          <li onclick="shareFile('${file.UniqueId}','${siteID}','${FolderPath}','${file.Name}','DocumentLibrary','${file.MajorVersion}','${((file.Length as unknown as number) / (1024 * 1024)).toFixed(2)}','${file.ListItemAllFields.Status}','','${currentDocumentLibrary}'); closeMenuByFileId('${file.UniqueId}');">
           <img src=${ShareFile} alt="Share"/> Share
           </li>
             ${file.ListItemAllFields.Status === 'Auto Approved' ? `   
-               <li onclick="versionHistory('${file.Name}', '${file.ServerRelativeUrl}', '${siteID}' ,'DocumentLibrary','${file.UniqueId}')">
+               <li onclick="versionHistory('${file.Name}', '${file.ServerRelativeUrl}', '${siteID}' ,'DocumentLibrary','${file.UniqueId}'); closeMenuByFileId('${file.UniqueId}');">
                   <img src=${VHIcon} alt="Version History"/>
                     Version History
                </li>
               ` : ` `}
+                  <li onclick="showDocumentSummary('${file.Name}', '${file.ServerRelativeUrl}', '${siteID}', '${file.UniqueId}' , '' , '${FolderPath}')">
+            <img src=${DocumentSummaryIcon} alt="Document Summary"/> Document Summary
+          </li>
+           <li onclick="showAIVersionCompare('${file.Name}', '${file.ServerRelativeUrl}', '${siteID}', '${file.UniqueId}' , '' , '${FolderPath}')">
+            <img src=${AIIcon} alt="AI Version Compare"/> AI Version Compare
+          </li>
+
         </ul>
       `;
       }else if(isprocessfolder === true){
         menu.innerHTML = `
         <ul>
-          <li onclick="confirmDeleteFile('${file.UniqueId}', '${siteID}', '${IsHardDelete}', '${null}')">
+          <li onclick="confirmDeleteFile('${file.UniqueId}', '${siteID}', '${IsHardDelete}', '${null}'); closeMenuByFileId('${file.UniqueId}');">
                   <img src=${deleteIcon} alt="Delete"/>
                   Delete
           </li>
       
-          <li onclick="PreviewFile('${file.ServerRelativeUrl}', '${siteID}' , '${docLibName}','${file.ListItemAllFields.Status}')">
+          <li onclick="PreviewFile('${file.ServerRelativeUrl}', '${siteID}' , '${docLibName}','${file.ListItemAllFields.Status}'); closeMenuByFileId('${file.UniqueId}');">
           <img src=${FilePreview} alt="Preview"/>
                       Preview File
           </li>
      
-          <li onclick="shareFile('${file.UniqueId}','${siteID}','${FolderPath}','${file.Name}','DocumentLibrary','${file.MajorVersion}','${((file.Length as unknown as number) / (1024 * 1024)).toFixed(2)}','${file.ListItemAllFields.Status}','','${currentDocumentLibrary}')">
+          <li onclick="shareFile('${file.UniqueId}','${siteID}','${FolderPath}','${file.Name}','DocumentLibrary','${file.MajorVersion}','${((file.Length as unknown as number) / (1024 * 1024)).toFixed(2)}','${file.ListItemAllFields.Status}','','${currentDocumentLibrary}'); closeMenuByFileId('${file.UniqueId}');">
           <img src=${ShareFile} alt="Share"/> Share
           </li>
             ${file.ListItemAllFields.Status === 'Auto Approved' ? `   
-               <li onclick="versionHistory('${file.Name}', '${file.ServerRelativeUrl}', '${siteID}' ,'DocumentLibrary','${file.UniqueId}')">
+               <li onclick="versionHistory('${file.Name}', '${file.ServerRelativeUrl}', '${siteID}' ,'DocumentLibrary','${file.UniqueId}'); closeMenuByFileId('${file.UniqueId}');">
                   <img src=${VHIcon} alt="Version History"/>
                     Version History
                </li>
@@ -6020,13 +6328,13 @@ blurOverlay.id = "blurOverlay";
     left: 8%;
    
     z-index: 2;
-    
+    width:84%;
     
     background-color: white;
    
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
-    padding: 20px;
+    padding: 12px;
     overflow-y: auto;
   `;
 
@@ -7333,6 +7641,17 @@ window.PreviewFile = function(path: any, SiteID: any, docLibName: any, status: s
   createpreviewdiv.style.position = 'relative';
   createpreviewdiv.style.height = '100%';
  
+// Text for Preview File Mode By Aman
+  const previewInfoText = document.createElement('div');
+  previewInfoText.textContent = 'File preview mode — viewing only.';
+  previewInfoText.style.fontSize = '16px';
+  previewInfoText.style.color = '#000';
+  
+  previewInfoText.style.paddingTop = '23px';
+  previewInfoText.style.paddingBottom = '22px';
+    previewInfoText.style.borderBottom = '10px solid #fbfbfb';
+  createpreviewdiv.appendChild(previewInfoText);
+ 
   let finalPreviewUrl = "";
  
   try {
@@ -7425,8 +7744,17 @@ window.PreviewFile = function(path: any, SiteID: any, docLibName: any, status: s
   // 5. Create Close Button
   const closeButton = document.createElement('button');
   closeButton.classList.add('my-class'); 
-  closeButton.innerHTML = "&times;";
+  //closeButton.innerHTML = "&times;";
+
+  const closeIcon = document.createElement('img');
+closeIcon.src = require('../assets/backnew.png'); // Upload File wala icon
+closeIcon.alt = 'Back';
+
+closeIcon.style.cursor = 'pointer';
+
+closeButton.appendChild(closeIcon);
   closeButton.title = 'Close Preview';
+ 
   closeButton.style.background = 'transparent';
   closeButton.style.border = 'none';
   closeButton.style.fontSize = '28px';
@@ -7595,19 +7923,19 @@ const searchFiles = async (event: React.FormEvent) => {
           menu.className = "popup-menu";
           menu.innerHTML = `
                 <ul>
-                  <li onclick="confirmDeleteFile('${file.UniqueId}', '${currentsiteID}')">
+                  <li onclick="confirmDeleteFile('${file.UniqueId}', '${currentsiteID}'); closeMenuByFileId('${file.UniqueId}');">
                     <img src=${deleteIcon} alt="Delete"/>
                     Delete
                   </li>
-                  <li onclick="auditHistory('${file.UniqueId}', '${currentsiteID}','${file.Title}')">
+                  <li onclick="auditHistory('${file.UniqueId}', '${currentsiteID}','${file.Title}'); closeMenuByFileId('${file.UniqueId}');">
                     <img src=${AuditHistoryIcon} alt="Audit History"/>
                     Audit History
                   </li>
-                  <li onclick="PreviewFile('${fileserverrelativeurl}', '${currentsiteID}' , '${currentDocumentLibrary}')">
+                  <li onclick="PreviewFile('${fileserverrelativeurl}', '${currentsiteID}' , '${currentDocumentLibrary}'); closeMenuByFileId('${file.UniqueId}');">
                     <img src=${editIcon} alt="Preview"/>
                     Preview File
                   </li>
-                  <li id="favouriteToggle-${file.UniqueId}" onclick="toggleFavourite('${file.UniqueId}', '${currentsiteID}')">
+                  <li id="favouriteToggle-${file.UniqueId}" onclick="toggleFavourite('${file.UniqueId}', '${currentsiteID}'); closeMenuByFileId('${file.UniqueId}');">
                     <img src=${UnFillFavouriteFile} alt="Mark as Favourite" class="mark-as-favourite"/>
                     <img src=${FillFavouriteFile} alt="Unmark as Favourite" class="unmark-as-favourite" style="display:none;"/>
                     <span class="favourite-text">Mark as Favourite</span>
@@ -8176,6 +8504,10 @@ const ShareWithOther = async (
   event: React.MouseEvent<HTMLButtonElement> = null,
   searchText: HTMLInputElement = null
 ) => {
+  setShowCreateFolderButton(false);
+  setEditviewgridviewButtons(false);
+  setFlowResponse(null);
+                                setAILoading(false);
   const getfilescontainer = document.getElementById('files-container');
   if (getfilescontainer) getfilescontainer.innerHTML = '';
   const loader = document.getElementById('loader2');
@@ -8201,8 +8533,10 @@ const ShareWithOther = async (
   const CreateFolder = document.getElementById("CreateFolder");
   const createFileButton = document.getElementById("createFileButton");
   const CreateRoot = document.getElementById("CreateFolder1");
-  if (CreateFolder) CreateFolder.style.display = 'none';
-  if (createFileButton) createFileButton.style.display = 'none';
+  // if (CreateFolder) CreateFolder.style.display = 'none';
+  if (CreateFolder){ setShowCreateFolderButton(false) };
+  // if (createFileButton) createFileButton.style.display = 'none';
+  if (createFileButton) {setShowCreateFileButton(false);};
   if (CreateRoot) CreateRoot.style.display = 'none';
 
   try {
@@ -8428,7 +8762,7 @@ window.revokeAccess=(UserArray:string,FileName:string,fileId:any,siteId:any,fold
    popup.style.top = "0";
    popup.style.left = "0";
    popup.style.width = "100%";
-   popup.style.height = "100%";
+   popup.style.height = "80vh";
    popup.style.backgroundColor = "rgba(246,246,246,0.87)";
    popup.style.display = "flex";
    popup.style.justifyContent = "center";
@@ -9320,6 +9654,10 @@ const shareInterval = setInterval(() => {
 // }
 
 const ShareWithMe = async (event: React.MouseEvent<HTMLButtonElement> = null, searchText: HTMLInputElement = null) => {
+  setShowCreateFolderButton(false);
+  setEditviewgridviewButtons(false);
+  setFlowResponse(null);
+                                setAILoading(false);
   const container = document.getElementById("files-container");
   const loader = document.getElementById('loader2');
   if (container) container.innerHTML = "";
@@ -9343,8 +9681,10 @@ const ShareWithMe = async (event: React.MouseEvent<HTMLButtonElement> = null, se
   const CreateFolder = document.getElementById("CreateFolder");
   const createFileButton = document.getElementById("createFileButton");
   const CreateRoot = document.getElementById("CreateFolder1");
-  if (CreateFolder) CreateFolder.style.display = 'none';
-  if (createFileButton) createFileButton.style.display = 'none';
+  // if (CreateFolder) CreateFolder.style.display = 'none';
+  if (CreateFolder) {setShowCreateFolderButton(false)}
+  // if (createFileButton) createFileButton.style.display = 'none';
+  if (createFileButton) {setShowCreateFileButton(false)}
   if (CreateRoot) CreateRoot.style.display = 'none';
 
   const newUrl = `${window.location.origin}${window.location.pathname}`;
@@ -10286,6 +10626,10 @@ const Recyclebin = async (
   searchText: any = null,
   currentPage: number = 1  // Add currentPage parameter to maintain pagination state
 ) => {
+  setShowCreateFolderButton(false);
+  setEditviewgridviewButtons(false);
+  setFlowResponse(null);
+                                setAILoading(false);
   entityclicktext = '';
   setdisplayuploadfileandcreatefolder(false);
   
@@ -11362,6 +11706,41 @@ function closePopup() {
 
 
 // Sharewith Me And Share With Others
+// Helper function to close menu by file ID
+// @ts-ignore
+window.closeMenuByFileId = function(fileId: any) {
+  const menu = document.getElementById(`menu-${fileId}`);
+  if (menu) {
+    menu.classList.remove('show');
+    console.log(`closeMenuByFileId: closed menu-${fileId}`);
+  }
+};
+
+// Helper to close all menus (useful as a fallback)
+// @ts-ignore
+window.closeAllMenus = function() {
+  const menus = document.querySelectorAll('.popup-menu.show');
+  menus.forEach(m => {
+    m.classList.remove('show');
+  });
+  console.log('closeAllMenus: closed all popup menus');
+};
+
+// Global listener to close menu when any menu item is clicked.
+// Use capture phase to ensure this runs before other handlers that may navigate.
+document.addEventListener('click', (e) => {
+  const target = e.target as HTMLElement;
+  if (target && target.closest && target.closest('.popup-menu li')) {
+    // Close the specific menu containing the clicked item
+    const menu = target.closest('.popup-menu');
+    if (menu) {
+      menu.classList.remove('show');
+      // also log for debugging
+      console.log('Global listener: closed menu on menu item click');
+    }
+  }
+}, true);
+
 //Toggle the menu card
 // @ts-ignore
  window.toggleMenu2 = async function(fileId: any , siteID:any , listitemid:any , Listname:any) {
@@ -12968,6 +13347,10 @@ window.view=(message:string)=>{
 // this is last updated code for mycreatedfolders after pagination
 const mycreatedfolders = async (event: any = null, searchText: any = null) => {
     // Clear container and show loader
+    setEditviewgridviewButtons(false)
+    setShowCreateFolderButton(false);
+    setFlowResponse(null);
+                                setAILoading(false);
     const getfilescontainer = document.getElementById('files-container');
     if (getfilescontainer) getfilescontainer.innerHTML = ''; // Clear the container
     const loader = document.getElementById('loader2');
@@ -12982,8 +13365,10 @@ const mycreatedfolders = async (event: any = null, searchText: any = null) => {
     const CreateFolder = document.getElementById("CreateFolder");
     const createFileButton = document.getElementById("createFileButton");
     const CreateRoot = document.getElementById("CreateFolder1");
-    if (CreateFolder) CreateFolder.style.display = 'none';
-    if (createFileButton) createFileButton.style.display = 'none';
+    // if (CreateFolder) CreateFolder.style.display = 'none';
+    if (CreateFolder){setShowCreateFolderButton(false)}
+    // if (createFileButton) createFileButton.style.display = 'none';
+    if (createFileButton)  {setShowCreateFileButton(false)}
     if (CreateRoot) CreateRoot.style.display = 'none';
     
     setlistorgriddata('');
@@ -14522,6 +14907,10 @@ if (container) {
 // this is working myfavourite code after pagination buttons
   
 const myFavorite = async (event: any = null, siteIdToUpdate: string = null, searchText: any = null) => {
+  setShowCreateFolderButton(false);
+  setEditviewgridviewButtons(true);
+  setFlowResponse(null);
+                                setAILoading(false);
   routeToDiffSideBar === "myFavourite"
   // Pagination variables
 
@@ -14544,9 +14933,14 @@ const myFavorite = async (event: any = null, siteIdToUpdate: string = null, sear
   const CreateFolder = document.getElementById("CreateFolder");
   const createFileButton = document.getElementById("createFileButton");
   const CreateRoot = document.getElementById("CreateFolder1");
-  if (CreateFolder) CreateFolder.style.display = 'none';
-  if (createFileButton) createFileButton.style.display = 'none';
+  // if (CreateFolder) CreateFolder.style.display = 'none';
+  if (CreateFolder){setShowCreateFolderButton(false)};
+  // if (createFileButton) createFileButton.style.display = 'none';
+  if (createFileButton)  {setShowCreateFileButton(false)}
   if (CreateRoot) CreateRoot.style.display = 'none';
+
+  // Hide the Create label for my fav - addhyan kumar
+  setdisplayuploadfileandcreatefolder(false);
 
   setTimeout(() => {
     setlistorgriddata('');
@@ -14817,6 +15211,10 @@ const createFileCard = (file:any, fileIcon:any, siteId:any,listToUpdate:any,file
   // `;
   menu.innerHTML = `
     <ul>
+      <li onclick="PreviewFile('${file.CurrentFolderPath}/${file.FileName}', '${file.SiteID}' , '${file.DocumentLibraryName}','${file.Status}','${file.FilePreviewURL}')">
+        <img src=${FilePreview} alt="Preview"/>
+        Preview File
+      </li>
       <li onclick="unMarkAsFavorite('${file.FileUID}', '${siteId}','${listToUpdate}')">
         <img src=${FillFavouriteFile} alt="Unmark as Favorite"/> Unmark as Favorite
       </li>
@@ -17161,6 +17559,7 @@ img.style.height = "18px";   // optional
 img.style.marginRight = "6px";
 submitButton.appendChild(img);
 submitButton.appendChild(img);
+submitButton.type = "submit";
      submitButton.style.padding = "6px 20px";
      submitButton.style.backgroundColor = "#2c9942";
      submitButton.style.color = "#fff";
@@ -17169,7 +17568,8 @@ submitButton.appendChild(img);
      submitButton.style.cursor = "pointer";
      submitButton.style.float = "right";
      submitButton.style.marginTop = "0px";
-    submitButton.onclick = async() => {
+    submitButton.onclick = async(e) => {
+      e.preventDefault();
       const newName = input.value.trim();
       if (newName) {
         console.log("New  name:", newName);
@@ -17278,6 +17678,10 @@ const myRequest = async (
   siteIdToUpdate: string = null,
   searchText: any = null
 ) => {
+  setEditviewgridviewButtons(true)
+  setShowCreateFolderButton(false);
+  setFlowResponse(null);
+                                setAILoading(false);
   // Initialize pagination variables
   let currentPage = 1;
   const itemsPerPage = 12;
@@ -17306,8 +17710,10 @@ const myRequest = async (
   const CreateFolder = document.getElementById("CreateFolder");
   const createFileButton = document.getElementById("createFileButton");
   const CreateRoot = document.getElementById("CreateFolder1");
-  if (CreateFolder) CreateFolder.style.display = 'none';
-  if (createFileButton) createFileButton.style.display = 'none';
+  // if (CreateFolder) CreateFolder.style.display = 'none';
+  if (CreateFolder) {setShowCreateFolderButton(false)};
+  // if (createFileButton) createFileButton.style.display = 'none';
+  if (createFileButton)  {setShowCreateFileButton(false)}
   if (CreateRoot) CreateRoot.style.display = 'none';
 
   // Reset view
@@ -17360,8 +17766,13 @@ const myRequest = async (
           <div class="col-md-10"> 
             <div class="CardTextContainer">
               <p class="p1st" style="cursor: pointer;" title="${file.FileName}" onclick="PreviewFile('${file.FileUID}','${file.SiteID}','${file.ID}' , '${file.FileMasterList}', '${file.FilePreviewURL}')">${file.FileName}</p>
-              <p class="p2nd" title="${file.CurrentFolderPath ? file.CurrentFolderPath.split('/').slice(3).join('/') : ''}">${file.DocumentLibraryName}</p>
- <p class="p3rd">${fixSize(file.FileSize as number)}</p>
+                <div class="d-flex justify-content-between align-items-center">
+               <p class="p2nd" title="${file.CurrentFolderPath ? file.CurrentFolderPath.split('/').slice(3).join('/') : ''}">${file.DocumentLibraryName}</p>
+               ${file.RequestNo && file.RequestNo.trim() !== '' ? `<p style="text-align: right;font-size:11px; margin-bottom:5px" class="doctext"><span style="font-weight:600" class="text-dark">DOC.NO:</span> ${file.RequestNo}</p>` : ''}
+            
+  </div>
+              <p class="p3rd">${fixSize(file.FileSize as number)}</p>
+
               <p class="filestatus myrequestp3rd">${file.Status ? file.Status : ''}</p>
             </div>
             <div class="three-dots" onclick="toggleMenu2('${file.FileUID}','${file.SiteID}','${file.ID}' , '${file.FileMasterList}')">
@@ -17552,6 +17963,7 @@ const myRequest = async (
             .getByTitle(`${fileItem.FileMasterList}`)
             .items.select(
               "ID", "FileName", "FileUID", "FileSize", "FileVersion", 
+              "RequestNo",
               "Status", "SiteID", "CurrentFolderPath", "DocumentLibraryName", 
               "SiteName", "FilePreviewURL", "IsDeleted", "MyRequest", "Modified"
             )
@@ -17717,8 +18129,11 @@ window.showDocumentSummary = async (
   CurrentFolderPath: string,
   SiteID: string,
   FileUID: string,
-  SiteName: string
+  SiteName: string,
+  FolderPath: string
 ) => {
+ console.log("FolderPath AI",FolderPath)
+  console.log("FileUID AI",FileUID)
   //aman 30-12-25
   document.getElementById("files-container")
   ?.classList.add("Airesponse");
@@ -17727,7 +18142,12 @@ window.showDocumentSummary = async (
     setRightPanelMode("DOC_SUMMARY");
     setDocSummaryLoading(true);
     setDocSummaryHtml(null);
-
+    if(SiteName === null || SiteName === undefined || SiteName === ''){
+      const segments = FolderPath.split('/').filter(Boolean);
+      const folderName = segments[segments.length - 2];
+      console.log(folderName); // Output: "RAKEZ"
+      SiteName= folderName;
+    }
     const siteUrl = `${window.location.origin}/sites/multiverseintranetportal`;
     const api = `${siteUrl}/_api/web/lists/getbytitle('DMS${SiteName}FileMaster')/items?$filter=FileUID eq '${FileUID}'&$select=AISummary`;
 
@@ -17755,9 +18175,18 @@ window.showAIVersionCompare = async (
   CurrentFolderPath: string,
   SiteID: string,
   FileUID: string,
-  SiteName: string
+  SiteName: string,
+  FolderPath: string
 ) => {
+  console.log("FolderPath AI",FolderPath)
+  console.log("FileUID AI",FileUID)
   //aman 30-12-25
+    if(SiteName === null || SiteName === undefined || SiteName === ''){
+      const segments = FolderPath.split('/').filter(Boolean);
+      const folderName = segments[segments.length - 2];
+      console.log(folderName); // Output: "RAKEZ"
+      SiteName= folderName;
+    }
   document
     .getElementById("files-container")
     ?.classList.add("Airesponse");
@@ -17942,7 +18371,15 @@ useEffect(() => {
     setActiveComponent(''); // Reset to show the main component
   };
   
-
+  const gidviewforbothmyreqandmyfav=(event:any)=>{
+     event.preventDefault();
+     if(routeToDiffSideBar === "myFavorite"){
+      myFavorite()
+     }
+     if(routeToDiffSideBar === "myRequest"){  
+      myRequest()
+     }
+  }
   const MyrequestshowListView = (componentName:any)=>{
     const wait = document.getElementById('files-container')
     wait.classList.add('hidemydatacards')
@@ -18349,11 +18786,15 @@ useEffect(() => {
                     IsFolderDeligationUser=false;
                   console.log(`User is a member of the group: ${currentEntity}_Admin`);
                   if(createFileButton){
-                    createFileButton.style.display=  "none";
+                    // createFileButton.style.display=  "none";
+                     setShowCreateFileButton(false)
                   }
                   if(CreateFolder){
-                    CreateFolder.style.display="block";
-                  }
+                    // CreateFolder.style.display="block";
+
+// musaib create file and folder button change
+                        // CreateFolder.style.display="block";
+                        setShowCreateFolderButton(true);                  }
                   // if(CreateRoot){
                   //   CreateRoot.style.display="none";
                   // }
@@ -18361,18 +18802,26 @@ useEffect(() => {
                     IsFolderDeligationUser=true;
                     console.log(`User is a member of the group: ${currentEntity}_FolderDeligation`);
                     if(createFileButton){
-                      createFileButton.style.display=  "none";
+                      // createFileButton.style.display=  "none";
+                       setShowCreateFileButton(false)
                     }
                     if(CreateFolder){
-                      CreateFolder.style.display="block";
+                      // CreateFolder.style.display="block";
+                      // musaib create file and folder button change
+                        // CreateFolder.style.display="block";
+                        setShowCreateFolderButton(true);
                     }
                  }else {
                     console.log(`User is not a member of the group: ${currentEntity}_Admin`);
                     if(createFileButton){
-                      createFileButton.style.display="none";
+                      // createFileButton.style.display="none";
+                       setShowCreateFileButton(false)
                     }
                     if(CreateFolder){
-                      CreateFolder.style.display="none";
+                      // CreateFolder.style.display="none";
+                      // musaib create file and folder button change
+                        // CreateFolder.style.display="none";
+                        setShowCreateFolderButton(false);
                     }
                   
               
@@ -18380,10 +18829,14 @@ useEffect(() => {
                 } catch (error) {
                   console.log(`User is not a member of the group: ${currentEntity}_Admin`);
                   if(createFileButton){
-                    createFileButton.style.display="none";
+                    // createFileButton.style.display="none";
+                     setShowCreateFileButton(false)
                   }
                   if(CreateFolder){
-                    CreateFolder.style.display="none";
+                    // CreateFolder.style.display="none";
+                    // musaib create file and folder button change
+                        // CreateFolder.style.display="none";
+                        setShowCreateFolderButton(false);
                   }
               
                  
@@ -18426,27 +18879,38 @@ useEffect(() => {
                       IsFolderDeligationUser=false;
                     console.log(`User is a member of the group: ${currentEntity}_Admin`);
                     if(createFileButton){
-                      createFileButton.style.display=  "none";
+                      // createFileButton.style.display=  "none";
+                       setShowCreateFileButton(false)
                     }
                     if(CreateFolder){
-                      CreateFolder.style.display="block";
+                      // CreateFolder.style.display="block";
+                      // musaib create file and folder button change
+                        // CreateFolder.style.display="block";
+                        setShowCreateFolderButton(true);
                     }
                    }else if(isMemberOfDeligation){
                       IsFolderDeligationUser=true;
                       console.log(`User is a member of the group: ${currentEntity}_FolderDeligation`);
                       if(createFileButton){
-                        createFileButton.style.display=  "none";
+                        // createFileButton.style.display=  "none";
+                         setShowCreateFileButton(false)
                       }
                       if(CreateFolder){
-                        CreateFolder.style.display="block";
+                        // musaib create file and folder button change
+                        // CreateFolder.style.display="block";
+                        setShowCreateFolderButton(true);
                       }
                    }else {
                       console.log(`User is not a member of the group: ${currentEntity}_Admin`);
                       if(createFileButton){
-                        createFileButton.style.display="none";
+                        // createFileButton.style.display="none";
+                         setShowCreateFileButton(false)
                       }
                       if(CreateFolder){
-                        CreateFolder.style.display="none";
+                        // CreateFolder.style.display="none";
+                        // musaib create file and folder button change
+                        // CreateFolder.style.display="none";
+                        setShowCreateFolderButton(false);
                       }
                     
                 
@@ -18454,10 +18918,14 @@ useEffect(() => {
                   } catch (error) {
                     console.log(`User is not a member of the group: ${currentEntity}_Admin`);
                     if(createFileButton){
-                      createFileButton.style.display="none";
+                      // createFileButton.style.display="none";
+                      setShowCreateFileButton(false);
                     }
                     if(CreateFolder){
-                      CreateFolder.style.display="none";
+                      // CreateFolder.style.display="none";
+                      // musaib create file and folder button change
+                        // CreateFolder.style.display="none";
+                        setShowCreateFolderButton(false);
                     }
                 
                    
@@ -18820,13 +19288,33 @@ if (container) {
   });
 
   // Add save button
+  // const saveButton = document.createElement("button");
+  // saveButton.innerText = "Save";
+  // saveButton.style.marginTop = "10px";
+  // // popupContainer.appendChild(saveButton);
+  // wrapper.appendChild(saveButton);
   const saveButton = document.createElement("button");
-  saveButton.innerText = "Save";
+  saveButton.type = "submit";
   saveButton.style.marginTop = "10px";
-  // popupContainer.appendChild(saveButton);
+  saveButton.style.background = "#fff";
+  saveButton.style.border = "none";
+  saveButton.style.borderRadius = "50%";
+  saveButton.style.padding = "3px";
+  saveButton.style.cursor = "pointer";
+  
+  saveButton.innerHTML = `
+    <img 
+      src="${SubmitIcon}"
+      alt="Save"
+      "
+    />
+  `;
+  
   wrapper.appendChild(saveButton);
 
-  saveButton.addEventListener('click', () => {
+  saveButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
     // debugger
      // Collect data from newly added fields
      console.log(formContent , "formContent")
@@ -18840,6 +19328,28 @@ if (container) {
           columnType: fieldTypeSelect.value
       };
   });
+// Aman 8-01-26
+  const invalidSpecialCharFields = newFields.filter(field =>
+    field.columnName && !/^[a-zA-Z0-9]+( [a-zA-Z0-9]+)*$/.test(field.columnName.trim())
+  );
+  
+  if (invalidSpecialCharFields.length > 0) {
+    isMetaValidationErrorActive = true;
+    Swal.fire({
+      icon: 'error',
+      title: 'Validation Error',
+      text: `Special characters are not allowed in field names: "${invalidSpecialCharFields
+        .map(f => f.columnName)
+        .join(', ')}"`,
+      confirmButtonText: 'OK',
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    }).then(() => {
+      isMetaValidationErrorActive = false;   
+    });
+  
+    return;
+  }
 
   console.log("New Fields:", newFields);
     // Validation for forbidden column names
@@ -18942,6 +19452,7 @@ if (container) {
     // Wait for all promises to resolve
     Promise.all(addColumnPromises)
       .then(() => {
+        isMetaValidationErrorActive = false;
         popupContainer.style.display = 'none';
         Swal.fire(
           'Columns Added Successfully',
@@ -20141,7 +20652,12 @@ popup.innerHTML = `
   </textarea>
 </div>
 <div class="share-popup-footer">
-  <button id="share-shareFileButton">Share</button>
+  <button id="share-shareFileButton">
+  <div class="me-0 mt-0 btncolorCreate1">
+<span class="mb-1 mt-2" data-tooltip="Share">
+   <img src=${sharedoc} alt="Share"/></span>
+</div>
+  </button>
 </div>
 </div>
 `;
@@ -21304,7 +21820,7 @@ console.log("approverDetailsArray", approverDetailsArray);
   // Generate the dynamic HTML for the detail rows
   let detailRowsHTML = "";
   resultArrayThatContainstheColumnDetails.forEach((item, index) => {
-    if (index % 3 === 0) {
+    if (index % 4 === 0) {
       detailRowsHTML += '<div class="detail-row">';
     }
 
@@ -21401,9 +21917,8 @@ approverDetailsArray.forEach((approver) => {
       
       z-index: 1;
       width: 100%;
-      max-width: 1200px;
-      max-height: auto !important;
-      height: 100vh !important;
+      
+     
       overflow-y: auto;
       border-radius: 0px; 
     }
@@ -21464,7 +21979,7 @@ approverDetailsArray.forEach((approver) => {
     
     .detail-column {
       flex: 1; display:block;
-      min-width: 25%;
+      min-width: 23%;
       padding: 0px 10px 0px 0px;
     }
   
@@ -21641,8 +22156,12 @@ if (askAI) {
       }
 
       // Add Meta Data popup (.edit-popup)
-      const editPopup = document.querySelector('.edit-popup') as HTMLElement | null;
-      editPopup?.parentNode?.removeChild(editPopup);
+      // const editPopup = document.querySelector('.edit-popup') as HTMLElement | null;
+      // editPopup?.parentNode?.removeChild(editPopup);
+      if (!isMetaValidationErrorActive) {
+        const editPopup = document.querySelector('.edit-popup') as HTMLElement | null;
+        editPopup?.parentNode?.removeChild(editPopup);
+        }
 
       // Rename Folder
       const renameFolderPopup = document.getElementById('rename-popup');
@@ -21674,6 +22193,30 @@ if (askAI) {
       setShowWorkflow(false);
       setShowfolderpermission(false);
     };
+    const metaIconInterval = setInterval(() => {
+      const editPopup = document.querySelector('.edit-popup');
+      if (!editPopup) return;
+    
+      const saveBtn = Array.from(editPopup.querySelectorAll('button'))
+        .find(btn => btn.textContent?.trim() === 'Save');
+    
+      if (saveBtn && !saveBtn.querySelector('img')) {
+        saveBtn.innerHTML = `
+          <img 
+            src="${SubmitIcon}"
+            alt="Save"
+            style="width:18px;height:18px;"
+          />
+        `;
+        saveBtn.style.background = 'rgb(44,153,66)';
+        saveBtn.style.border = 'none';
+        saveBtn.style.borderRadius = '50%';
+        saveBtn.style.padding = '6px 20px';
+    
+        clearInterval(metaIconInterval);
+      }
+    }, 100);
+    
 
     document.addEventListener('mousedown', handleOutsideClick);
 
@@ -23297,7 +23840,7 @@ const ASKAI = () => {
                             <div style={{display:'flex', justifyContent:'end', gap:'5px'}} className="col-lg-10 newbutton tool">
 
                           
-                            {displayuploadfileandcreatefolder && (
+                            {/* {displayuploadfileandcreatefolder && (
 <div className="bordernewr">
   <div className="d-flex justify-content-center gap-3 mt-2">
   <button style={{marginLeft:'14px'}} type="button" className="btn mt-0"
@@ -23319,7 +23862,29 @@ const ASKAI = () => {
 </div>
 )
 
-}
+} */}
+                            
+<div className="bordernewr">
+  <div className="d-flex justify-content-center gap-3 mt-2">
+  <button style={{marginLeft:'14px'}} type="button" className="btn mt-0"
+  id="createFileButton"
+  onClick={() => handleButtonClickShow("UploadFile")}
+  disabled={!showCreateFileButton}
+  >
+  <span className="mb-1" data-tooltip='Upload File'>
+
+  <img className="sidebariconssmall" src={create1}></img> &nbsp;</span>
+  </button>
+    <button type="button" className="btn mt-0"  id="CreateFolder"
+       onClick={() => handleButtonClickShow("CreateFolder")} disabled={!showCreateFolderButton}>
+
+    <span className="mb-1" data-tooltip='Create Folder'>
+  <img className="sidebariconssmall" src={create2}></img> &nbsp;</span>
+  </button>
+  </div>
+  <p style={{fontSize:'14px'}} className="mb-0 mt-2">Create</p>
+</div>
+
 
 
 {/* srs 12/12/25 */}
@@ -23392,13 +23957,16 @@ const ASKAI = () => {
 
                               <div id="hidegidvewlistviewbutton" className="view-buttons  bordernewr">
                                 <div className="d-flex justify-content-center gap-4 mt-2">
-                                <button  type="button" className="btn  btngridview mt-0 grid-view newl active"    
-                                onClick={(event: any = null, siteIdToUpdate: string = null)=>myRequest(event) }>
+                                <button  type="button" className="btn  btngridview mt-0 grid-view newl active" disabled={!showEditviewgridviewButtons}   
+                                // onClick={(event: any = null, siteIdToUpdate: string = null)=>myRequest(event) }
+                                onClick={(event: any = null, siteIdToUpdate: string = null)=>gidviewforbothmyreqandmyfav(event) }
+                                
+                                >
                                      <span className="mt-2 mb-1" data-tooltip='Grid View'>
                                            
                                   <img className="sidebariconssmall" src={listicon5}></img> </span>  
                                 </button>
-                                <button type="button" className="btn btnlistview list-view mt-0" onClick={(event:any)=>MyrequestshowListView('ListViewComponent')}>
+                                <button type="button" className="btn btnlistview list-view mt-0" disabled={!showEditviewgridviewButtons}  onClick={(event:any)=>MyrequestshowListView('ListViewComponent')}>
                                 <span className="mt-2 mb-1" data-tooltip='List View'>
                                   <img className="sidebariconssmall" src={listicon6}></img> &nbsp;</span>
                                 </button>
@@ -23408,7 +23976,7 @@ const ASKAI = () => {
                           </div>
                           <div className="missing-link">
                           <button type="button" className="btn  grid-view notactive mt-2"    
-                                onClick={()=>window.open('https://officeindia.sharepoint.com/sites/Intranetdemos/SitePages/CheckUrl.aspx' , "_blank") }>
+                                onClick={()=>window.open(`${props.context.pageContext.web.absoluteUrl}/SitePages/CheckUrl.aspx` , "_blank") }>
                                                                          <span className="mt-2 mb-1" data-tooltip='Check Mission Link'>
 
                                                                          
@@ -23803,7 +24371,7 @@ const ASKAI = () => {
 
 {/* POWER AUTOMATE RESPONSE PANEL */}
 {!AILoading && rightPanelMode === "AI" && flowResponse && (
-  <div id="ai-response-panel" style={{ width: "35%", background:'#fff', minWidth: "320px", border: "2px dotted #c9c9c9", height:'86vh',  marginTop: "5px",}}>
+  <div id="ai-response-panel" style={{ width: "35%", background:'#fff', minWidth: "320px", border: "2px dotted #c9c9c9", height:'98vh',  marginTop: "5px",}}>
     <div
       className="pa-response-box"
       style={{
@@ -23940,6 +24508,7 @@ const ASKAI = () => {
         top: "-9px",
         right: "8px",
         zIndex: 10,
+        padding:'0',
         background: "red",
         color: "white",
         border: "none",
@@ -23996,12 +24565,16 @@ const ASKAI = () => {
     <div id="files-container" className="buttonaligm"></div>
   ) : (
     <>
-      {listorgriddata === 'showListView' && (
-        <Table
-          onReturnToMain={handleReturnToMain}
-          Currentbuttonclick={{ buttonclickis: Myreqormyfav }}
-        />
-      )}
+     {listorgriddata === 'showListView' && (
+  <Table
+    key={Myreqormyfav}
+    onReturnToMain={handleReturnToMain}
+    Currentbuttonclick={{ 
+      buttonclickis: Myreqormyfav,
+      documentLibraryData: documentLibraryDataForTable // ✅ Pass the data
+    }}
+  />
+)}
       {listorgriddata === 'showcreatefolderListView' && (
         <Testfile
           onReturnToMain={handleReturnToMain}
