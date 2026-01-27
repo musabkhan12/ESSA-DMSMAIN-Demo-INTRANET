@@ -485,11 +485,13 @@ const handlePreview = (previewUrl: string) => {
 React.useEffect(()=>{
   const  loadFormOptions = async ()=> {
     try {
-      const documentLibraryFields=await sp.web.lists.getByTitle("DMSPreviewFormMaster").items.select("ColumnName","ColumnType","IsRequired","IsRename")
+      const documentLibraryFields=await sp.web.lists.getByTitle("DMSPreviewFormMaster").items.select("ColumnName","ColumnType","IsRequired","IsRename", "Sequence","columnlabel")
       .filter(
             `SiteName eq '${currentfolderpath.Entity}' 
             and DocumentLibraryName eq '${currentfolderpath.DocumentLibrary}' 
-            and AddorRemoveThisColumn eq  'Add To Library' and IsInProgress eq 0`)();
+            and AddorRemoveThisColumn eq  'Add To Library' and IsInProgress eq 0`) 
+            // and AddorRemoveThisColumn eq  'Add To Library' and IsInProgress eq 0`)();
+            .orderBy("Sequence", true)();
 
       console.log("Document Library Fields",documentLibraryFields);
       // end
@@ -498,7 +500,7 @@ React.useEffect(()=>{
      
       const uploadFileDiv=document.createElement('div');
 
-      const createElement=(fieldName:string,type:string,required:boolean,IsRename:string)=>{
+      const createElement=(fieldName:string,type:string,required:boolean,IsRename:string, columnlabel:string)=>{
             let fName=fieldName
             if(IsRename!== null){
               fName=IsRename
@@ -516,10 +518,10 @@ React.useEffect(()=>{
                 const asterisk = document.createElement("span");
                 asterisk.textContent = " *";
                 asterisk.style.color = "red";
-                label.textContent = fName;
+                label.textContent = columnlabel;
                 label.appendChild(asterisk); 
               } else {
-                label.textContent = fName;
+                label.textContent = columnlabel;
               }
             inputContainer.appendChild(label);
     
@@ -570,7 +572,7 @@ React.useEffect(()=>{
 
       // start
       documentLibraryFields.forEach((field)=>{
-        createElement(field.ColumnName,field.ColumnType,field.IsRequired,field.IsRename);
+        createElement(field.ColumnName,field.ColumnType,field.IsRequired,field.IsRename, field.columnlabel);
         })
       // end
 
@@ -2070,7 +2072,7 @@ const breadcrumbParts = useMemo(() => {
           <div className="mt-0 UploadFileCont">
               <div className='row'>
               <div className='col-lg-6'>
-              <nav className="dms-breadcrumb" aria-label="Breadcrumb" style={{marginBottom:12}}>
+              {/* <nav className="dms-breadcrumb" aria-label="Breadcrumb" style={{marginBottom:12}}>
               <img className="" src={info}></img> 
             {breadcrumbParts && breadcrumbParts.length > 0 ? (
               breadcrumbParts.map((seg, idx) => (
@@ -2084,7 +2086,26 @@ const breadcrumbParts = useMemo(() => {
             ) : (
               <span className="dms-breadcrumb-text">Upload</span>
             )}
-          </nav>
+          </nav> */}
+          <nav className="dms-breadcrumb" aria-label="Breadcrumb" style={{marginBottom:12}}>
+  <img className="" src={info}></img> 
+  {breadcrumbParts && breadcrumbParts.length > 0 ? (
+    <>
+      {breadcrumbParts.map((seg, idx) => (
+        <span key={idx} className="dms-breadcrumb-segment">
+          <span className="dms-breadcrumb-text">{seg}</span>
+          {idx < breadcrumbParts.length - 1 && (
+            <span className="dms-breadcrumb-sep">&nbsp;&gt;&nbsp;</span>
+          )}
+        </span>
+      ))}
+      <span className="dms-breadcrumb-text">: Upload File</span>
+    </>
+  ) : (
+    <span className="dms-breadcrumb-text">Upload</span>
+  )}
+</nav>
+
                       {/* <h1>File Preview</h1> */}
                       <div className="borderprev">
                         {isUploading && (
@@ -2136,24 +2157,23 @@ const breadcrumbParts = useMemo(() => {
                      
                       <div className='col-lg-6'>
                           <form id='formSelector' className="mt-3 position-relative">
-                              <h1 className="font-16 fw-bold text-dark mb-0 pt-3">Upload file</h1>
+                              {/* <h1 className="font-16 fw-bold text-dark mb-0 pt-3">Upload file</h1> */}
                               {/* <label className="switch">
                               <input type="checkbox"/>
                               <span className="slider round"></span>
                             </label> */}
-                            {showBulkUpload === true && ( 
+                            {/* this below commented line is for infromation icon and when i hover on info icon the i will get text related to file this line was commented after tarunjeet sir */}
+                            {/* {showBulkUpload === true && ( 
                               <p style={{color:'#6c757d'}} className="font-14"> 
                               <button className="popover-btn1"><img  src={infoupload} className="me-1"></img> information</button>
 <div className="popover-content1">
 Files uploaded to this folder require approval and will be visible only after approval.
 </div>
-                              {/* <button type="button"   className="btn btn-dark" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="  " data-bs-original-title="Exciting Features!">
-                              <img  src={infoupload}></img> information
-                                </button> */}
+                          
 
                              
  </p>
-                             )}
+                             )} */}
                              <div>
       {showBulkUpload === false && ( // Show only if IsApproval is false
       <div style={{display:'flex', justifyContent:'space-between',alignItems:'center'}} className="mt-3 mb-3">
@@ -2186,7 +2206,7 @@ Files uploaded to this folder require approval and will be visible only after ap
         <div className="d-flex align-items-center justify-content-between"><p className="fw-bold font-14">Selected</p>
            <span className="clearall">Clear All    <img style={{margin:'-3px 0px 0px 3px'}} src={require("../assets/delnew1.png")} /></span>
           </div>
-            {uploadedFiles.map((file, index) => (
+            {uploadedFiles.map((file, index, ) => (
               
     <li 
       key={index}
@@ -2221,7 +2241,10 @@ Files uploaded to this folder require approval and will be visible only after ap
         </div>
       )}
     </div>
-    {!isChecked ?   <h3 className="mt-2 mb-2 font-16 text-dark fw-bold">Tags</h3> : null}
+    {!isChecked ?   
+    // <h3 className="mt-2 mb-2 font-16 text-dark fw-bold">Tags</h3> 
+    <></>
+    : null}
     
     </div>
    

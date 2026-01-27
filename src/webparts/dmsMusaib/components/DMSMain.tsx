@@ -91,6 +91,7 @@ import VerticalSideBar from "../../verticalSideBar/components/VerticalSideBar";
 import UserContext from "../../../GlobalContext/context";
 import BulkUpload from "./bulkUpload";
 import UploadFileInDestination from "./uploadFileInDestination"
+let back = require('../assets/backnew.png')
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {  
   faUser, 
@@ -6008,6 +6009,10 @@ const createFileCardForDocumentLibrary=(file:any,fileIcon:any,siteID:string,IsHa
           <li onclick="auditHistory('${file.UniqueId}', '${siteID}','${currentDocumentLibrary}','${currentEntity}'); closeMenuByFileId('${file.UniqueId}');">
           <img src=${AuditHistoryIcon} alt="Audit History"/>
                       Audit History
+          </li>
+          <li onclick="metadataAndTags('${file.UniqueId}', '${siteID}','${currentDocumentLibrary}','${currentEntity}'); closeMenuByFileId('${file.UniqueId}');">
+          <img src=${AddMetaData} alt="Metadata & Tags"/>
+                      Metadata & Tags
           </li>
           <li onclick="PreviewFile('${file.ServerRelativeUrl}', '${siteID}' , '${docLibName}','${file.ListItemAllFields.Status}'); closeMenuByFileId('${file.UniqueId}');">
           <img src=${FilePreview} alt="Preview"/>
@@ -17791,6 +17796,9 @@ const myRequest = async (
           <li onclick="auditHistory('${file.FileUID}', '${file.SiteID}','${file?.DocumentLibraryName}','${file?.SiteName}')">
             <img src=${AuditHistoryIcon} alt="Audit History"/> Audit History
           </li>
+          <li onclick="metadataAndTags('${file.FileUID}', '${file.SiteID}','${file?.DocumentLibraryName}','${file?.SiteName}')">
+            <img src=${AddMetaData} alt="Metadata & Tags"/> Metadata & Tags
+          </li>
           <li onclick="shareFile('${file.FileUID}', '${file.SiteID}','${file.CurrentFolderPath}','${file.FileName}','MyRequest','${file.FileVersion}','${file.FileSize}','${file.Status}','${file.FilePreviewURL}','${file.DocumentLibraryName}')">
             <img src=${ShareFile} alt="Share"/> Share
           </li>
@@ -21569,11 +21577,662 @@ try {
 //   document.body.appendChild(popup);
 // }
 
+// window.auditHistory = async (fileId: string, siteId: string, DocumentLibraryName: string, SiteName: String) => {
+//   console.log("Audit History called", fileId, siteId);
+//   console.log("Audit History called", SiteName);
+//   console.log("Audit History called", DocumentLibraryName);
+//    console.log("Addhyan Audit History called", SiteName);
+
+
+//    const addhyansite = "https://multiverse.sharepoint.com/sites/multiverseintranetportal"
+
+
+// //addhyan 
+
+
+//   // Check if SiteName is "Maintenance and Calibration"
+//   let maintenanceCalibrationData: any = null;
+//   if (SiteName === "Maintenance and Calibration") {
+//     try {
+//       // Fetch data from DmsMaintenanceandCalibration list
+//       const maintenanceItems = await sp.web.lists
+//         .getByTitle("DMSMaintenance and CalibrationFileMaster")
+//         .items.select(
+//           "CompanyName",
+//           "DocumentType",
+//           "EquipmentID",
+//           "EquipmentName",
+//           "StandardReference",
+//           "NextDueDate",
+//           "CalibrationDate",
+//           "CalibrationResult",
+//           "ClientName",
+//           "ContractStartDate",
+//           "ContractEndDate",
+//           "ProjectLocation",
+//           "ReportDate",
+//           "DocumentSummary"
+//         )
+//         .filter(`FileUID eq '${fileId}'`)();
+      
+//       if (maintenanceItems && maintenanceItems.length > 0) {
+//         maintenanceCalibrationData = maintenanceItems[0];
+//         console.log("Maintenance and Calibration data:", maintenanceCalibrationData);
+//       }
+//     } catch (error) {
+//       console.error("Error fetching Maintenance and Calibration data:", error);
+//     }
+//   }
+
+  
+
+
+
+
+
+   
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//   // Date formatting function
+//   const formatDate = (dateValue: any): string => {
+//     if (!dateValue) return "";
+    
+//     const date = new Date(dateValue);
+    
+//     const day = date.getDate().toString().padStart(2, '0');
+//     const month = date.toLocaleString('default', { month: 'short' }).toLowerCase();
+//     const year = date.getFullYear();
+    
+//     let hours = date.getHours();
+//     const minutes = date.getMinutes().toString().padStart(2, '0');
+//     const ampm = hours >= 12 ? 'pm' : 'am';
+//     hours = hours % 12;
+//     hours = hours ? hours : 12;
+    
+//     return `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
+//   };
+  
+//   const formatDate2 = (dateValue: any): string => {
+//     if (!dateValue) return "";
+    
+//     const date = new Date(dateValue);
+    
+//     const day = date.getDate().toString().padStart(2, '0');
+//     const month = date.toLocaleString('default', { month: 'short' }).toLowerCase();
+//     const year = date.getFullYear();
+    
+//     let hours = date.getHours();
+//     const minutes = date.getMinutes().toString().padStart(2, '0');
+//     const ampm = hours >= 12 ? 'pm' : 'am';
+//     hours = hours % 12;
+//     hours = hours ? hours : 12;
+    
+//     return `${day}/${month}/${year}`;
+//   };
+
+//   const { web } = await sp.site.openWebById(siteId)
+
+//   // Get the list item corresponding to the file
+//   const fileItem: any = await web.getFileById(fileId).expand("ListItemAllFields")();
+//   console.log("fileItem", fileItem.ListItemAllFields.Status);
+
+//   //
+  
+
+
+
+//   //
+
+
+
+//   // Get the document library/list to retrieve all fields
+//   const list = await web.lists.getByTitle(DocumentLibraryName);
+//   const listFields = await list.fields.select('Title', 'InternalName', 'TypeAsString', 'Hidden')();
+
+//   console.log("All fields", listFields);
+  
+//   // Filter out hidden and system fields
+//   const visibleFields = listFields.filter(field => 
+//     !field.Hidden && 
+//     field.InternalName !== 'ContentType' && 
+//     field.InternalName !== 'Attachments' &&
+//     field.InternalName !== 'Edit' &&
+//     field.InternalName !== 'DocIcon' &&
+//     field.InternalName !== 'FileLeafRef' &&
+//     field.InternalName !== 'FileRef' &&
+//     !field.InternalName.startsWith('_') &&
+//     field.TypeAsString !== 'Computed' &&
+//     field.TypeAsString !== 'Threading' &&
+//     field.TypeAsString !== 'Guid'
+//   );
+  
+//   console.log("Visible fields", visibleFields);
+
+
+
+
+
+
+
+
+
+
+//     // Define fields you don't want to show in Audit History
+//   const excludedFieldsByTitle = [
+//     "Checked Out To",
+//     "Item Child Count",
+//     "Folder Child Count",
+//     "App Created By",
+//     "App Modified By",
+//     "Source Version (Converted Document)",
+//     "Source Name (Converted Document)",
+//     "Modified By",
+//     "Created By",
+//     "Title",
+//     "IsDeleted",
+//     "Compliance Asset Id"
+//   ];
+//   // Create an array of objects to store the columnName with their corresponding value
+//   // const resultArrayThatContainstheColumnDetails = visibleFields.map((field) => {
+//   //   let columnName = field.Title;
+//   //   let columnValue = fileItem.ListItemAllFields[field.InternalName];
+    
+//   //   // Format date values
+//   //   if (columnValue && typeof columnValue === 'string' && 
+//   //       columnValue.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
+//   //     columnValue = formatDate2(columnValue);
+//   //   }
+    
+//   //   // Handle boolean values
+//   //   if (typeof columnValue === 'boolean') {
+//   //     columnValue = columnValue ? 'Yes' : 'No';
+//   //   }
+    
+//   //   // Handle user fields
+//   //   if (field.TypeAsString === 'User' && columnValue) {
+//   //     columnValue = columnValue.Title || columnValue.Email || columnValue;
+//   //   }
+    
+//   //   // Handle lookup fields
+//   //   if (field.TypeAsString === 'Lookup' && columnValue) {
+//   //     columnValue = columnValue.LookupValue || columnValue;
+//   //   }
+    
+//   //   return {
+//   //     label: columnName,
+//   //     value: columnValue !== undefined && columnValue !== null ? columnValue.toString() : ""
+//   //   };
+//   // });
+
+//    // Create an array of objects to store the columnName with their corresponding value
+//   const resultArrayThatContainstheColumnDetails = visibleFields
+//     .filter(field => !excludedFieldsByTitle.includes(field.Title)) // <--- filter out unwanted
+//     .map((field) => {
+//       let columnName = field.Title;
+//       let columnValue = fileItem.ListItemAllFields[field.InternalName];
+
+//       // Format date values
+//       if (columnValue && typeof columnValue === "string" &&
+//           columnValue.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
+//         columnValue = formatDate2(columnValue);
+//       }
+
+//       // Handle boolean values
+//       if (typeof columnValue === "boolean") {
+//         columnValue = columnValue ? "Yes" : "No";
+//       }
+
+//       // Handle user fields
+//       if (field.TypeAsString === "User" && columnValue) {
+//         columnValue = columnValue.Title || columnValue.Email || columnValue;
+//       }
+
+//       // Handle lookup fields
+//       if (field.TypeAsString === "Lookup" && columnValue) {
+//         columnValue = columnValue.LookupValue || columnValue;
+//       }
+
+//       return {
+//         label: columnName,
+//         value: columnValue !== undefined && columnValue !== null ? columnValue.toString() : ""
+//       };
+//     })
+//     // remove any empty value fields (extra safety)
+//     .filter(item => item.value.trim() !== "");
+
+//   // Add status if it's not already included
+//   if (!resultArrayThatContainstheColumnDetails.some(item => item.label === "Status")) {
+//     resultArrayThatContainstheColumnDetails.push({
+//       label: "Status",
+//       value: fileItem.ListItemAllFields.Status || ""
+//     });
+//   }
+
+//   console.log("result", resultArrayThatContainstheColumnDetails);
+
+
+
+
+
+
+
+
+
+  
+
+//   // Get the details of approver
+//   const itemsFromTaskList = await sp.web.lists.getByTitle('DMSFileApprovalTaskList').items.select(
+//     "Log", "CurrentUser", "Remark"
+//     , "LogHistory", "ID"
+//     , "FileUID/FileUID"
+//     , "FileUID/SiteName"
+//     , "FileUID/DocumentLibraryName"
+//     , "FileUID/FileName"
+//     , "FileUID/Status"
+//     , "FileUID/RequestedBy"
+//     , "FileUID/Created"
+//     , "FileUID/ApproveAction"
+//     , "MasterApproval/ApprovalType"
+//     , "MasterApproval/Level"
+//     , "MasterApproval/DocumentLibraryName"
+//     , "Modified"
+//   )
+//     .expand("FileUID", "MasterApproval")
+//     .filter(`FileUID/FileUID eq '${fileId}'`)
+//     .orderBy("Modified", false)();
+
+//    // Step 1: Extract and ensure Level is a number
+// const maxLevelFromTaskList = itemsFromTaskList
+//   .map(item => Number(item.MasterApproval?.Level) || 0) // force number
+//   .reduce((max, curr) => (curr > max ? curr : max), 0);
+
+// console.log("Max Level (Number):", maxLevelFromTaskList, typeof maxLevelFromTaskList);
+
+
+// console.log("Max Level from TaskList:", maxLevelFromTaskList);
+//     const itemfromapprovallist = await sp.web.lists.getByTitle('DMSFolderPermissionMaster').items.select(
+//      "SiteName" , "DocumentLibraryName" , "CurrentUser" , "ApprovalUser/Title" , "ApprovalUser/EMail" , "Level" , "ApprovalType"
+//     ).expand("ApprovalUser").filter(`SiteName eq '${SiteName}' and DocumentLibraryName eq 'TRANSMITTAL' and  Level gt ${maxLevelFromTaskList}`)();
+//     console.log("itemfromapprovallist",itemfromapprovallist);
+//   console.log("itemsFromTaskList", itemsFromTaskList);
+
+//   // Mapping to the desired format
+//   // const approverDetailsArray = itemsFromTaskList.map(task => ({
+//   //   level: `Level ${task.MasterApproval?.Level || 'N/A'}`,
+//   //   approver: task.CurrentUser,
+//   //   actionDateTime: formatDate(task.Modified),
+//   //   status: task.Log || "",
+//   //   remark: task.Remark || ""
+//   // }));
+// // From Task List (already approved / acted)
+// const approverDetailsArrayFromTasks = itemsFromTaskList
+//   .sort((a, b) => {
+//     const levelA = parseInt(a.MasterApproval?.Level) || 0;
+//     const levelB = parseInt(b.MasterApproval?.Level) || 0;
+//     return levelA - levelB;
+//   })
+//   .map(task => ({
+//     level: `Level ${task.MasterApproval?.Level || 'N/A'}`,
+//     approver: task.CurrentUser,
+//     actionDateTime: formatDate(task.Modified),
+//     status: task.Log || "Pending",
+//     remark: task.Remark || ""
+//   }));
+
+// // From Approval Master (future approvers)
+// const approverDetailsArrayFromApprovals = itemfromapprovallist
+//   .sort((a, b) => {
+//     // Convert to numbers for safe comparison
+//     const levelA = parseInt(a.Level) || 0;
+//     const levelB = parseInt(b.Level) || 0;
+//     return levelA - levelB;
+//   })
+//   .map(item => ({
+//     level: `Level ${item.Level}`,
+//     approver: item.ApprovalUser?.EMail || "N/A",
+//     actionDateTime: "",
+//     status: "Pending",
+//     remark: ""
+//   }));
+
+// // Combine both arrays
+// const approverDetailsArray = [
+//   ...approverDetailsArrayFromTasks,
+//   ...approverDetailsArrayFromApprovals
+// ];
+
+// console.log("approverDetailsArray", approverDetailsArray);
+
+//   console.log("approverDetailsArray", approverDetailsArray);
+
+//   // Generate the dynamic HTML for the detail rows
+//   let detailRowsHTML = "";
+//   resultArrayThatContainstheColumnDetails.forEach((item, index) => {
+//     if (index % 4 === 0) {
+//       detailRowsHTML += '<div class="detail-row">';
+//     }
+
+//     detailRowsHTML += `
+//     <div class="detail-column">
+//       <div class="detail-label">${item.label}:</div>
+//       <div class="detail-value">${item.value}</div>
+//     </div>
+//   `;
+
+//     if ((index + 1) % 4 === 0 || index === resultArrayThatContainstheColumnDetails.length - 1) {
+//       detailRowsHTML += '</div>';
+//     }
+//   });
+
+//   // Generate the dynamic HTML for the approver details
+//   let approverRowsHTML = "";
+// //   approverDetailsArray.forEach((approver) => {
+// //     approverRowsHTML += `
+// //     <tr class="approver-row">
+// //      <td class="approver-level">${approver.level}</td>
+// //      <td class="approver-name">${approver.approver}</td>
+// //      <td class="approver-date">${approver.actionDateTime}</td>
+// //      <td class="approver-status">${approver.status}</td>
+// //      <td class="approver-remark">${approver.remark}</td>
+// //    </tr>
+// //  `;
+// //   });
+// approverDetailsArray.forEach((approver) => {
+//   const status = approver.status && approver.status.trim() !== "" 
+//     ? approver.status 
+//     : "Pending";
+
+//   approverRowsHTML += `
+//     <tr class="approver-row">
+//       <td class="approver-level">${approver.level}</td>
+//       <td class="approver-name">${approver.approver}</td>
+//       <td class="approver-date">${approver.actionDateTime}</td>
+//       <td class="approver-status"> <span style="background: #bddbcc; border-radius: 4px;padding: 4px 10px;
+//     color: #00733b;"> ${status} </span> </td>
+//       <td class="approver-remark">${approver.remark || ""}</td>
+//     </tr>
+//   `;
+// });
+// // Addhyan 22-01-2026 Maintenance and Calibration
+//   // Generate HTML for Maintenance and Calibration data if available
+//   let maintenanceCalibrationHTML = "";
+//   if (maintenanceCalibrationData) {
+//     const maintenanceFields = [
+//       { label: "Company Name", value: maintenanceCalibrationData.CompanyName },
+//       { label: "Document Type", value: maintenanceCalibrationData.DocumentType },
+//       { label: "Equipment ID", value: maintenanceCalibrationData.EquipmentID },
+//       { label: "Equipment Name", value: maintenanceCalibrationData.EquipmentName },
+//       { label: "Standard Reference", value: maintenanceCalibrationData.StandardReference },
+//       { label: "Next Due Date", value: maintenanceCalibrationData.NextDueDate ? formatDate2(maintenanceCalibrationData.NextDueDate) : "" },
+//       { label: "Calibration Date", value: maintenanceCalibrationData.CalibrationDate ? formatDate2(maintenanceCalibrationData.CalibrationDate) : "" },
+//       { label: "Calibration Result", value: maintenanceCalibrationData.CalibrationResult },
+//       { label: "Client Name", value: maintenanceCalibrationData.ClientName },
+//       { label: "Contract Start Date", value: maintenanceCalibrationData.ContractStartDate ? formatDate2(maintenanceCalibrationData.ContractStartDate) : "" },
+//       { label: "Contract End Date", value: maintenanceCalibrationData.ContractEndDate ? formatDate2(maintenanceCalibrationData.ContractEndDate) : "" },
+//       { label: "Project Location", value: maintenanceCalibrationData.ProjectLocation },
+//       { label: "Report Date", value: maintenanceCalibrationData.ReportDate ? formatDate2(maintenanceCalibrationData.ReportDate) : "" },
+//       { label: "Document Summary", value: maintenanceCalibrationData.DocumentSummary }
+//     ];
+
+//     maintenanceCalibrationHTML = `
+//       <div class="maintenance-calibration-section">
+//               // <h6 style="margin-top: 20px; margin-bottom: 15px; color: #4c4c4c; font-weight: bold; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px;">Document Clarification Details</h6>
+
+//         <h6 style="margin-top: 20px; margin-bottom: 15px; color: #4c4c4c; font-weight: bold; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px;"></h6>
+//         <div class="maintenance-details">
+//     `;
+
+//     maintenanceFields.forEach((field, index) => {
+//       if (field.value && field.value.toString().trim() !== "") {
+//         if (index % 4 === 0) {
+//           maintenanceCalibrationHTML += '<div class="detail-row">';
+//         }
+
+//         maintenanceCalibrationHTML += `
+//           <div class="detail-column">
+//              <div class="detail-label">${field.label}:</div>
+//            <div class="detail-value">${field.value}</div>
+//           </div>
+//         `;
+
+//         if ((index + 1) % 4 === 0 || index === maintenanceFields.filter(f => f.value && f.value.toString().trim() !== "").length - 1) {
+//           maintenanceCalibrationHTML += '</div>';
+//         }
+//       }
+//     });
+
+//     maintenanceCalibrationHTML += `
+//         </div>
+//       </div>
+//     `;
+//   }
+
+//   // Create the popup
+//   const popup = document.createElement("div");
+//   popup.className = "audit-history-popup";
+//   popup.innerHTML = `
+// <div class="popup-content-auditHistory">
+//   <div class="popup-header mb-0">
+//     <h5>Audit History</h5>
+//     <span class="close-btn" onclick="hideAuditHistoryPopup()">&times;</span>
+//   </div>
+//   <div class="popup-details">
+//     ${detailRowsHTML}
+
+//     ${maintenanceCalibrationHTML}
+
+//     ${fileItem.ListItemAllFields.Status !== "Auto Approved" ?
+//       `
+//       <div class="approval-table-container">
+//         <table class="approval-table mtbalenew">
+//           <thead>
+//             <tr>
+//               <th>Approval Level</th>
+//               <th>Approver</th>
+//               <th>Action DateTime</th>
+//               <th>Status</th>
+//               <th>Remark</th>
+//             </tr>
+//           </thead>
+//           <tbody>
+//             ${approverRowsHTML}
+//           </tbody>
+//         </table>
+//       </div>
+//      `
+//       :
+//       `<div class="auto-approved-message">Audit History is not available as the file does not have approval</div>`
+//     }
+//   </div>
+// </div>
+// `;
+
+
+//   // Add CSS styles
+//   const style = document.createElement('style');
+//   style.textContent = `
+//     .audit-history-popup {
+//       position: absolute;
+//       top: 0%;
+//       left: 0%;
+//       transform: translate(0%, 0%);
+//       background: rgba(246,246,246,0.87);
+//       border: 0px solid #ccc;
+      
+//       z-index: 1;
+//       width: 100%;
+      
+     
+//       overflow-y: auto;
+//       border-radius: 0px; 
+//     }
+    
+//     .popup-content-auditHistory {
+//       padding: 20px;box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+//       display: block; width:80% !important;
+//     }
+//       .popup-content-auditHistory .mtbalenew tbody {
+    
+//     max-height: 200px !important;
+//     overflow-y: auto !important;
+   
+// }
+//    .popup-content-auditHistory  .detail-row{margin-bottom:0px !important;}
+
+//     .popup-content-auditHistory  .detail-column {
+   
+//     padding: 0px 15px;
+// }
+//     .popup-header {
+//       display: flex;
+//       justify-content: space-between;
+//       align-items: center;
+//       padding-bottom: 15px;
+//       border-bottom: 1px solid #e0e0e0;
+//       position:relative;
+//     }
+    
+//     .popup-header h5 {
+//           margin: 0;
+//     color: #4c4c4c;
+//     font-weight: bold;
+//     padding-top: 10px;
+//     }
+    
+//     .close-btn {
+//       cursor: pointer;
+//       font-size: 27px;
+//       color: #ec1c24;
+//     }
+    
+//     .close-btn:hover {
+//       color: #ec1c24;
+//     }
+    
+//     .popup-details {
+//       margin-top: 20px;
+//     }
+    
+//     .detail-row {
+//       display: flex;
+//       flex-wrap: wrap;
+//       margin-bottom: 0px;
+//       border-bottom: 0px solid #f0f0f0;
+//       padding-bottom: 15px;
+//     }
+    
+//     .detail-column {
+//       flex: 1; display:block;
+//       min-width: 23%;
+//       padding: 0px 10px 0px 0px;
+//     }
+  
+
+//     .detail-label {
+//       font-weight: 600;
+//       color: #4a4a4a; font-size:14px;
+//       margin-bottom: 5px;
+//     }
+    
+//     .detail-value {
+//       color: #9f9f9f;
+//       word-break: break-word;font-size:14px;
+//     }
+
+//     .maintenance-calibration-section {
+//       margin-top: 20px;
+//       padding-top: 15px;
+//       border-top: 2px solid #e0e0e0;
+//     }
+
+//     .maintenance-calibration-section h6 {
+//       margin-top: 20px;
+//       margin-bottom: 15px;
+//       color: #4c4c4c;
+//       font-weight: bold;
+//       border-bottom: 2px solid #e0e0e0;
+//       padding-bottom: 10px;
+//     }
+
+//     .maintenance-details {
+//       padding: 10px 0;
+//     }
+    
+//     .approval-table-container {
+//       margin-top: 20px;
+//       overflow-x: auto;  width: 100%;
+//     }
+    
+//     .approval-table {
+//       width: 100%;
+//       border-collapse: collapse;
+//     }
+    
+//     .approval-table th {
+//       background-color: #f5f5f5;
+//       padding: 10px;
+//       text-align: left;
+//       border-bottom: 2px solid #ddd;
+//     }
+    
+//     .approval-table td {
+//       padding: 10px;
+//       border-bottom: 1px solid #ddd;
+//     }
+    
+//     .approver-row:hover {
+//       background-color: #f9f9f9;
+//     }
+    
+//     .auto-approved-message {
+//       padding: 15px;
+//       background-color: #f8f9fa;
+//       border-radius: 4px;
+//       text-align: center;
+//       margin-top: 20px;
+//     }
+//   `;
+
+
+
+  
+//   document.head.appendChild(style);
+//   // ensure style is inserted (already present above)
+// document.head.appendChild(style);
+ 
+// // wait until .librarydata exists, then append popup inside it
+// const checkInterval = setInterval(() => {
+//   const container = document.querySelector('.librarydata');
+//   if (container) {
+//     container.appendChild(popup);
+//     clearInterval(checkInterval);
+//   }
+// }, 100);
+
+  
+// };
+
+
 window.auditHistory = async (fileId: string, siteId: string, DocumentLibraryName: string, SiteName: String) => {
   console.log("Audit History called", fileId, siteId);
   console.log("Audit History called", SiteName);
   console.log("Audit History called", DocumentLibraryName);
-
+ 
   // Date formatting function
   const formatDate = (dateValue: any): string => {
     if (!dateValue) return "";
@@ -21620,6 +22279,8 @@ window.auditHistory = async (fileId: string, siteId: string, DocumentLibraryName
   // Get the document library/list to retrieve all fields
   const list = await web.lists.getByTitle(DocumentLibraryName);
   const listFields = await list.fields.select('Title', 'InternalName', 'TypeAsString', 'Hidden')();
+
+  console.log("All fields", listFields);
   
   // Filter out hidden and system fields
   const visibleFields = listFields.filter(field => 
@@ -21865,8 +22526,8 @@ approverDetailsArray.forEach((approver) => {
     </tr>
   `;
 });
-
-
+ 
+ 
   // Create the popup
   const popup = document.createElement("div");
   popup.className = "audit-history-popup";
@@ -21994,7 +22655,7 @@ approverDetailsArray.forEach((approver) => {
       color: #9f9f9f;
       word-break: break-word;font-size:14px;
     }
-    
+   
     .approval-table-container {
       margin-top: 0px;
       overflow-x: auto;  width: 100%;
@@ -22058,6 +22719,305 @@ window.hideAuditHistoryPopup=()=> {
     popup.remove();
   }
 }
+
+// Metadata and Tags function
+// @ts-ignore
+window.metadataAndTags = async (fileId: string, siteId: string, DocumentLibraryName: string, SiteName: String) => {
+  console.log("Metadata and Tags called", fileId, siteId);
+  console.log("SiteName:", SiteName);
+  console.log("DocumentLibraryName:", DocumentLibraryName);
+
+  // Date formatting function
+  const formatDate2 = (dateValue: any): string => {
+    if (!dateValue) return "";
+    
+    const date = new Date(dateValue);
+    
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = date.toLocaleString('default', { month: 'short' }).toLowerCase();
+    const year = date.getFullYear();
+    
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    
+    return `${day}/${month}/${year}`;
+  };
+
+  let metadataAndTagsData: any = null;
+  if (SiteName === "Maintenance and Calibration") {
+    try {
+      // Fetch data from DmsMaintenanceandCalibration list
+      const maintenanceItems = await sp.web.lists
+        .getByTitle("DMSMaintenance and CalibrationFileMaster")
+        .items.select(
+          "CompanyName",
+          "DocumentType",
+          "EquipmentID",
+          "EquipmentName",
+          "StandardReference",
+          "NextDueDate",
+          "CalibrationDate",
+          "CalibrationResult",
+          "ClientName",
+          "ContractStartDate",
+          "ContractEndDate",
+          "ProjectLocation",
+          "ReportDate",
+          "DocumentSummary",
+          "SensitivityLevel",
+          "PriorityScore",
+          "ActionRequired",
+          "ComplianceRisk",
+          "SafetyHazardLevel",
+          "DocumentLanguage"
+        )
+        .filter(`FileUID eq '${fileId}'`)();
+      
+      if (maintenanceItems && maintenanceItems.length > 0) {
+        metadataAndTagsData = maintenanceItems[0];
+        console.log("Metadata and Tags data:", metadataAndTagsData);
+      }
+    } catch (error) {
+      console.error("Error fetching Metadata and Tags data:", error);
+    }
+  }
+
+  // Generate HTML for Metadata section
+  let metadataHTML = "";
+  if (metadataAndTagsData) {
+    const metadataFields = [
+      { label: "Company Name", value: metadataAndTagsData.CompanyName },
+      { label: "Document Type", value: metadataAndTagsData.DocumentType },
+      { label: "Equipment ID", value: metadataAndTagsData.EquipmentID },
+      { label: "Equipment Name", value: metadataAndTagsData.EquipmentName },
+      { label: "Standard Reference", value: metadataAndTagsData.StandardReference },
+      { label: "Next Due Date", value: metadataAndTagsData.NextDueDate ? formatDate2(metadataAndTagsData.NextDueDate) : "" },
+      { label: "Calibration Date", value: metadataAndTagsData.CalibrationDate ? formatDate2(metadataAndTagsData.CalibrationDate) : "" },
+      { label: "Calibration Result", value: metadataAndTagsData.CalibrationResult },
+      { label: "Client Name", value: metadataAndTagsData.ClientName },
+      { label: "Contract Start Date", value: metadataAndTagsData.ContractStartDate ? formatDate2(metadataAndTagsData.ContractStartDate) : "" },
+      { label: "Contract End Date", value: metadataAndTagsData.ContractEndDate ? formatDate2(metadataAndTagsData.ContractEndDate) : "" },
+      { label: "Project Location", value: metadataAndTagsData.ProjectLocation },
+      { label: "Report Date", value: metadataAndTagsData.ReportDate ? formatDate2(metadataAndTagsData.ReportDate) : "" },
+      { label: "Document Summary", value: metadataAndTagsData.DocumentSummary }
+    ];
+
+    metadataHTML = `
+      <div class="metadata-section">
+        <h6 style="margin-top: 0; margin-bottom: 15px; color: #4c4c4c; font-weight: bold; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px;">Metadata</h6>
+        <div class="metadata-details">
+    `;
+
+    metadataFields.forEach((field, index) => {
+      if (field.value && field.value.toString().trim() !== "") {
+        if (index % 4 === 0) {
+          metadataHTML += '<div class="detail-row">';
+        }
+
+        metadataHTML += `
+          <div class="detail-column">
+            <div class="detail-label">${field.label}:</div>
+            <div class="detail-value">${field.value}</div>
+          </div>
+        `;
+
+        if ((index + 1) % 4 === 0 || index === metadataFields.filter(f => f.value && f.value.toString().trim() !== "").length - 1) {
+          metadataHTML += '</div>';
+        }
+      }
+    });
+
+    metadataHTML += `
+        </div>
+      </div>
+    `;
+  }
+
+  // Generate HTML for Tags section
+  let tagsHTML = "";
+  if (metadataAndTagsData) {
+    const tagsFields = [
+      { label: "Sensitivity Level", value: metadataAndTagsData.SensitivityLevel },
+      { label: "Priority Score", value: metadataAndTagsData.PriorityScore },
+      { label: "Action Required", value: metadataAndTagsData.ActionRequired },
+      { label: "Compliance Risk", value: metadataAndTagsData.ComplianceRisk },
+      { label: "Safety Hazard Level", value: metadataAndTagsData.SafetyHazardLevel },
+      { label: "Document Language", value: metadataAndTagsData.DocumentLanguage }
+    ];
+
+    tagsHTML = `
+      <div class="tags-section">
+        <h6 style="margin-top: 20px; margin-bottom: 15px; color: #4c4c4c; font-weight: bold; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px;">Tags</h6>
+        <div class="tags-details">
+    `;
+
+    tagsFields.forEach((tag, index) => {
+      if (tag.value && tag.value.toString().trim() !== "") {
+        if (index % 4 === 0) {
+          tagsHTML += '<div class="detail-row">';
+        }
+
+        tagsHTML += `
+          <div class="detail-column">
+            <div class="detail-label">${tag.label}:</div>
+            <div class="detail-value">${tag.value}</div>
+          </div>
+        `;
+
+        if ((index + 1) % 4 === 0 || index === tagsFields.filter(f => f.value && f.value.toString().trim() !== "").length - 1) {
+          tagsHTML += '</div>';
+        }
+      }
+    });
+
+    tagsHTML += `
+        </div>
+      </div>
+    `;
+  }
+
+  // Create the popup
+  const popup = document.createElement("div");
+  popup.className = "audit-history-popup";
+  popup.innerHTML = `
+<div class="popup-content-auditHistory">
+  <div class="popup-header mb-0">
+    <h5>Metadata & Tags</h5>
+    <span class="close-btn" onclick="hideAuditHistoryPopup()">&times;</span>
+  </div>
+  <div class="popup-details">
+    ${metadataHTML}
+    ${tagsHTML}
+  </div>
+</div>
+`;
+
+  // Add CSS styles
+  const style = document.createElement('style');
+  style.textContent = `
+    .metadata-tags-popup {
+      position: absolute;
+      top: 0%;
+      left: 0%;
+      transform: translate(0%, 0%);
+      background: rgba(246,246,246,0.87);
+      border: 0px solid #ccc;
+      z-index: 1;
+      width: 100%;
+      overflow-y: auto;
+      border-radius: 0px; 
+    }
+    
+    .popup-content-metadata-tags {
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      display: block;
+      width: 80% !important;
+    }
+
+    .popup-content-metadata-tags .detail-row {
+      margin-bottom: 0px !important;
+    }
+
+    .popup-content-metadata-tags .detail-column {
+      padding: 0px 15px;
+    }
+
+    .popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e0e0e0;
+      position: relative;
+    }
+    
+    .popup-header h5 {
+      margin: 0;
+      color: #4c4c4c;
+      font-weight: bold;
+      padding-top: 10px;
+    }
+    
+    .close-btn {
+      cursor: pointer;
+      font-size: 27px;
+      color: #ec1c24;
+    }
+    
+    .close-btn:hover {
+      color: #ec1c24;
+    }
+    
+    .popup-details {
+      margin-top: 20px;
+    }
+    
+    .detail-row {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 0px;
+      border-bottom: 0px solid #f0f0f0;
+      padding-bottom: 15px;
+    }
+    
+    .detail-column {
+      flex: 1;
+      display: block;
+      min-width: 23%;
+      padding: 0px 10px 0px 0px;
+    }
+
+    .detail-label {
+      font-weight: 600;
+      color: #4a4a4a;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+    
+    .detail-value {
+      color: #9f9f9f;
+      word-break: break-word;
+      font-size: 14px;
+    }
+
+    .metadata-section {
+      margin-top: 0px;
+      padding-top: 0px;
+      border-top: none;
+    }
+
+    .tags-section {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 2px solid #e0e0e0;
+    }
+  `;
+
+  document.head.appendChild(style);
+
+  // Wait until .librarydata exists, then append popup inside it
+  const checkInterval = setInterval(() => {
+    const container = document.querySelector('.librarydata');
+    if (container) {
+      container.appendChild(popup);
+      clearInterval(checkInterval);
+    }
+  }, 100);
+};
+
+// function to hide metadata and tags popup
+// @ts-ignore
+window.hideMetadataAndTagsPopup=()=> {
+  const popup = document.querySelector(".metadata-tags-popup");
+  if (popup) {
+    popup.remove();
+  }
+}
+
 // start
   // Ref for MyFolder
   const myFolderButtonRef = useRef(null);
@@ -23863,6 +24823,33 @@ const ASKAI = () => {
 )
 
 } */}
+
+
+
+
+
+
+{/* back button - addhyan 22-01-2026 */}
+
+{(listorgriddata === 'UploadFile' || listorgriddata === 'CreateFolder') && (
+<div className="missing-link">
+ <div className="d-flex justify-content-center gap-3 mt-2">      <button style={{marginTop:'0px'}}  type="button" className="btn   grid-view "    
+                               onClick={() => {location.reload(); handleReturnToMain()}}>
+                                    <span className="mt-2 mb-1" data-tooltip='Back'>    
+                                  <img className="sidebariconssmall" src={back}></img> </span>  
+                                </button>
+                                </div>
+   
+                                </div>
+)}
+
+{/* end  */}
+
+
+
+
+
+
                             
 <div className="bordernewr">
   <div className="d-flex justify-content-center gap-3 mt-2">

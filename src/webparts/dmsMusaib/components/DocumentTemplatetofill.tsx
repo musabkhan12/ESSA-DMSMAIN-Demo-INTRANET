@@ -1022,7 +1022,9 @@ let fullw1 = require('../assets/exitf.png')
 // export default DocumentTemplatetofill;
 
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , useRef} from "react";
+import Select from "react-select";
+
 import Swal from "sweetalert2";
 import { getSP } from "../loc/pnpjsConfig";
 import { SPFI } from "@pnp/sp";
@@ -1033,6 +1035,7 @@ import "@pnp/sp/items";
 import "@pnp/sp/folders";
 import "@pnp/sp/files";
 import "@pnp/sp/sites";
+import "./DocumnetTemplate.css";
 import JSZip from "jszip";
 import { set } from "@microsoft/sp-lodash-subset";
 const DocumentTemplatetofill = () => {
@@ -1046,7 +1049,23 @@ const DocumentTemplatetofill = () => {
     const [selectedfile, setselectedFile] = useState<any>(null);
     const [uploadedFileResponse, setUploadedFileResponse] = useState<any>(null);
 
+     const currentUserEmailRef = useRef('');
+     const currentUserIDref = useRef<number>(0);
+     const currentUserTitleRef = useRef('');
+const [companyMasterList, setCompanyMasterList] = useState<any[]>([]);
+const [classificationList, setClassificationList] = useState<any[]>([]);
+const [selectedCompany, setSelectedCompany] = useState<any>(null);
+const [selectedClassification, setSelectedClassification] = useState<any>(null);
+const [fileCounter, setFileCounter] = useState<number>(0);
 
+    // Add these state variables after your existing useState declarations
+    const [allUsers, setAllUsers] = useState<any[]>([]);
+    const [selectedFromUser, setSelectedFromUser] = useState<any>(null);
+    const [selectedDate, setSelectedDate] = useState<string>("");
+const [reference, setReference] = useState<string>("");
+
+    const [selectedToUser, setSelectedToUser] = useState<any>(null);
+    
 const [newRequestNo, setNewRequestNo] = useState<string>("");
 //     const copyFile = async () => {
 //         try {
@@ -1280,8 +1299,154 @@ const [newRequestNo, setNewRequestNo] = useState<string>("");
 //     };
 
     // Special function to release file lock using direct API call
+    // Generate request number when company or classification changes
+    // Fetch data in useEffect
+useEffect(() => {
+    const fetchData = async () => {
+        try {
+            // Fetch company master and classification
+            const companymaster = await sp.web.lists
+                .getByTitle("ESSAcompanymaster")
+                .items.select("*")
+                .getAll();
+            
+            const companyclassification = await sp.web.lists
+                .getByTitle("ESSAcompanyclassification")
+                .items.select("*")
+                .getAll();
+            
+            console.log(companymaster, "companymaster");
+            console.log(companyclassification, "companyclassification");
+            
+            // Transform to dropdown format
+            const companyOptions = companymaster.map((item) => ({
+                value: item.CompanyNameShort,
+                label: item.CompanyDescription,
+                id: item.ID
+            }));
+            
+            const classificationOptions = companyclassification.map((item) => ({
+                value: item.classificationshort,
+                label: item.classification,
+                id: item.ID
+            }));
+            
+            setCompanyMasterList(companyOptions);
+            setClassificationList(classificationOptions);
+            
+            // Fetch counter ONCE
+            const counterItem = await sp.web.lists
+                .getByTitle("DMSFileCounterList")
+                .items.getById(1)();
+            
+            const counter = counterItem.FileCount + 1;
+            setFileCounter(counter);
+            
+            // Update counter in database
+            await sp.web.lists
+                .getByTitle("DMSFileCounterList")
+                .items.getById(1)
+                .update({ FileCount: counter });
+            
+            console.log("File Counter fetched:", counter);
+            
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
     
+    fetchData();
+}, []);
+
+
+useEffect(() => {
+    if (selectedCompany && selectedClassification && fileCounter) {
+        const year = new Date().getFullYear();
+        const increment = String(fileCounter).padStart(4, "0");
+        
+        // Format: 0091/TR/PAU-EXT/2026
+        // where PAU = CompanyNameShort, EXT = classificationshort
+        const requestNo = `${increment}/TR/${selectedCompany.value}-${selectedClassification.value}/${year}`;
+        
+        console.log("Generated Request No:", requestNo);
+        setNewRequestNo(requestNo);
+    } else {
+        setNewRequestNo("");
+    }
+}, [selectedCompany, selectedClassification, fileCounter]);
     // --- Copy File Function ---
+    const fetchAllUsers = async () => {
+        // const companymaster = await sp.web.lists.getByTitle("ESSAcompanymaster").items.select("*").getAll();
+        // const companyclassification = await sp.web.lists.getByTitle("ESSAcompanyclassification").items.select("*").getAll();
+        // console.log(companymaster , "companymaster")
+        // console.log(companyclassification , "companyclassification")
+
+//         const counterItem = await sp.web.lists
+//   .getByTitle("DMSFileCounterList")
+//   .items.getById(1)();
+
+// const fileCounter = counterItem.FileCount + 1;
+
+// await sp.web.lists
+//   .getByTitle("DMSFileCounterList")
+//   .items.getById(1)
+//   .update({ FileCount: fileCounter });
+
+// const year = new Date().getFullYear();
+// const increment = String(fileCounter).padStart(4, "0");
+
+// const requestNo = `${increment}/TR/PAU-EXT/${year}`;
+
+// console.log("Generated Request No:", requestNo);
+// setNewRequestNo(requestNo);
+        try {
+          
+  const userProfile = await sp.profiles.myProperties();
+  console.log(userProfile , "userProfile")
+  console.log(userProfile.Title , "userProfile userProfile.Title")
+  const userdata = await sp.web.currentUser();
+
+  console.log(userdata , "user data edc")
+  console.log(userdata.Id , "user data edc")
+  currentUserIDref.current = userdata.Id;
+  currentUserEmailRef.current = userdata.Email;
+  currentUserTitleRef.current = userdata.Title;
+       if(userdata){
+        console.log(userdata.Email , "current user email")
+          setSelectedFromUser({
+      label: userdata.Title,
+      value: userdata.Email
+    });
+
+    // default today date (YYYY-MM-DD for input type="date")
+    const today = new Date().toISOString().split("T")[0];
+    setSelectedDate(today);
+       }
+            const siteID = "931e8b14-6d73-412e-a411-720ab18bd124";
+            const subsiteWeb = await sp.site.openWebById(siteID);
+            
+             // Get the root site collection
+        const rootSite = await sp.site.rootWeb();
+        
+        // Get all users from the site collection
+        const users = await sp.web.siteUsers()          
+            // Format users for react-select
+            const formattedUsers = users
+                .filter((user: any) => !user.IsHiddenInUI && user.Email) // Filter out system accounts
+                .map((user: any) => ({
+                    value: user.Title, // Display name
+                    label: user.Title,
+                    email: user.Email,
+                    id: user.Id
+                }));
+            
+            setAllUsers(formattedUsers);
+            console.log("Fetched users:", formattedUsers);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            Swal.fire("Error", "Failed to load users", "error");
+        }
+    };
 const copyFile = async () => {
     try {
         const sourceFileUrl = "/sites/multiverseintranetportal/Document Template/Transmittal.docx";
@@ -1322,25 +1487,27 @@ const copyFile = async () => {
         // });
         // const requestNo = `File${String(fileCounter).padStart(2, "0")}`;
         // setNewRequestNo(requestNo);
-        const counterItem = await sp.web.lists
-  .getByTitle("DMSFileCounterList")
-  .items.getById(1)();
 
-const fileCounter = counterItem.FileCount + 1;
+        //previous working reqno 
+//         const counterItem = await sp.web.lists
+//   .getByTitle("DMSFileCounterList")
+//   .items.getById(1)();
 
-await sp.web.lists
-  .getByTitle("DMSFileCounterList")
-  .items.getById(1)
-  .update({ FileCount: fileCounter });
+// const fileCounter = counterItem.FileCount + 1;
 
-const now = new Date();
-const month = String(now.getMonth() + 1).padStart(2, "0"); // 01–12
-const year = now.getFullYear();
-const increment = String(fileCounter).padStart(4, "0");
+// await sp.web.lists
+//   .getByTitle("DMSFileCounterList")
+//   .items.getById(1)
+//   .update({ FileCount: fileCounter });
 
-const requestNo = `TR_${month}_${year}_${increment}`;
-console.log("Generated Request No:", requestNo);
-setNewRequestNo(requestNo);
+// const now = new Date();
+// const month = String(now.getMonth() + 1).padStart(2, "0"); // 01–12
+// const year = now.getFullYear();
+// const increment = String(fileCounter).padStart(4, "0");
+
+// const requestNo = `TR_${month}_${year}_${increment}`;
+// console.log("Generated Request No:", requestNo);
+// setNewRequestNo(requestNo);
 
 
         // Build edit URL
@@ -1645,136 +1812,846 @@ const waitForFileUnlock = async (file: any, maxWaitTime: number = 30000): Promis
     return false;
 };
 
+// const handleSubmit = async () => {
+//     try {
+//         if (!uploadedFileResponse) {
+//             Swal.fire("Error", "No file has been prepared. Please run Copy first.", "error");
+//             return;
+//         }
+
+//         Swal.fire({
+//             title: "Submitting Document",
+//             text: "Please wait while we submit your document for approval.",
+//             allowOutsideClick: false,
+//             didOpen: () => Swal.showLoading(),
+//         });
+
+//         // const siteID = "9f942ad9-f2b6-4d4a-b99c-80f1171b57e3";
+//           const siteID = "931e8b14-6d73-412e-a411-720ab18bd124";
+//         const subsiteWeb = await sp.site.openWebById(siteID);
+        
+//         // Build preview URL
+//         const encodeSharePointURL = (url: string) => encodeURIComponent(url);
+//         const parentFolder = fileServerRelativeUrl.substring(0, fileServerRelativeUrl.lastIndexOf("/"));
+//         const previewUrl = `https://multiverse.sharepoint.com/sites/multiverseintranetportal/Location/TRANSMITTAL/Forms/AllItems.aspx?id=${encodeSharePointURL(
+//             fileServerRelativeUrl
+//         )}&parent=${encodeSharePointURL(parentFolder)}`;
+           
+//         const getcurrentuseremail = async () => {
+//             const currentUser = await sp.web.currentUser();
+//             return currentUser.Email;
+//         }
+//         const currentUserEmail = await getcurrentuseremail();
+
+//         // Save in DMSLocationFileMaster
+//         await sp.web.lists.getByTitle("DMSLocationFileMaster").items.add({
+//             FileName: String(uploadedFileResponse.data.Name),
+//             FileSize: String(uploadedFileResponse.data.Length),
+//             FileVersion: String(uploadedFileResponse.data.MajorVersion),
+//             CurrentFolderPath: "/sites/multiverseintranetportal/Location/TRANSMITTAL",
+//             FileUID: String(uploadedFileResponse.data.UniqueId),
+//             CurrentUser: String(currentUserEmail),
+//             SiteID: siteID,
+//             Status: "Pending",
+//             FilePreviewURL: previewUrl,
+//             DocumentLibraryName: "TRANSMITTAL",
+//             SiteName: "Location",
+//             MyRequest: true,
+//             Processname: "New File Request",
+//             RequestNo: newRequestNo,
+//         });
+
+//         // Save in approval list
+//         await sp.web.lists.getByTitle("DMSFileApprovalList").items.add({
+//             SiteName: "Location",
+//             DocumentLibraryName: "TRANSMITTAL",
+//             RequestedBy: String(currentUserEmail),
+//             FileName: String(uploadedFileResponse.data.Name),
+//             FileUID: String(uploadedFileResponse.data.UniqueId),
+//             FilePreviewUrl: previewUrl,
+//             Status: "Pending",
+//             FolderPath: "/sites/multiverseintranetportal/Location/TRANSMITTAL",
+//             ApproveAction: "Submitted",
+//             ApprovedLevel: 1,
+//             RequestNo: newRequestNo,
+//             Processname: "New File Request",
+//             CurrentLevel: 1,
+//         });
+//          //  wordEditorFrame
+//           const iframe = document.getElementById("wordEditorFrame") as HTMLIFrameElement;
+//           if (iframe) {
+//               iframe.remove();
+
+//           }
+//         // Release lock first
+//       try {
+//     await releaseFileLock(subsiteWeb, fileServerRelativeUrl);
+    
+//     // Wait for file to be unlocked
+//     const isUnlocked = await waitForFileUnlock(selectedfile.file, 30000);
+    
+//     if (isUnlocked) {
+//         await new Promise(resolve => setTimeout(resolve, 8000)); // 3 second delay
+//         const listItem = await selectedfile.file.getItem();
+//         const updatestatus = await listItem.update({ Status: "Pending" });
+//         console.log("File status updated to Pending:", updatestatus);
+//     } else {
+//         console.warn("File remained locked after waiting period, status update skipped");
+//     }
+    
+// } catch (lockError) {
+//     console.log("File lock handling failed:", lockError);
+// }
+
+//         Swal.close();
+//         Swal.fire({
+//             icon: "success",
+//             title: "Document submitted",
+//             text: `Your Document Name is ${uploadedFileResponse.data.Name} for your future reference`,
+//             confirmButtonText: "OK",
+//         }).then((result) => {
+//             if (result.isConfirmed) {
+//                 window.location.reload();
+//             }
+//         });
+
+//         setTimeout(() => {
+//             setEditUrl(null);
+//         }, 2000);
+//     } catch (error: any) {
+//         Swal.close();
+//         console.error("Error submitting document:", error);
+
+//         if (error.message.includes("locked for shared use") || error.message.includes("423")) {
+//             Swal.fire({
+//                 title: "File Still in Use",
+//                 html: `Please close the file in Word Online and try again.`,
+//                 icon: "warning",
+//                 confirmButtonText: "Try Again",
+//                 showCancelButton: true,
+//             }).then((result) => {
+//                 if (result.isConfirmed) {
+//                     handleSubmit();
+//                 }
+//             });
+//         } else {
+//             Swal.fire("Error", `An error occurred while submitting the document: ${error.message}`, "error");
+//         }
+//     }
+// };
+
+
+// working code previous updating from and to columns
+// const handleSubmit = async () => {
+//     try {
+//         // Validations
+//         if (!selectedFromUser) {
+//             Swal.fire("Validation Error", "Please select 'From' user", "warning");
+//             return;
+//         }
+        
+//         if (!selectedToUser) {
+//             Swal.fire("Validation Error", "Please select 'To' user", "warning");
+//             return;
+//         }
+        
+//         if (!uploadedFileResponse) {
+//             Swal.fire("Error", "No file has been prepared. Please run Copy first.", "error");
+//             return;
+//         }
+
+//         Swal.fire({
+//             title: "Submitting Document",
+//             text: "Please wait while we submit your document for approval.",
+//             allowOutsideClick: false,
+//             didOpen: () => Swal.showLoading(),
+//         });
+
+//         const siteID = "931e8b14-6d73-412e-a411-720ab18bd124";
+//         const subsiteWeb = await sp.site.openWebById(siteID);
+        
+//         // 🔥 STEP 1: Remove iframe FIRST to close the editing session
+//         const iframe = document.getElementById("wordEditorFrame") as HTMLIFrameElement;
+//         if (iframe) {
+//             iframe.remove();
+//         }
+        
+//         // 🔥 STEP 2: Wait a moment for Word Online to release the file
+//         await new Promise(resolve => setTimeout(resolve, 3000));
+        
+//         // 🔥 STEP 3: Try to force release the lock
+//         try {
+//             // Get the file object
+//             const file = subsiteWeb.web.getFileByServerRelativePath(fileServerRelativeUrl);
+            
+//             // Check if file is checked out
+//             const fileInfo = await file.select("CheckOutType", "CheckedOutByUser")();
+//             console.log("File checkout status:", fileInfo);
+            
+//             if (fileInfo.CheckOutType !== 2) { // 2 = None (not checked out)
+//                 try {
+//                     // Try to discard checkout
+//                     await file.undoCheckout();
+//                     console.log("Successfully undid checkout");
+//                     await new Promise(resolve => setTimeout(resolve, 2000));
+//                 } catch (undoError) {
+//                     console.log("Undo checkout failed, file may not be checked out:", undoError);
+//                 }
+//             }
+//         } catch (lockError) {
+//             console.log("Lock check/release failed:", lockError);
+//         }
+        
+//         // 🔥 STEP 4: Wait for file to be completely unlocked
+//         const isUnlocked = await waitForFileUnlock(selectedfile.file, 45000); // Increased timeout
+        
+//         if (!isUnlocked) {
+//             Swal.close();
+//             Swal.fire({
+//                 title: "File Still Locked",
+//                 html: "The file is still being edited in Word Online. Please:<br/>1. Close the Word editor<br/>2. Wait a few seconds<br/>3. Try submitting again",
+//                 icon: "warning",
+//                 confirmButtonText: "Try Again",
+//                 showCancelButton: true,
+//                 cancelButtonText: "Cancel"
+//             }).then((result) => {
+//                 if (result.isConfirmed) {
+//                     handleSubmit();
+//                 }
+//             });
+//             return;
+//         }
+        
+//         // 🔥 STEP 5: Now update the list item columns (From, To, Status)
+//         await new Promise(resolve => setTimeout(resolve, 2000)); // Additional safety delay
+        
+//         const listItem = await selectedfile.file.getItem();
+//         await listItem.update({ 
+//             Status: "Pending",
+//             From: selectedFromUser.value,  
+//             To: selectedToUser.value       
+//         });
+        
+//         console.log("File status and From/To fields updated successfully");
+        
+//         // Build preview URL
+//         const encodeSharePointURL = (url: string) => encodeURIComponent(url);
+//         const parentFolder = fileServerRelativeUrl.substring(0, fileServerRelativeUrl.lastIndexOf("/"));
+//         const previewUrl = `https://multiverse.sharepoint.com/sites/multiverseintranetportal/Location/TRANSMITTAL/Forms/AllItems.aspx?id=${encodeSharePointURL(
+//             fileServerRelativeUrl
+//         )}&parent=${encodeSharePointURL(parentFolder)}`;
+           
+//         const currentUserEmail = (await sp.web.currentUser()).Email;
+
+//         // Save in DMSLocationFileMaster
+//         await sp.web.lists.getByTitle("DMSLocationFileMaster").items.add({
+//             FileName: String(uploadedFileResponse.data.Name),
+//             FileSize: String(uploadedFileResponse.data.Length),
+//             FileVersion: String(uploadedFileResponse.data.MajorVersion),
+//             CurrentFolderPath: "/sites/multiverseintranetportal/Location/TRANSMITTAL",
+//             FileUID: String(uploadedFileResponse.data.UniqueId),
+//             CurrentUser: String(currentUserEmail),
+//             SiteID: siteID,
+//             Status: "Pending",
+//             FilePreviewURL: previewUrl,
+//             DocumentLibraryName: "TRANSMITTAL",
+//             SiteName: "Location",
+//             MyRequest: true,
+//             Processname: "New File Request",
+//             RequestNo: newRequestNo,
+//         });
+
+//         // Save in approval list
+//         await sp.web.lists.getByTitle("DMSFileApprovalList").items.add({
+//             SiteName: "Location",
+//             DocumentLibraryName: "TRANSMITTAL",
+//             RequestedBy: String(currentUserEmail),
+//             FileName: String(uploadedFileResponse.data.Name),
+//             FileUID: String(uploadedFileResponse.data.UniqueId),
+//             FilePreviewUrl: previewUrl,
+//             Status: "Pending",
+//             FolderPath: "/sites/multiverseintranetportal/Location/TRANSMITTAL",
+//             ApproveAction: "Submitted",
+//             ApprovedLevel: 1,
+//             RequestNo: newRequestNo,
+//             Processname: "New File Request",
+//             CurrentLevel: 1,
+//         });
+
+//         Swal.close();
+//         Swal.fire({
+//             icon: "success",
+//             title: "Document submitted",
+//             text: `Your Document Name is ${uploadedFileResponse.data.Name} for your future reference`,
+//             confirmButtonText: "OK",
+//         }).then((result) => {
+//             if (result.isConfirmed) {
+//                 window.location.reload();
+//             }
+//         });
+
+//         setTimeout(() => {
+//             setEditUrl(null);
+//         }, 2000);
+        
+//     } catch (error: any) {
+//         Swal.close();
+//         console.error("Error submitting document:", error);
+
+//         if (error.message.includes("locked") || error.message.includes("423") || error.message.includes("checked out")) {
+//             Swal.fire({
+//                 title: "File Still in Use",
+//                 html: `The file is still being edited. Please:<br/>
+//                        1. Make sure Word editor is closed<br/>
+//                        2. Wait a few seconds<br/>
+//                        3. Try again`,
+//                 icon: "warning",
+//                 confirmButtonText: "Try Again",
+//                 showCancelButton: true,
+//             }).then((result) => {
+//                 if (result.isConfirmed) {
+//                     handleSubmit();
+//                 }
+//             });
+//         } else {
+//             Swal.fire("Error", `An error occurred: ${error.message}`, "error");
+//         }
+//     }
+// };
+// const handleSubmit = async () => {
+//     try {
+//         // Validations
+//         if (!selectedFromUser) {
+//             Swal.fire("Validation Error", "Please select 'From' user", "warning");
+//             return;
+//         }
+        
+//         if (!selectedToUser) {
+//             Swal.fire("Validation Error", "Please select 'To' user", "warning");
+//             return;
+//         }
+        
+//         if (!uploadedFileResponse) {
+//             Swal.fire("Error", "No file has been prepared. Please run Copy first.", "error");
+//             return;
+//         }
+
+//         Swal.fire({
+//             title: "Updating Document",
+//             text: "Please wait while we update the document fields...",
+//             allowOutsideClick: false,
+//             didOpen: () => Swal.showLoading(),
+//         });
+
+//         // 🔥 STEP 1: Update document content BEFORE closing iframe
+//         try {
+//             const fieldMappings = {
+//                 "Fill Here": newRequestNo || "N/A",  // Replace "No: Fill Here" with request number
+//                 // Add more mappings as needed
+//                 // "To \\(Kepada\\): Fill Here": selectedToUser.label,
+//                 // "From : Fill Here": selectedFromUser.label,
+//                 // "Date \\(Tanggal\\): Fill Here": new Date().toLocaleDateString(),
+//             };
+//             // Add this function before handleSubmit
+// const updateDocumentContent = async (
+//     iframeId: string, 
+//     fieldMappings: { [key: string]: string }
+// ) => {
+//     return new Promise<void>((resolve, reject) => {
+//         try {
+//             const iframe = document.getElementById(iframeId) as HTMLIFrameElement;
+            
+//             if (!iframe || !iframe.contentWindow) {
+//                 reject(new Error("Iframe not found or not accessible"));
+//                 return;
+//             }
+
+//             // Wait for Office.js to be ready in the iframe
+//             const checkOfficeReady = setInterval(() => {
+//                 try {
+//                     const iframeWindow = iframe.contentWindow as any;
+                    
+//                     if (iframeWindow.Office && iframeWindow.Office.context) {
+//                         clearInterval(checkOfficeReady);
+                        
+//                         // Use Office.js API to update content
+//                         iframeWindow.Office.context.document.body.getAsync(
+//                             iframeWindow.Office.CoercionType.Text,
+//                             (result: any) => {
+//                                 if (result.status === iframeWindow.Office.AsyncResultStatus.Succeeded) {
+//                                     let content = result.value;
+                                    
+//                                     // Replace placeholders with actual values
+//                                     Object.keys(fieldMappings).forEach(placeholder => {
+//                                         const value = fieldMappings[placeholder];
+//                                         content = content.replace(
+//                                             new RegExp(placeholder, 'g'), 
+//                                             value
+//                                         );
+//                                     });
+                                    
+//                                     // Set updated content back
+//                                     iframeWindow.Office.context.document.setSelectedDataAsync(
+//                                         content,
+//                                         { coercionType: iframeWindow.Office.CoercionType.Text },
+//                                         (setResult: any) => {
+//                                             if (setResult.status === iframeWindow.Office.AsyncResultStatus.Succeeded) {
+//                                                 console.log("Document content updated successfully");
+//                                                 resolve();
+//                                             } else {
+//                                                 reject(new Error("Failed to update document content"));
+//                                             }
+//                                         }
+//                                     );
+//                                 } else {
+//                                     reject(new Error("Failed to read document content"));
+//                                 }
+//                             }
+//                         );
+//                     }
+//                 } catch (error) {
+//                     clearInterval(checkOfficeReady);
+//                     reject(error);
+//                 }
+//             }, 500);
+            
+//             // Timeout after 10 seconds
+//             setTimeout(() => {
+//                 clearInterval(checkOfficeReady);
+//                 reject(new Error("Timeout waiting for Office.js"));
+//             }, 10000);
+            
+//         } catch (error) {
+//             reject(error);
+//         }
+//     });
+// };
+//             await updateDocumentContent("wordEditorFrame", fieldMappings);
+//             console.log("Document content updated");
+            
+//             // Wait for changes to be saved by Word Online
+//             await new Promise(resolve => setTimeout(resolve, 3000));
+            
+//         } catch (updateError) {
+//             console.warn("Could not auto-update document content:", updateError);
+//             // Continue anyway - user may have filled manually
+//         }
+
+//         Swal.fire({
+//             title: "Submitting Document",
+//             text: "Please wait while we submit your document for approval.",
+//             allowOutsideClick: false,
+//             didOpen: () => Swal.showLoading(),
+//         });
+
+//         const siteID = "931e8b14-6d73-412e-a411-720ab18bd124";
+//         const subsiteWeb = await sp.site.openWebById(siteID);
+        
+//         // 🔥 STEP 2: Remove iframe to close the editing session
+//         const iframe = document.getElementById("wordEditorFrame") as HTMLIFrameElement;
+//         if (iframe) {
+//             iframe.remove();
+//         }
+        
+//         // 🔥 STEP 3: Wait for Word Online to release the file
+//         await new Promise(resolve => setTimeout(resolve, 3000));
+        
+//         // 🔥 STEP 4: Try to force release the lock
+//         try {
+//             const file = subsiteWeb.web.getFileByServerRelativePath(fileServerRelativeUrl);
+//             const fileInfo = await file.select("CheckOutType", "CheckedOutByUser")();
+//             console.log("File checkout status:", fileInfo);
+            
+//             if (fileInfo.CheckOutType !== 2) {
+//                 try {
+//                     await file.undoCheckout();
+//                     console.log("Successfully undid checkout");
+//                     await new Promise(resolve => setTimeout(resolve, 2000));
+//                 } catch (undoError) {
+//                     console.log("Undo checkout failed:", undoError);
+//                 }
+//             }
+//         } catch (lockError) {
+//             console.log("Lock check/release failed:", lockError);
+//         }
+        
+//         // 🔥 STEP 5: Wait for file to be completely unlocked
+//         const isUnlocked = await waitForFileUnlock(selectedfile.file, 45000);
+        
+//         if (!isUnlocked) {
+//             Swal.close();
+//             Swal.fire({
+//                 title: "File Still Locked",
+//                 html: "The file is still being edited. Please close Word editor and try again.",
+//                 icon: "warning",
+//                 confirmButtonText: "Try Again",
+//                 showCancelButton: true,
+//             }).then((result) => {
+//                 if (result.isConfirmed) {
+//                     handleSubmit();
+//                 }
+//             });
+//             return;
+//         }
+        
+//         // 🔥 STEP 6: Update list item columns
+//         await new Promise(resolve => setTimeout(resolve, 2000));
+        
+//         const listItem = await selectedfile.file.getItem();
+//         await listItem.update({ 
+//             Status: "Pending",
+//             From: selectedFromUser.value,  
+//             To: selectedToUser.value,
+//             DocumentNumber: newRequestNo,
+//             MetaDataUpdated: "No",
+//             Date: selectedDate.toString(),
+//             Ref: reference       
+//         });
+//             const listItemData = await listItem.select("ID")();
+//         const itemID = listItemData.ID;
+//         console.log("List Item ID:", itemID);
+//         console.log("File metadata updated successfully");
+        
+//         // Rest of your code (preview URL, DMSLocationFileMaster, approval list, etc.)
+//         const encodeSharePointURL = (url: string) => encodeURIComponent(url);
+//         const parentFolder = fileServerRelativeUrl.substring(0, fileServerRelativeUrl.lastIndexOf("/"));
+//         const previewUrl = `https://multiverse.sharepoint.com/sites/multiverseintranetportal/Location/TRANSMITTAL/Forms/AllItems.aspx?id=${encodeSharePointURL(
+//             fileServerRelativeUrl
+//         )}&parent=${encodeSharePointURL(parentFolder)}`;
+           
+//         const currentUserEmail = (await sp.web.currentUser()).Email;
+
+//         await sp.web.lists.getByTitle("DMSLocationFileMaster").items.add({
+//             FileName: String(uploadedFileResponse.data.Name),
+//             FileSize: String(uploadedFileResponse.data.Length),
+//             FileVersion: String(uploadedFileResponse.data.MajorVersion),
+//             CurrentFolderPath: "/sites/multiverseintranetportal/Location/TRANSMITTAL",
+//             FileUID: String(uploadedFileResponse.data.UniqueId),
+//             CurrentUser: String(currentUserEmail),
+//             SiteID: siteID,
+//             Status: "Pending",
+//             FilePreviewURL: previewUrl,
+//             DocumentLibraryName: "TRANSMITTAL",
+//             SiteName: "Location",
+//             MyRequest: true,
+//             Processname: "New File Request",
+//             RequestNo: newRequestNo,
+//         });
+
+//         await sp.web.lists.getByTitle("DMSFileApprovalList").items.add({
+//             SiteName: "Location",
+//             DocumentLibraryName: "TRANSMITTAL",
+//             RequestedBy: String(currentUserEmail),
+//             FileName: String(uploadedFileResponse.data.Name),
+//             FileUID: String(uploadedFileResponse.data.UniqueId),
+//             FilePreviewUrl: previewUrl,
+//             Status: "Pending",
+//             FolderPath: "/sites/multiverseintranetportal/Location/TRANSMITTAL",
+//             ApproveAction: "Submitted",
+//             ApprovedLevel: 1,
+//             RequestNo: newRequestNo,
+//             Processname: "New File Request",
+//             CurrentLevel: 1,
+//         });
+
+//         Swal.close();
+//         Swal.fire({
+//             icon: "success",
+//             title: "Document submitted",
+//             text: `Your Document Name is ${uploadedFileResponse.data.Name}`,
+//             confirmButtonText: "OK",
+//         }).then((result) => {
+//             if (result.isConfirmed) {
+//                 window.location.reload();
+//             }
+//         });
+
+//         setTimeout(() => {
+//             setEditUrl(null);
+//         }, 2000);
+//          try {
+//             const apiResponse = await fetch(
+//                 "http://23.100.43.23:8081/MultiverseIntranetPortalAPI/api/UpdateMetaDataInTemplateFile",
+//                 {
+//                     method: "POST",
+//                     headers: {
+//                         "Content-Type": "application/json",
+//                     },
+//                     body: JSON.stringify({
+//                         SiteUrl: "https://multiverse.sharepoint.com/sites/multiverseintranetportal/Location",
+//                         ClientID: "6a92b992-0f2a-4e00-a8dd-1927138068b6",
+//                         ClientSecret: "SlFrOFF+TktkdXNhZ3JGRWY1Y2NNQW9tZDRRVVlaeEVhQ0h+Q2FzRQ==",
+//                         ItemID: itemID.toString()
+//                     })
+//                 }
+//             );
+
+//             if (!apiResponse.ok) {
+//                 throw new Error(`API returned status ${apiResponse.status}`);
+//             }
+
+//             const apiResult = await apiResponse.json();
+//             console.log("API Response:", apiResult);
+            
+//         } catch (apiError: any) {
+//             console.error("Error calling UpdateMetaDataInTemplateFile API:", apiError);
+//             // Continue with success message even if API fails
+//             Swal.fire({
+//                 icon: "warning",
+//                 title: "Partial Success",
+//                 text: "Document submitted but metadata update failed. Please contact administrator.",
+//                 confirmButtonText: "OK",
+//             });
+//         }
+
+//     } catch (error: any) {
+//         Swal.close();
+//         console.error("Error submitting document:", error);
+//         Swal.fire("Error", `An error occurred: ${error.message}`, "error");
+//     }
+// };
 const handleSubmit = async () => {
     try {
-        if (!uploadedFileResponse) {
-            Swal.fire("Error", "No file has been prepared. Please run Copy first.", "error");
-            return;
-        }
-
-        Swal.fire({
-            title: "Submitting Document",
-            text: "Please wait while we submit your document for approval.",
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading(),
-        });
-
-        // const siteID = "9f942ad9-f2b6-4d4a-b99c-80f1171b57e3";
-          const siteID = "931e8b14-6d73-412e-a411-720ab18bd124";
-        const subsiteWeb = await sp.site.openWebById(siteID);
-        
-        // Build preview URL
-        const encodeSharePointURL = (url: string) => encodeURIComponent(url);
-        const parentFolder = fileServerRelativeUrl.substring(0, fileServerRelativeUrl.lastIndexOf("/"));
-        const previewUrl = `https://multiverse.sharepoint.com/sites/multiverseintranetportal/Location/TRANSMITTAL/Forms/AllItems.aspx?id=${encodeSharePointURL(
-            fileServerRelativeUrl
-        )}&parent=${encodeSharePointURL(parentFolder)}`;
-           
-        const getcurrentuseremail = async () => {
-            const currentUser = await sp.web.currentUser();
-            return currentUser.Email;
-        }
-        const currentUserEmail = await getcurrentuseremail();
-
-        // Save in DMSLocationFileMaster
-        await sp.web.lists.getByTitle("DMSLocationFileMaster").items.add({
-            FileName: String(uploadedFileResponse.data.Name),
-            FileSize: String(uploadedFileResponse.data.Length),
-            FileVersion: String(uploadedFileResponse.data.MajorVersion),
-            CurrentFolderPath: "/sites/multiverseintranetportal/Location/TRANSMITTAL",
-            FileUID: String(uploadedFileResponse.data.UniqueId),
-            CurrentUser: String(currentUserEmail),
-            SiteID: siteID,
-            Status: "Pending",
-            FilePreviewURL: previewUrl,
-            DocumentLibraryName: "TRANSMITTAL",
-            SiteName: "Location",
-            MyRequest: true,
-            Processname: "New File Request",
-            RequestNo: newRequestNo,
-        });
-
-        // Save in approval list
-        await sp.web.lists.getByTitle("DMSFileApprovalList").items.add({
-            SiteName: "Location",
-            DocumentLibraryName: "TRANSMITTAL",
-            RequestedBy: String(currentUserEmail),
-            FileName: String(uploadedFileResponse.data.Name),
-            FileUID: String(uploadedFileResponse.data.UniqueId),
-            FilePreviewUrl: previewUrl,
-            Status: "Pending",
-            FolderPath: "/sites/multiverseintranetportal/Location/TRANSMITTAL",
-            ApproveAction: "Submitted",
-            ApprovedLevel: 1,
-            RequestNo: newRequestNo,
-            Processname: "New File Request",
-            CurrentLevel: 1,
-        });
-         //  wordEditorFrame
-          const iframe = document.getElementById("wordEditorFrame") as HTMLIFrameElement;
-          if (iframe) {
-              iframe.remove();
-
-          }
-        // Release lock first
+      // Validations
+      if (!selectedFromUser) {
+        Swal.fire("Validation Error", "Please select 'From' user", "warning");
+        return;
+      }
+      if (!selectedToUser) {
+        Swal.fire("Validation Error", "Please select 'To' user", "warning");
+        return;
+      }
+      if (!uploadedFileResponse) {
+        Swal.fire("Error", "No file has been prepared. Please run Copy first.", "error");
+        return;
+      }
+  
+      // 🔥 Show single loading alert that we'll update
+      Swal.fire({
+        title: "Processing Document",
+        text: "Updating document fields...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+  
+      // 🔥 STEP 1: Update document content BEFORE closing iframe
       try {
-    await releaseFileLock(subsiteWeb, fileServerRelativeUrl);
-    
-    // Wait for file to be unlocked
-    const isUnlocked = await waitForFileUnlock(selectedfile.file, 30000);
-    
-    if (isUnlocked) {
-        await new Promise(resolve => setTimeout(resolve, 8000)); // 3 second delay
-        const listItem = await selectedfile.file.getItem();
-        const updatestatus = await listItem.update({ Status: "Pending" });
-        console.log("File status updated to Pending:", updatestatus);
-    } else {
-        console.warn("File remained locked after waiting period, status update skipped");
-    }
-    
-} catch (lockError) {
-    console.log("File lock handling failed:", lockError);
-}
-
+        const fieldMappings = {
+          "Fill Here": newRequestNo || "N/A",
+        };
+  
+        const updateDocumentContent = async (
+          iframeId: string,
+          fieldMappings: { [key: string]: string }
+        ) => {
+          return new Promise((resolve, reject) => {
+            try {
+              const iframe = document.getElementById(iframeId) as HTMLIFrameElement;
+              if (!iframe || !iframe.contentWindow) {
+                reject(new Error("Iframe not found or not accessible"));
+                return;
+              }
+  
+              const checkOfficeReady = setInterval(() => {
+                try {
+                  const iframeWindow = iframe.contentWindow as any;
+                  if (iframeWindow.Office && iframeWindow.Office.context) {
+                    clearInterval(checkOfficeReady);
+  
+                    iframeWindow.Office.context.document.body.getAsync(
+                      iframeWindow.Office.CoercionType.Text,
+                      (result: any) => {
+                        if (result.status === iframeWindow.Office.AsyncResultStatus.Succeeded) {
+                          let content = result.value;
+  
+                          Object.keys(fieldMappings).forEach(placeholder => {
+                            const value = fieldMappings[placeholder];
+                            content = content.replace(
+                              new RegExp(placeholder, 'g'),
+                              value
+                            );
+                          });
+  
+                          iframeWindow.Office.context.document.setSelectedDataAsync(
+                            content,
+                            { coercionType: iframeWindow.Office.CoercionType.Text },
+                            (setResult: any) => {
+                              if (setResult.status === iframeWindow.Office.AsyncResultStatus.Succeeded) {
+                                console.log("Document content updated successfully");
+                                resolve("Document content updated successfully");
+                              } else {
+                                reject(new Error("Failed to update document content"));
+                              }
+                            }
+                          );
+                        } else {
+                          reject(new Error("Failed to read document content"));
+                        }
+                      }
+                    );
+                  }
+                } catch (error) {
+                  clearInterval(checkOfficeReady);
+                  reject(error);
+                }
+              }, 500);
+  
+              setTimeout(() => {
+                clearInterval(checkOfficeReady);
+                reject(new Error("Timeout waiting for Office.js"));
+              }, 10000);
+            } catch (error) {
+              reject(error);
+            }
+          });
+        };
+  
+        await updateDocumentContent("wordEditorFrame", fieldMappings);
+        console.log("Document content updated");
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      } catch (updateError) {
+        console.warn("Could not auto-update document content:", updateError);
+      }
+  
+      // 🔥 Update alert text
+      Swal.update({
+        title: "Processing Document",
+        text: "Submitting document for approval...",
+        showConfirmButton: false
+      });
+  
+      const siteID = "931e8b14-6d73-412e-a411-720ab18bd124";
+      const subsiteWeb = await sp.site.openWebById(siteID);
+  
+      // 🔥 STEP 2: Remove iframe to close the editing session
+      const iframe = document.getElementById("wordEditorFrame") as HTMLIFrameElement;
+      if (iframe) {
+        iframe.remove();
+      }
+  
+      // 🔥 STEP 3: Wait for Word Online to release the file
+      await new Promise(resolve => setTimeout(resolve, 3000));
+  
+      // 🔥 STEP 4: Try to force release the lock
+      try {
+        const file = subsiteWeb.web.getFileByServerRelativePath(fileServerRelativeUrl);
+        const fileInfo = await file.select("CheckOutType", "CheckedOutByUser")();
+        console.log("File checkout status:", fileInfo);
+  
+        if (fileInfo.CheckOutType !== 2) {
+          try {
+            await file.undoCheckout();
+            console.log("Successfully undid checkout");
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          } catch (undoError) {
+            console.log("Undo checkout failed:", undoError);
+          }
+        }
+      } catch (lockError) {
+        console.log("Lock check/release failed:", lockError);
+      }
+  
+      // 🔥 STEP 5: Wait for file to be completely unlocked
+      const isUnlocked = await waitForFileUnlock(selectedfile.file, 45000);
+      if (!isUnlocked) {
         Swal.close();
         Swal.fire({
-            icon: "success",
-            title: "Document submitted",
-            text: `Your Document Name is ${uploadedFileResponse.data.Name} for your future reference`,
-            confirmButtonText: "OK",
+          title: "File Still Locked",
+          html: "The file is still being edited. Please close Word editor and try again.",
+          icon: "warning",
+          confirmButtonText: "Try Again",
+          showCancelButton: true,
         }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.reload();
-            }
+          if (result.isConfirmed) {
+            handleSubmit();
+          }
         });
-
-        setTimeout(() => {
-            setEditUrl(null);
-        }, 2000);
-    } catch (error: any) {
-        Swal.close();
-        console.error("Error submitting document:", error);
-
-        if (error.message.includes("locked for shared use") || error.message.includes("423")) {
-            Swal.fire({
-                title: "File Still in Use",
-                html: `Please close the file in Word Online and try again.`,
-                icon: "warning",
-                confirmButtonText: "Try Again",
-                showCancelButton: true,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    handleSubmit();
-                }
-            });
-        } else {
-            Swal.fire("Error", `An error occurred while submitting the document: ${error.message}`, "error");
+        return;
+      }
+  
+      // 🔥 STEP 6: Update list item columns
+      await new Promise(resolve => setTimeout(resolve, 2000));
+  
+      const listItem = await selectedfile.file.getItem();
+      await listItem.update({
+        Status: "Pending",
+        From: selectedFromUser.value,
+        To: selectedToUser.value,
+        TransmittalNumber: newRequestNo,
+        MetaDataUpdated: "No",
+        Date: selectedDate.toString(),
+        Ref: reference
+      });
+  
+      const listItemData = await listItem.select("ID")();
+      const itemID = listItemData.ID;
+      console.log("List Item ID:", itemID);
+      console.log("File metadata updated successfully");
+  
+      const encodeSharePointURL = (url: string) => encodeURIComponent(url);
+      const parentFolder = fileServerRelativeUrl.substring(0, fileServerRelativeUrl.lastIndexOf("/"));
+      const previewUrl = `https://multiverse.sharepoint.com/sites/multiverseintranetportal/Location/TRANSMITTAL/Forms/AllItems.aspx?id=${encodeSharePointURL(
+        fileServerRelativeUrl
+      )}&parent=${encodeSharePointURL(parentFolder)}`;
+  
+      const currentUserEmail = (await sp.web.currentUser()).Email;
+  
+      await sp.web.lists.getByTitle("DMSLocationFileMaster").items.add({
+        FileName: String(uploadedFileResponse.data.Name),
+        FileSize: String(uploadedFileResponse.data.Length),
+        FileVersion: String(uploadedFileResponse.data.MajorVersion),
+        CurrentFolderPath: "/sites/multiverseintranetportal/Location/TRANSMITTAL",
+        FileUID: String(uploadedFileResponse.data.UniqueId),
+        CurrentUser: String(currentUserEmail),
+        SiteID: siteID,
+        Status: "Pending",
+        FilePreviewURL: previewUrl,
+        DocumentLibraryName: "TRANSMITTAL",
+        SiteName: "Location",
+        MyRequest: true,
+        Processname: "New File Request",
+        RequestNo: newRequestNo,
+      });
+  
+      await sp.web.lists.getByTitle("DMSFileApprovalList").items.add({
+        SiteName: "Location",
+        DocumentLibraryName: "TRANSMITTAL",
+        RequestedBy: String(currentUserEmail),
+        FileName: String(uploadedFileResponse.data.Name),
+        FileUID: String(uploadedFileResponse.data.UniqueId),
+        FilePreviewUrl: previewUrl,
+        Status: "Pending",
+        FolderPath: "/sites/multiverseintranetportal/Location/TRANSMITTAL",
+        ApproveAction: "Submitted",
+        ApprovedLevel: 1,
+        RequestNo: newRequestNo,
+        Processname: "New File Request",
+        CurrentLevel: 1,
+      });
+  
+      // 🔥 Show success message
+      Swal.close();
+      Swal.fire({
+        icon: "success",
+        title: "Document Submitted",
+        text: `Your Document Name is ${uploadedFileResponse.data.Name}`,
+        confirmButtonText: "OK",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.reload();
         }
+      });
+  
+      setTimeout(() => {
+        setEditUrl(null);
+      }, 2000);
+  
+    } catch (error: any) {
+      Swal.close();
+      console.error("Error submitting document:", error);
+      Swal.fire("Error", `An error occurred: ${error.message}`, "error");
     }
-};
-
-
-
+  };
 
     const getApprovals = async () => {
         try {
@@ -1820,6 +2697,7 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
     useEffect(() => {
         // alert("this file")
         // Call copyFile when component mounts
+        fetchAllUsers();
         copyFile();
         getApprovals();
     }, []);
@@ -1843,7 +2721,15 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
                     <div className="Newfilealign">
 
                     <div style={{ marginBottom: "15px", display: "flex", justifyContent:"end", gap: "10px", flexWrap: "wrap" }}>
-                     
+                      <h6 className="mb-1 fw-bold text-dark header-title"
+                            style={{
+                              color: "black",
+                              marginBottom: "0px",
+                              fontSize: "16px",
+                            }}
+                          >
+                            Transmittal Template
+                          </h6>
                         
                       {/* <button
                             style={{ 
@@ -1914,7 +2800,170 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
 </div>
 
                     </div>
-                   
+                   {/* Add this section just before the iframe div */}
+<div className="card mb-3">
+    <div className="card-body">
+        <div className="row">
+            <div className="col-md-6 mb-3">
+                <label style={{ fontWeight: 600,     marginBottom: "8px", }}>
+                Transmittal number
+</label>
+
+<input
+  type="text"
+  value={newRequestNo}
+  readOnly
+  style={{
+    width: "100%",
+    padding: "6px",
+    border: "1px solid #ddd",
+    backgroundColor: "#f3f2f1",
+    cursor: "copy"
+  }}
+  onClick={(e:any) => e.target.select()}
+/>
+ {/* Company Master Dropdown */}
+               
+
+               
+
+            </div>
+            
+            <div className="col-md-6 mb-3">
+                <label htmlFor="toUser" style={{ 
+                    fontWeight: "600", 
+                    marginBottom: "8px",
+                    display: "block",
+                    color: "#323130"
+                }}>
+                    To <span style={{ color: "red" }}>*</span>
+                </label>
+                <Select
+                    id="toUser"
+                    options={allUsers}
+                    value={selectedToUser}
+                    onChange={(selected:any) => setSelectedToUser(selected)}
+                    placeholder="Select To User"
+                    isSearchable={true}
+                    styles={{
+                        control: (base:any) => ({
+                            ...base,
+                            minHeight: "38px",
+                            borderColor: "#ddd",
+                        })
+                    }}
+                />
+            </div>
+
+            <div className="col-md-6 mb-3">
+            <label htmlFor="companyMaster" style={{ 
+                    fontWeight: "600", 
+                    marginBottom: "8px",
+                    display: "block",
+                    color: "#323130"
+                }}>
+                    Company <span style={{ color: "red" }}>*</span>
+                </label>
+                <Select
+                    id="companyMaster"
+                    options={companyMasterList}
+                    value={selectedCompany}
+                    onChange={(selected: any) => setSelectedCompany(selected)}
+                    placeholder="Select Company"
+                    isSearchable={true}
+                    styles={{
+                        control: (base: any) => ({
+                            ...base,
+                            minHeight: "38px",
+                            borderColor: "#ddd",
+                        })
+                    }}
+                />
+                </div>
+
+                <div className="col-md-6 mb-3">
+                     {/* Classification Dropdown */}
+                <label htmlFor="classification" style={{ 
+                    fontWeight: "600", 
+                    marginBottom: "8px",
+                  
+                    display: "block",
+                    color: "#323130"
+                }}>
+                    Classification <span style={{ color: "red" }}>*</span>
+                </label>
+                <Select
+                    id="classification"
+                    options={classificationList}
+                    value={selectedClassification}
+                    onChange={(selected: any) => setSelectedClassification(selected)}
+                    placeholder="Select Classification"
+                    isSearchable={true}
+                    styles={{
+                        control: (base: any) => ({
+                            ...base,
+                            minHeight: "38px",
+                            borderColor: "#ddd",
+                        })
+                    }}
+                />
+
+              
+
+  
+
+                    </div>
+         
+<div className="col-md-6 mb-3">
+<label htmlFor="fromUser" style={{ 
+                    fontWeight: "600", 
+                    marginBottom: "8px",
+                    display: "block",
+                    color: "#323130"
+                }}>
+                    From <span style={{ color: "red" }}>*</span>
+                </label>
+                <Select
+  id="fromUser"
+  options={allUsers}
+  value={selectedFromUser}   // ✅ full object
+  isDisabled={true}          // ✅ correct prop
+  placeholder="From User"
+  styles={{
+    control: (base:any) => ({
+      ...base,
+      minHeight: "38px",
+      borderColor: "#ddd",
+      backgroundColor: "#f3f2f1" // optional disabled look
+    })
+  }}
+/>
+</div>
+<div className="col-md-6 mb-3">
+<label style={{marginBottom: "8px",}}>Date <span style={{color:"red"}}>*</span></label>
+<input
+  type="date"
+  className="form-control"
+  value={selectedDate}
+  onChange={(e) => setSelectedDate(e.target.value)}
+/>
+</div>
+
+<div className="col-md-6 mb-3">
+            
+<label>Reference</label>
+<input style={{height:'40px'}}
+  type="text"
+  className="form-control"
+  value={reference}
+  onChange={(e) => setReference(e.target.value)}
+  placeholder="Enter reference"
+/>
+    </div>
+
+        </div>
+    </div>
+</div>
                     
                     <div style={{ 
                         border: "1px solid #ddd", 
@@ -2033,7 +3082,7 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
                 </div>
                 <div className="d-flex justify-content-end gap-3 mt-3 mar-90">
                     <button className="btncolorCreate1 mt-0"
-                            
+                            type="button"
                             // onMouseOver={(e) => {
                             //     const target = e.target as HTMLButtonElement;
                             //     target.style.backgroundColor = "#106ebe";
@@ -2051,9 +3100,11 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
                             > <span className="mb-1 mt-2" data-tooltip="Cancel">
                              <img  src={cancelnew}></img></span> </button>
           </div></div>
-            ) : (
+            ) :
+            
+             (
                 <div style={{ textAlign: "center", padding: "40px" }}>
-                    <p style={{ marginBottom: "15px", color: "#323130", fontSize: "18px" }}>Loading document from template...</p>
+                    {/* <p style={{ marginBottom: "15px", color: "#323130", fontSize: "18px" }}>Loading document from template...</p>
                     <div style={{
                         width: "3rem",
                         height: "3rem",
@@ -2070,7 +3121,7 @@ console.log("Grouped Hierarchy:", Object.values(groupedHierarchy));
                             100% { transform: rotate(360deg); }
                         }
                         `}
-                    </style>
+                    </style> */}
                 </div>
             )}
         </div>

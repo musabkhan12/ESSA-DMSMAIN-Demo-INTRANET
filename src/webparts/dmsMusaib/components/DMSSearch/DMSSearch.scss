@@ -587,8 +587,35 @@
     overflow-y: auto;
     border-radius: 0;
   }
+  .metadata-tags-popup {
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+    width: 100%;
+  
+    
+    /* FIX */
+
+   
+    
+    background: rgba(246, 246, 246, 0.87);
+    border: 0;
+    z-index: 1;
+    
+    overflow-y: auto;
+    border-radius: 0;
+  }
    
   .popup-content-auditHistory {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 900px;
+    position: relative;
+  }
+   
+  .popup-content-metadata-tags {
     background: white;
     padding: 20px;
     border-radius: 5px;

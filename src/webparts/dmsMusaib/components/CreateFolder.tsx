@@ -198,8 +198,15 @@ const CreateFolder: React.FC<CreateFolderProps> = ({
 
   //start
 //   store the form field and its type.
-  const [formFields, setFormFields] = useState([
-    { id:0, fieldName: '', selectField: ''}
+
+//previous working code before meta sequence
+//  const [formFields, setFormFields] = useState([
+//    { id:0, fieldName: '', selectField: ''}
+//  ]);
+const [formFields, setFormFields] = useState([
+    // { id:0, fieldName: '', selectField: ''} 
+    { id:0, fieldName: '', selectField: '', sequence: 1}    
+
   ]);
 
 //   add field in the formField arry
@@ -238,15 +245,90 @@ const CreateFolder: React.FC<CreateFolderProps> = ({
         }));
       }
   }
-//   add new field row
-  const handleAddFields = () => {
-    const newId = formFields.length ? formFields[formFields.length - 1].id + 1 : 0;
-    setFormFields([
-      ...formFields,
-      { id: newId, fieldName: "", selectField:"" },
-    ]);
-  };
-  console.log("FormsField Array",formFields);
+//   add new field row hide by addhyan 21/01/2026
+  // const handleAddFields = () => {
+  //   const newId = formFields.length ? formFields[formFields.length - 1].id + 1 : 0;
+  //   setFormFields([
+  //     ...formFields,
+  //     { id: newId, fieldName: "", selectField:"" },
+  //   ]);
+  // };
+  // console.log("FormsField Array",formFields);
+
+// add by addhyan 21/01/2026 for auto sequence
+//   const handleAddFields = () => {
+//   const newId = formFields.length
+//     ? formFields[formFields.length - 1].id + 1
+//     : 0;
+
+//   setFormFields([
+//     ...formFields,
+//     {
+//       id: newId,
+//       fieldName: "",
+//       selectField: "",
+//       sequence: formFields.length + 1   // ⭐ auto sequence
+//     },
+//   ]);
+// };
+
+const handleAddFields = () => {
+  const nextSequence = formFields.length + 1;
+  const newId = Math.max(...formFields.map(f => f.id)) + 1;
+
+  const updated = [
+    ...formFields.map((f, i) => ({ ...f, sequence: i + 1 })),
+    {
+      id: newId,
+      fieldName: "",
+      selectField: "",
+      sequence: nextSequence
+    }
+  ];
+
+  setFormFields(updated);
+};
+
+
+
+const getSequenceOptions = () => {
+  return formFields.map((_, index) => index + 1);
+};
+
+
+const handleSequenceChange = (id: number, newSequence: number) => {
+  let updatedFields = [...formFields];
+
+  const current = updatedFields.find(f => f.id === id);
+  if (!current) return;
+
+  const oldSequence = current.sequence;
+
+  updatedFields = updatedFields.map(field => {
+    if (field.id === id) {
+      return { ...field, sequence: newSequence };
+    }
+
+    if (newSequence > oldSequence) {
+      if (field.sequence > oldSequence && field.sequence <= newSequence) {
+        return { ...field, sequence: field.sequence - 1 };
+      }
+    } else {
+      if (field.sequence < oldSequence && field.sequence >= newSequence) {
+        return { ...field, sequence: field.sequence + 1 };
+      }
+    }
+
+    return field;
+  });
+
+  updatedFields.sort((a, b) => a.sequence - b.sequence);
+  setFormFields(updatedFields);
+};
+
+
+// add by addhyan 21/01/2026 for auto sequence ---- end 
+
 
 //   remove field row
   const handleRemoveField=(id:number,event:any)=>{
@@ -254,9 +336,31 @@ const CreateFolder: React.FC<CreateFolderProps> = ({
     // console.log("index",id);
     // console.log("Remove Field Called");
 
-    setFormFields(formFields.filter((field) => field.id !== id));
-    
+    // setFormFields(formFields.filter((field) => field.id !== id)); hide by addhyan 21/01/2026 for auto sequence
+//     const updated = formFields
+//   .filter(field => field.id !== id)
+//   .map((field, index) => ({
+//     ...field,
+//     sequence: index + 1
+//   }));
+
+// setFormFields(updated);
+
+const updated = formFields
+  .filter(field => field.id !== id)
+  .sort((a, b) => a.sequence - b.sequence)
+  .map((field, index) => ({
+    ...field,
+    sequence: index + 1
+  }));
+
+setFormFields(updated);
+
+
   }
+
+
+  
 
 // Handle validation and error state update
 const validateFields = () => {
@@ -1037,7 +1141,8 @@ const validateFields = () => {
               DocumentLibraryName:folderName.trim(),
               IsRequired:true,
               AddorRemoveThisColumn:"Add To Library",
-              IsInProgress:true
+              IsInProgress:true,
+              Sequence: 0   // You can set the sequence as needed -  add by addhyan 21-01-2026
             }
   
             // console.log("payloadForPreviewFormMaster",payloadForPreviewFormMaster)
@@ -1069,18 +1174,57 @@ const validateFields = () => {
             
             if(formFields.length > 0){
               // if(formFields[0].fieldName !== '' && formFields[0].selectField !== ''){
-                formFields.forEach(async(field)=>{
-                  // type.replace(/\s+/g, '').toLowerCase();
-                  if (field.fieldName.trim() !== '') {
-                      (payloadForPreviewFormMaster as any).ColumnName=field.fieldName.replace(/\s+/g,'');
-                      (payloadForPreviewFormMaster as any).ColumnType=field.selectField
-                      console.log("Call the Api with this payload",payloadForPreviewFormMaster)
+                // formFields.forEach(async(field)=>{
+                //   // type.replace(/\s+/g, '').toLowerCase();
+                //   if (field.fieldName.trim() !== '') {
+                //       (payloadForPreviewFormMaster as any).ColumnName=field.fieldName.replace(/\s+/g,'');
+                //       (payloadForPreviewFormMaster as any).ColumnType=field.selectField
+                //       console.log("Call the Api with this payload",payloadForPreviewFormMaster)
       
-                      const addedItem = await sp.web.lists.getByTitle("DMSPreviewFormMaster").items.add(payloadForPreviewFormMaster);
-                      console.log("Item added successfully in the DMSPreviewFormField", addedItem);
-                  }
+                //       const addedItem = await sp.web.lists.getByTitle("DMSPreviewFormMaster").items.add(payloadForPreviewFormMaster);
+                //       console.log("Item added successfully in the DMSPreviewFormField", addedItem);
+                //   }
                       
-                })
+                // })
+
+
+
+// add by addhyan 21-01-2026 for sequence in form fields
+
+                const orderedFields = [...formFields].sort(
+  (a, b) => a.sequence - b.sequence
+);
+
+                orderedFields.forEach(async (field) => {
+  if (field.fieldName.trim() !== '') {
+    const payloadForPreviewFormMaster = {
+      SiteName: OthProps.Entity,
+      DocumentLibraryName: folderName.trim(),
+      ColumnName: field.fieldName.replace(/\s+/g, ''),
+      columnlabel: field.fieldName,
+      ColumnType: field.selectField,
+      Sequence: field.sequence, // ⭐ SAVE SEQUENCE
+      IsRequired: true,
+      AddorRemoveThisColumn: "Add To Library",
+      IsInProgress: true
+    };
+
+    await sp.web.lists
+      .getByTitle("DMSPreviewFormMaster")
+      .items.add(payloadForPreviewFormMaster);
+  }
+});
+
+// -- end addhyan 
+
+
+
+
+
+
+
+
+
               // }
             }
             // formFields.forEach(async(field)=>{
@@ -1355,14 +1499,17 @@ const validateFields = () => {
           
 
 </div>
-        <div className="BackButton1 p-0 me-0 mb-1"
+
+
+ {/* hide this button and add new back buton on toolbar  acoding musaib sir - addhyan 22-01-2026  */}
+        {/* <div className="BackButton1 p-0 me-0 mb-1"
          onClick={()=>{location.reload() ;onReturnToMain()}}
       >
  
  <span className="mb-1" data-tooltip='Back'>
 
 <img className="" src={backnew}></img> &nbsp;</span>
-      </div>
+      </div> */}
       </div>
 
       </div>
@@ -1573,12 +1720,18 @@ const validateFields = () => {
       <tr>
         <th>  Field Name</th>
         <th>    Select Field Type</th>
+        <th style={{minWidth:'40px',maxWidth:'40px'}}>  Order</th>
         <th style={{minWidth:'40px',maxWidth:'40px'}}> Action</th>
       </tr>
     </thead>
     <tbody>
 
-          {togglecolumneDetails && formFields.map((formField) => (
+          {/* {togglecolumneDetails && formFields.map((formField) => ( */}
+          {togglecolumneDetails &&
+  [...formFields]
+    .sort((a, b) => a.sequence - b.sequence)
+    .map((formField) => (
+
             
       <tr  key={formField.id} id="columnDetail">
         <td>
@@ -1628,6 +1781,29 @@ const validateFields = () => {
             )}
           </div>
         </td>
+            {/* //  Sequence column */}
+
+            {/* //add by addhyan for sequence */}
+
+        <td style={{minWidth:'40px',maxWidth:'40px'}}>
+  <select
+    className="form-control"
+    value={formField.sequence}
+    onChange={(e) =>
+      handleSequenceChange(formField.id, Number(e.target.value))
+    }
+  >
+    {getSequenceOptions().map(seq => (
+      <option key={seq} value={seq}>
+        {seq}
+      </option>
+    ))}
+  </select>
+</td>
+
+
+
+
         <td style={{minWidth:'40px',maxWidth:'40px',textAlign:'center'}}>
         <div >
         {formField.id === 0 ? (
