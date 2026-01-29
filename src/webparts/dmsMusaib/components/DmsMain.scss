@@ -990,7 +990,7 @@ border-radius: 5px;}
 #files-container .card {
   border: 1px solid #2c9942 !important;
   border-radius: 6px !important;
-  height: 107px; padding: 0.75rem; position: relative !important;
+  height: 109px; padding: 0.75rem; position: relative !important;
 }
 .search-container input:focus{outline: 1px solid #2c9942 !important;}
 
@@ -1569,5 +1569,7 @@ button.rightalignpagination{right: 3px !important;}
     padding: 1px 8px;
 
 }
+.doctext{width: 100%;     float: left;
+  text-align: left !important;}
 .page-item:last-child .page-link{border-radius: 60px !important;}
 .librarydata-hide .audit-history-popup, .librarydata-hide .edit-popup,.librarydata-hide .share-popup,.librarydata-hide #renamefile-popup, .librarydata-hide #blurOverlay, .librarydata-hide #showfolderpermission .modal,.librarydata-hide #workflowdiv .modal{height: 762px !important;}

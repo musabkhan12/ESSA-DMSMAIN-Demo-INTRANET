@@ -5958,7 +5958,7 @@ const createFileCardForDocumentLibrary=(file:any,fileIcon:any,siteID:string,IsHa
          <div class="col-md-10 pe-0">
          <div class="CardTextContainer">
         <p style="cursor: pointer;" class="p1st" title="${file.Name}" onclick="PreviewFile('${file.ServerRelativeUrl}', '${siteID}' , '${docLibName}','${file.ListItemAllFields.Status}')">${file.Name}</p>
-         <div class="d-flex justify-content-between align-items-center">
+         <div style="flex-wrap: wrap;" class="d-flex justify-content-between align-items-center">
           <p class="p3rd">${fixSize(file.Length as unknown as number)}</p>
           ${file.ListItemAllFields?.DocumentNumber && file.ListItemAllFields.DocumentNumber.trim() !== '' ? `<p style="text-align: right;font-size:11px;margin-bottom:5px" class="doctext"><span style="font-weight:600" class="text-dark">DOC.NO:</span> ${file.ListItemAllFields.DocumentNumber}</p>` : ''}
            
@@ -17771,7 +17771,7 @@ const myRequest = async (
           <div class="col-md-10"> 
             <div class="CardTextContainer">
               <p class="p1st" style="cursor: pointer;" title="${file.FileName}" onclick="PreviewFile('${file.FileUID}','${file.SiteID}','${file.ID}' , '${file.FileMasterList}', '${file.FilePreviewURL}')">${file.FileName}</p>
-                <div class="d-flex justify-content-between align-items-center">
+                <div style="flex-wrap: wrap;" class="d-flex justify-content-between align-items-center">
                <p class="p2nd" title="${file.CurrentFolderPath ? file.CurrentFolderPath.split('/').slice(3).join('/') : ''}">${file.DocumentLibraryName}</p>
                ${file.RequestNo && file.RequestNo.trim() !== '' ? `<p style="text-align: right;font-size:11px; margin-bottom:5px" class="doctext"><span style="font-weight:600" class="text-dark">DOC.NO:</span> ${file.RequestNo}</p>` : ''}
             
@@ -22784,7 +22784,48 @@ window.metadataAndTags = async (fileId: string, siteId: string, DocumentLibraryN
       console.error("Error fetching Metadata and Tags data:", error);
     }
   }
-
+   // Generate HTML for Tags section
+   let tagsHTML = "";
+   if (metadataAndTagsData) {
+     const tagsFields = [
+       { label: "Sensitivity Level", value: metadataAndTagsData.SensitivityLevel },
+       { label: "Priority Score", value: metadataAndTagsData.PriorityScore },
+       { label: "Action Required", value: metadataAndTagsData.ActionRequired },
+       { label: "Compliance Risk", value: metadataAndTagsData.ComplianceRisk },
+       { label: "Safety Hazard Level", value: metadataAndTagsData.SafetyHazardLevel },
+       { label: "Document Language", value: metadataAndTagsData.DocumentLanguage }
+     ];
+ 
+     tagsHTML = `
+       <div class="tags-section">
+         <h6 style="margin-top: 20px; margin-bottom: 15px; color: #4c4c4c; font-weight: bold; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px;">Tags</h6>
+         <div class="tags-details">
+     `;
+ 
+     tagsFields.forEach((tag, index) => {
+       if (tag.value && tag.value.toString().trim() !== "") {
+         if (index % 4 === 0) {
+           tagsHTML += '<div class="detail-row">';
+         }
+ 
+         tagsHTML += `
+           <div class="detail-column">
+             <div class="detail-label">${tag.label}:</div>
+             <div class="detail-value">${tag.value}</div>
+           </div>
+         `;
+ 
+         if ((index + 1) % 4 === 0 || index === tagsFields.filter(f => f.value && f.value.toString().trim() !== "").length - 1) {
+           tagsHTML += '</div>';
+         }
+       }
+     });
+ 
+     tagsHTML += `
+         </div>
+       </div>
+     `;
+   }
   // Generate HTML for Metadata section
   let metadataHTML = "";
   if (metadataAndTagsData) {
@@ -22801,8 +22842,8 @@ window.metadataAndTags = async (fileId: string, siteId: string, DocumentLibraryN
       { label: "Contract Start Date", value: metadataAndTagsData.ContractStartDate ? formatDate2(metadataAndTagsData.ContractStartDate) : "" },
       { label: "Contract End Date", value: metadataAndTagsData.ContractEndDate ? formatDate2(metadataAndTagsData.ContractEndDate) : "" },
       { label: "Project Location", value: metadataAndTagsData.ProjectLocation },
-      { label: "Report Date", value: metadataAndTagsData.ReportDate ? formatDate2(metadataAndTagsData.ReportDate) : "" },
-      { label: "Document Summary", value: metadataAndTagsData.DocumentSummary }
+      { label: "Report Date", value: metadataAndTagsData.ReportDate ? formatDate2(metadataAndTagsData.ReportDate) : "" }
+      // { label: "Document Summary", value: metadataAndTagsData.DocumentSummary }
     ];
 
     metadataHTML = `
@@ -22810,73 +22851,50 @@ window.metadataAndTags = async (fileId: string, siteId: string, DocumentLibraryN
         <h6 style="margin-top: 0; margin-bottom: 15px; color: #4c4c4c; font-weight: bold; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px;">Metadata</h6>
         <div class="metadata-details">
     `;
+    metadataHTML += '<div class="detail-row">';
 
-    metadataFields.forEach((field, index) => {
-      if (field.value && field.value.toString().trim() !== "") {
-        if (index % 4 === 0) {
-          metadataHTML += '<div class="detail-row">';
-        }
+    // metadataFields.forEach((field, index) => {
+    //   if (field.value && field.value.toString().trim() !== "") {
+    //     // if (index % 4 === 0) {
+    //     //   metadataHTML += '<div class="detail-row">';
+    //     // }
 
-        metadataHTML += `
-          <div class="detail-column">
-            <div class="detail-label">${field.label}:</div>
-            <div class="detail-value">${field.value}</div>
-          </div>
-        `;
+    //     metadataHTML += `
+    //       <div class="detail-column">
+    //         <div class="detail-label">${field.label}:</div>
+    //         <div class="detail-value">${field.value}</div>
+    //       </div>
+    //     `;
 
-        if ((index + 1) % 4 === 0 || index === metadataFields.filter(f => f.value && f.value.toString().trim() !== "").length - 1) {
-          metadataHTML += '</div>';
-        }
-      }
-    });
-
+    //     // if ((index + 1) % 4 === 0 || index === metadataFields.filter(f => f.value && f.value.toString().trim() !== "").length - 1) {
+    //     //   metadataHTML += '</div>';
+    //     // }
+    //   }
+    // });
+    metadataFields
+  .filter(
+    field => field.value && field.value.toString().trim() !== ""
+  )
+  .slice(0, 3)
+  .forEach(field => {
     metadataHTML += `
-        </div>
+      <div class="detail-column">
+        <div class="detail-label">${field.label}:</div>
+        <div class="detail-value">${field.value}</div>
       </div>
     `;
-  }
+  });
+    metadataHTML += '</div>'; // close detail-row
 
-  // Generate HTML for Tags section
-  let tagsHTML = "";
-  if (metadataAndTagsData) {
-    const tagsFields = [
-      { label: "Sensitivity Level", value: metadataAndTagsData.SensitivityLevel },
-      { label: "Priority Score", value: metadataAndTagsData.PriorityScore },
-      { label: "Action Required", value: metadataAndTagsData.ActionRequired },
-      { label: "Compliance Risk", value: metadataAndTagsData.ComplianceRisk },
-      { label: "Safety Hazard Level", value: metadataAndTagsData.SafetyHazardLevel },
-      { label: "Document Language", value: metadataAndTagsData.DocumentLanguage }
-    ];
-
-    tagsHTML = `
-      <div class="tags-section">
-        <h6 style="margin-top: 20px; margin-bottom: 15px; color: #4c4c4c; font-weight: bold; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px;">Tags</h6>
-        <div class="tags-details">
-    `;
-
-    tagsFields.forEach((tag, index) => {
-      if (tag.value && tag.value.toString().trim() !== "") {
-        if (index % 4 === 0) {
-          tagsHTML += '<div class="detail-row">';
-        }
-
-        tagsHTML += `
-          <div class="detail-column">
-            <div class="detail-label">${tag.label}:</div>
-            <div class="detail-value">${tag.value}</div>
-          </div>
-        `;
-
-        if ((index + 1) % 4 === 0 || index === tagsFields.filter(f => f.value && f.value.toString().trim() !== "").length - 1) {
-          tagsHTML += '</div>';
-        }
-      }
-    });
-
-    tagsHTML += `
-        </div>
-      </div>
-    `;
+    // metadataHTML += `
+    //     </div>
+    //   </div>
+    // `;
+    metadataHTML += `
+    ${tagsHTML}
+    </div>
+  </div>
+`;
   }
 
   // Create the popup
@@ -22889,9 +22907,8 @@ window.metadataAndTags = async (fileId: string, siteId: string, DocumentLibraryN
     <span class="close-btn" onclick="hideAuditHistoryPopup()">&times;</span>
   </div>
   <div class="popup-details">
-    ${metadataHTML}
-    ${tagsHTML}
-  </div>
+  ${metadataHTML}
+</div>
 </div>
 `;
 

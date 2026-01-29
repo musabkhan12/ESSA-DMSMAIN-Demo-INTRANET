@@ -2063,30 +2063,13 @@ const breadcrumbParts = useMemo(() => {
 
 
        
-          <div style={{float:'right'}} className='mt-0' 
+          <div style={{float:'right',}} className='mt-0 d-none' 
           onClick={()=>{location.reload() ;onReturnToMain()}}
           >   
            <span className="mb-1" data-tooltip='Back'>
            <img  src={back}></img> &nbsp;</span>
           </div>
           <div className="mt-0 UploadFileCont">
-              <div className='row'>
-              <div className='col-lg-6'>
-              {/* <nav className="dms-breadcrumb" aria-label="Breadcrumb" style={{marginBottom:12}}>
-              <img className="" src={info}></img> 
-            {breadcrumbParts && breadcrumbParts.length > 0 ? (
-              breadcrumbParts.map((seg, idx) => (
-                <span key={idx} className="dms-breadcrumb-segment">
-                  <span className="dms-breadcrumb-text">{seg}</span>
-                  {idx < breadcrumbParts.length - 1 && (
-                    <span className="dms-breadcrumb-sep">&nbsp;&gt;&nbsp;</span>
-                  )}
-                </span>
-              ))
-            ) : (
-              <span className="dms-breadcrumb-text">Upload</span>
-            )}
-          </nav> */}
           <nav className="dms-breadcrumb" aria-label="Breadcrumb" style={{marginBottom:12}}>
   <img className="" src={info}></img> 
   {breadcrumbParts && breadcrumbParts.length > 0 ? (
@@ -2105,6 +2088,24 @@ const breadcrumbParts = useMemo(() => {
     <span className="dms-breadcrumb-text">Upload</span>
   )}
 </nav>
+              <div className='row'>
+              <div className='col-lg-6'>
+              {/* <nav className="dms-breadcrumb" aria-label="Breadcrumb" style={{marginBottom:12}}>
+              <img className="" src={info}></img> 
+            {breadcrumbParts && breadcrumbParts.length > 0 ? (
+              breadcrumbParts.map((seg, idx) => (
+                <span key={idx} className="dms-breadcrumb-segment">
+                  <span className="dms-breadcrumb-text">{seg}</span>
+                  {idx < breadcrumbParts.length - 1 && (
+                    <span className="dms-breadcrumb-sep">&nbsp;&gt;&nbsp;</span>
+                  )}
+                </span>
+              ))
+            ) : (
+              <span className="dms-breadcrumb-text">Upload</span>
+            )}
+          </nav> */}
+    
 
                       {/* <h1>File Preview</h1> */}
                       <div className="borderprev">
@@ -2156,7 +2157,7 @@ const breadcrumbParts = useMemo(() => {
                       </div>
                      
                       <div className='col-lg-6'>
-                          <form id='formSelector' className="mt-3 position-relative">
+                          <form id='formSelector' className="mt-0 position-relative">
                               {/* <h1 className="font-16 fw-bold text-dark mb-0 pt-3">Upload file</h1> */}
                               {/* <label className="switch">
                               <input type="checkbox"/>
@@ -2176,8 +2177,8 @@ Files uploaded to this folder require approval and will be visible only after ap
                              )} */}
                              <div>
       {showBulkUpload === false && ( // Show only if IsApproval is false
-      <div style={{display:'flex', justifyContent:'space-between',alignItems:'center'}} className="mt-3 mb-3">
-        <p className="mb-0 text-dark">Bulk  Upload :</p>
+      <div style={{display:'flex', justifyContent:'space-between',alignItems:'center'}} className="mt-0 mb-3">
+        <p className="mb-0 text-dark mt-0">Bulk  Upload :</p>
         <div style={{display:'flex', gap:'5px', alignItems:'center'}}>
           <label className="switch">
           <input type="checkbox" checked={isChecked} onChange={handleToggle} />
@@ -2194,7 +2195,9 @@ Files uploaded to this folder require approval and will be visible only after ap
         
       )}
        <div>
+       <div className="overscroll">
       {isChecked && (
+        
         <div className="input-container mt-3">
                   {/* <label htmlFor="Uplaod bulk">Bulk upload</label> */}
                   
@@ -2239,7 +2242,8 @@ Files uploaded to this folder require approval and will be visible only after ap
         <span className="mb-1" data-tooltip='Bulk Submit'> <img src={require("../assets/submit-new.png")}    alt="delete" /> </span> </div> 
         </div>
         </div>
-      )}
+       
+      )} </div>
     </div>
     {!isChecked ?   
     // <h3 className="mt-2 mb-2 font-16 text-dark fw-bold">Tags</h3> 

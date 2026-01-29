@@ -654,7 +654,7 @@ input[type=file]{
 
 /* this css was added as file preview was coming oiut of dic  */
 
-
+.overscroll{max-height: 650px; overflow-y: auto;}
 .borderprev {
 
   border: 10px solid #d9d9d9;

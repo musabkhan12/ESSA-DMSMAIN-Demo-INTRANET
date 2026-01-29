@@ -900,7 +900,7 @@ top: 0;
  #files-container .card {
     border: 2.2px dotted #c9c9c9 !important;
     border-radius: 0px !important;
-    height: 94px; padding: 0.75rem; position: relative !important;
+    height: 109px; padding: 0.75rem; position: relative !important;
 }
 .three-dots{position: absolute;
   right: 16px;
@@ -927,7 +927,7 @@ top: 0;
 }
 .input-container input{height: 36px;}
 .main-containeruploadfile h1{font-size: 20px; text-align: center;}
-.p3rd,.p2nd{margin-bottom: 5px !important; font-size: 11px; color: #6b6b6b;}
+.p3rd,.p2nd{margin-bottom: 3px !important; font-size: 11px; color: #6b6b6b;}
 
 .p1st{-webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
