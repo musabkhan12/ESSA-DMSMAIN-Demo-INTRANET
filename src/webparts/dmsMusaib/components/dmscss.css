@@ -33,9 +33,9 @@
   
     padding: 7px;
     /* max-height: 325px; */
-    max-height: 671px !important;
+    /* max-height: 671px !important;
     overflow-y: auto;
-    overflow-x: auto;
+    overflow-x: auto; */
 
     
 }
@@ -62,10 +62,7 @@
 #folderContainer2::-webkit-scrollbar-thumb:hover {
   background: #555; 
 }
-p.folder {font-size: 14px; font-weight: 600; margin-bottom: 7px;
 
-
-}
 .p3rd{
   width: 47%; float: left;
 }
@@ -812,7 +809,7 @@ top: 0;
     display: flex
 ;
     font-size: 14px;
-    padding: 9px 19px;
+    padding: 9px 10px;
 
   line-height: 19px;
  
@@ -885,9 +882,9 @@ top: 0;
   #hidegidvewlistviewbutton button:hover img,.notactive:hover img,.tool .btn-primary:hover img{
   filter: sepia(0) saturate(1) hue-rotate(-50deg) brightness(.8);
   }
-  #files-container .card{
+  /* #files-container .card{
     width: 32.1%; margin: 5px; float: left;
-  } 
+  }  */
   .tool .btn-primary:hover{
     background: transparent !important; color: #000 !important;
   }
@@ -927,32 +924,7 @@ top: 0;
 }
 .input-container input{height: 36px;}
 .main-containeruploadfile h1{font-size: 20px; text-align: center;}
-.p3rd,.p2nd{margin-bottom: 3px !important; font-size: 11px; color: #6b6b6b;}
 
-.p1st{-webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  display: -webkit-box;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 21px;
-  margin-top: -4px !important;
-  overflow: hidden;
-  line-height: 20px !important;
-  padding-right: 35px;
-  text-overflow: ellipsis;
-   color: #000;
-  margin-bottom: 5px !important;
-  height: 20px;
-}
-.p2nd{
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  display: -webkit-box;
-  
-  overflow: hidden;
-  
-  text-overflow: ellipsis;
-}
    .newbutton button{height: 27px !important; font-size: 14px; padding: 0px 0px !important;
   color: #000; border-radius: 4px;
   background: transparent !important;

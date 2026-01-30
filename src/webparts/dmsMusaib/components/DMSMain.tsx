@@ -25493,7 +25493,7 @@ const ASKAI = () => {
     style={{
       position: "relative",
       width: "35%",
-      height: "613px",
+      height: "704px",
       border: "2px dotted #ccc",
       borderRadius: "0px",
       marginTop:"5px",

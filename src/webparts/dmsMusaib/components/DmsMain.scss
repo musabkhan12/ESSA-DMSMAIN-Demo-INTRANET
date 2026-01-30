@@ -33,6 +33,32 @@
 .topButton-198{
   top: -7px !important; padding: 0px 24px 0px 0px !important;
 }
+.p3rd,.p2nd{margin-bottom: 3px !important; font-size: 11px; color: #6b6b6b;}
+
+.p1st{-webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 21px;
+  margin-top: -4px !important;
+  overflow: hidden;
+  line-height: 20px !important;
+  padding-right: 35px;
+  text-overflow: ellipsis;
+   color: #000;
+  margin-bottom: 5px !important;
+  height: 20px;
+}
+.p2nd{
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  
+  overflow: hidden;
+  
+  text-overflow: ellipsis;
+}
 .css-t3ipsp-control{
   position: absolute !important;
 }
@@ -880,16 +906,38 @@ label{font-size: 0.9rem !important; font-weight: 500 !important; color: #6c757d 
 }
 .mainsidebardms{
   width: 19%;
-  float: left;
-  padding: 5px 10px;
+  float: left; overflow-y: hidden; overflow-x: hidden;
+  padding: 5px 10px; height: 612px;
   position: relative; background:#fff; margin-top: 10px; border-radius: 0px;
+}
+.mainsidebardms:hover{
+  overflow-y: auto;
+}
+.mainsidebardms::-webkit-scrollbar {
+  width: 6px; height: 6px;
+}
+/* Track */
+.mainsidebardms::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey; 
+  border-radius: 10px;
+}
+ 
+/* Handle */
+.mainsidebardms::-webkit-scrollbar-thumb {
+  background: #6a6a6a; 
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+.mainsidebardms::-webkit-scrollbar-thumb:hover {
+  background: #6a6a6a; 
 }
 #folderContainer2{
     /* width: 17rem; */
     
     padding: 7px;
 
-    max-height: 671px !important;
+    // max-height: 671px !important;
    
 }
 #folderContainer2 .toggle-button{width: 17px;
@@ -993,7 +1041,7 @@ border-radius: 5px;}
   height: 109px; padding: 0.75rem; position: relative !important;
 }
 .search-container input:focus{outline: 1px solid #2c9942 !important;}
-
+p.folder {font-size: 14px; font-weight: 600; margin-bottom: 7px;}
 @media(max-width:1920px){
   .newdovvlose {right:55.5%;}
   .body--sidebar-open .newdovvlose {
@@ -1043,7 +1091,8 @@ border-radius: 5px;}
 
 
 #files-container .card{
-  width: 31.9% ;
+  width: 31.9% ; margin: 3px;
+  height: 113px;
 }
 .sidebardmsButton{
   padding: 8px 10px !important; font-size: 13px !important;
@@ -1070,7 +1119,7 @@ p.folder {
 .body--sidebar-open .newdovvlose {
   right: 75%;
 }
-
+.mainsidebardms{height: 657px;}
 .bordernewr, .newright{
   width: 85px;
 }
