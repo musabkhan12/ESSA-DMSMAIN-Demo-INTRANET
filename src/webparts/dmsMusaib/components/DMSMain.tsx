@@ -813,7 +813,8 @@ if (!matchedFile) {
   const listId = matchedFile.ListItemAllFields.ParentList.Id;
 
   // Build edit URL
-  const editUrl = `https://officeindia.sharepoint.com/:w:/r/sites/Intranetdemos/_layouts/15/Doc.aspx?sourcedoc=%7B${uniqueId}%7D&action=edit&uid=%7B${uniqueId.toUpperCase()}%7D&ListItemId=${itemId}&ListId=%7B${listId}%7D&odsp=1&env=prod`;
+  // const editUrl = `https://officeindia.sharepoint.com/:w:/r/sites/Intranetdemos/_layouts/15/Doc.aspx?sourcedoc=%7B${uniqueId}%7D&action=edit&uid=%7B${uniqueId.toUpperCase()}%7D&ListItemId=${itemId}&ListId=%7B${listId}%7D&odsp=1&env=prod`;
+  const editUrl = `https://multiverse.sharepoint.com/:w:/r/sites/multiverseintranetportal/_layouts/15/Doc.aspx?sourcedoc=%7B${uniqueId}%7D&action=edit&uid=%7B${uniqueId.toUpperCase()}%7D&ListItemId=${itemId}&ListId=%7B${listId}%7D&odsp=1&env=prod`;
   documenttemplatetofill = editUrl;
   console.log("Edit URL:", editUrl);
 }
@@ -2418,16 +2419,16 @@ const myrequestbuttonclick =()=>{
           // this i updated when new requirement came , they said when click on entity my request should hide and entity higlight in breadcrumb
           const getselectedText = document.getElementById("selectedText");
           if(getselectedText){
-            getselectedText.style.display="none";
+            // getselectedText.style.display="none";
           }
             const getcontainer = document.getElementById("files-container");
             if(getcontainer){ 
-                    getcontainer.innerHTML = "";
+                    // getcontainer.innerHTML = "";
             }
-     
-          const breadcrumbElement=document.getElementById("breadcrumb");
-           breadcrumbElement.style.display="block";
-           breadcrumbElement.textContent = value.entityTitle;
+           //musaib chane on entity click
+          // const breadcrumbElement=document.getElementById("breadcrumb");
+          //  breadcrumbElement.style.display="block";
+          //  breadcrumbElement.textContent = value.entityTitle;
          
           //  this is code where user whn click on entity entity will not update in breadcrumb and only show my request start from here
           // if(entityclicktext !== ''){
@@ -7623,16 +7624,191 @@ function PreviewFileFromMail (path :any , SiteID:any , docLibName:any,status:str
 //     }
 //   }
 // }
+
+//previous working code of previeew file with close or back button isndei preview only
+// window.PreviewFile = function(path: any, SiteID: any, docLibName: any, status: string, filepreviewurl: string) {
+ 
+//   const librarydiv = document.getElementById('files-container');
+ 
+//   if (!librarydiv) return; // Safety check
+ 
+//   // 1. DO NOT DELETE CONTENT
+ 
+//   // 2. Hide existing files instead.
+//   // *** TYPESCRIPT FIX HERE: Cast to HTMLElement[] ***
+//   const existingFiles = Array.from(librarydiv.children) as HTMLElement[];
+//   existingFiles.forEach(child => child.style.display = 'none');
+ 
+//   // 3. Temporarily switch layout to block
+//   const originalLayout = librarydiv.style.display;
+//   librarydiv.style.display = 'block';
+ 
+//   const createpreviewdiv = document.createElement('div');
+//   createpreviewdiv.classList.add('my-class-new');
+//   createpreviewdiv.style.display = 'grid';
+//   createpreviewdiv.style.position = 'relative';
+//   createpreviewdiv.style.height = '100%';
+ 
+// // Text for Preview File Mode By Aman
+//   const previewInfoText = document.createElement('div');
+//   previewInfoText.textContent = 'File preview mode — viewing only.';
+//   previewInfoText.style.fontSize = '16px';
+//   previewInfoText.style.color = '#000';
+  
+//   previewInfoText.style.paddingTop = '23px';
+//   previewInfoText.style.paddingBottom = '22px';
+//     previewInfoText.style.borderBottom = '10px solid #fbfbfb';
+//   createpreviewdiv.appendChild(previewInfoText);
+ 
+//   let finalPreviewUrl = "";
+ 
+//   try {
+//     const currentOrigin = window.location.origin;
+//     let serverRelativePath = "";
+//     let baseUrl = "";
+ 
+//     // --- LOGIC TO GENERATE URL ---
+//     if (filepreviewurl && filepreviewurl !== "undefined") {
+//       try {
+//         const urlObj = new URL(filepreviewurl);
+//         const params = new URLSearchParams(urlObj.search);
+//         serverRelativePath = params.get("id") || "";
+ 
+//         const pathStr = urlObj.pathname;
+//         const formsIndex = pathStr.toLowerCase().indexOf('/forms/');
+//         if (formsIndex !== -1) {
+//            const pathUpToForms = pathStr.substring(0, formsIndex);
+//            const lastSlashIndex = pathUpToForms.lastIndexOf('/');
+//            baseUrl = urlObj.origin + pathUpToForms.substring(0, lastSlashIndex);
+//         } else {
+//            baseUrl = urlObj.origin;
+//         }
+//       } catch (e) {
+//         console.warn("Error parsing filepreviewurl");
+//       }
+//     }
+ 
+//     if (!baseUrl) {
+//         if (typeof path === 'string' && path.startsWith('/')) {
+//             serverRelativePath = path;
+//             if (docLibName && path.includes(docLibName)) {
+//                 const libIndex = path.indexOf(docLibName);
+//                 const webPath = path.substring(0, libIndex);
+//                 const cleanWebPath = webPath.endsWith('/') ? webPath.slice(0, -1) : webPath;
+//                 baseUrl = currentOrigin + cleanWebPath;
+//             } else {
+//                 const pathParts = path.split('/');
+//                 if (pathParts[1] && pathParts[1].toLowerCase() === 'sites' && pathParts[2]) {
+//                     baseUrl = currentOrigin + `/sites/${pathParts[2]}`;
+//                 } else {
+//                     baseUrl = currentOrigin;
+//                 }
+//             }
+//         } else {
+//             baseUrl = currentOrigin;
+//         }
+//     }
+ 
+//     let extension = "";
+//     if (serverRelativePath) {
+//       extension = serverRelativePath.split('.').pop()?.toLowerCase() || "";
+//     } else if (typeof path === 'string' && path.includes('.')) {
+//       extension = path.split('.').pop()?.toLowerCase() || "";
+//     }
+ 
+//     const officeExtensions = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'csv'];
+//     const isOfficeFile = officeExtensions.includes(extension);
+ 
+//     if (isOfficeFile) {
+//       let sourceDocValue = "";
+//       const isPathString = (typeof path === 'string' && path.trim().startsWith('/'));
+ 
+//       if (isPathString) {
+//         sourceDocValue = encodeURIComponent(serverRelativePath || path);
+//       } else {
+//         sourceDocValue = `{${path}}`;
+//       }
+//       finalPreviewUrl = `${baseUrl}/_layouts/15/Doc.aspx?sourcedoc=${sourceDocValue}&action=edit`;
+//     } else {
+//       if (serverRelativePath) {
+//         finalPreviewUrl = serverRelativePath.startsWith('http') ? serverRelativePath : currentOrigin + serverRelativePath;
+//       } else {
+//         finalPreviewUrl = path;
+//       }
+//     }
+//   } catch (error) {
+//     console.error("Error generating preview URL:", error);
+//     return;
+//   }
+ 
+//   // 4. Create Iframe
+//   const previewfileframe = document.createElement('iframe');
+//   previewfileframe.id = 'filePreview';
+//   previewfileframe.style.width = '100%';
+//   previewfileframe.style.height = '600px';
+//   previewfileframe.style.border = 'none';
+//   previewfileframe.src = finalPreviewUrl;
+ 
+//   // 5. Create Close Button
+//   const closeButton = document.createElement('button');
+//   closeButton.classList.add('my-class'); 
+//   //closeButton.innerHTML = "&times;";
+
+//   const closeIcon = document.createElement('img');
+// closeIcon.src = require('../assets/backnew.png'); // Upload File wala icon
+// closeIcon.alt = 'Back';
+
+// closeIcon.style.cursor = 'pointer';
+
+// closeButton.appendChild(closeIcon);
+//   closeButton.title = 'Close Preview';
+ 
+//   closeButton.style.background = 'transparent';
+//   closeButton.style.border = 'none';
+//   closeButton.style.fontSize = '28px';
+//   closeButton.style.fontWeight = 'bold';
+//   closeButton.style.color = '#333';
+//   closeButton.style.cursor = 'pointer';
+//   closeButton.style.justifySelf = 'end';
+//   closeButton.style.lineHeight = '1';
+//   closeButton.style.marginBottom = '5px';
+//   closeButton.style.padding = '0 10px';
+ 
+//   closeButton.onmouseover = () => closeButton.style.color = 'red';
+//   closeButton.onmouseout = () => closeButton.style.color = '#333';
+ 
+//   // *** ON CLOSE LOGIC ***
+//   closeButton.onclick = function(e) {
+//     e.preventDefault();
+//     e.stopPropagation();
+   
+//     // A. Remove only the preview div
+//     if (librarydiv.contains(createpreviewdiv)) {
+//         librarydiv.removeChild(createpreviewdiv);
+//     }
+   
+//     // B. Restore the original layout (Grid)
+//     librarydiv.style.display = originalLayout;
+   
+//     // C. Show the original files again
+//     // No extra cast needed here because existingFiles is already typed as HTMLElement[]
+//     existingFiles.forEach(child => child.style.display = '');
+//   };
+ 
+//   createpreviewdiv.appendChild(closeButton);
+//   createpreviewdiv.appendChild(previewfileframe);
+//   librarydiv.appendChild(createpreviewdiv);
+// }
 window.PreviewFile = function(path: any, SiteID: any, docLibName: any, status: string, filepreviewurl: string) {
  
   const librarydiv = document.getElementById('files-container');
+  const ribbonDiv = document.querySelector('.col-lg-10.newbutton.tool') as HTMLElement;
  
   if (!librarydiv) return; // Safety check
  
   // 1. DO NOT DELETE CONTENT
  
   // 2. Hide existing files instead.
-  // *** TYPESCRIPT FIX HERE: Cast to HTMLElement[] ***
   const existingFiles = Array.from(librarydiv.children) as HTMLElement[];
   existingFiles.forEach(child => child.style.display = 'none');
  
@@ -7646,15 +7822,14 @@ window.PreviewFile = function(path: any, SiteID: any, docLibName: any, status: s
   createpreviewdiv.style.position = 'relative';
   createpreviewdiv.style.height = '100%';
  
-// Text for Preview File Mode By Aman
+  // Text for Preview File Mode By Aman
   const previewInfoText = document.createElement('div');
   previewInfoText.textContent = 'File preview mode — viewing only.';
   previewInfoText.style.fontSize = '16px';
   previewInfoText.style.color = '#000';
-  
   previewInfoText.style.paddingTop = '23px';
   previewInfoText.style.paddingBottom = '22px';
-    previewInfoText.style.borderBottom = '10px solid #fbfbfb';
+  previewInfoText.style.borderBottom = '10px solid #fbfbfb';
   createpreviewdiv.appendChild(previewInfoText);
  
   let finalPreviewUrl = "";
@@ -7746,36 +7921,45 @@ window.PreviewFile = function(path: any, SiteID: any, docLibName: any, status: s
   previewfileframe.style.border = 'none';
   previewfileframe.src = finalPreviewUrl;
  
-  // 5. Create Close Button
-  const closeButton = document.createElement('button');
-  closeButton.classList.add('my-class'); 
-  //closeButton.innerHTML = "&times;";
-
+  // 5. Create Close Button for Ribbon
+  const closeButtonRibbon = document.createElement('div');
+  closeButtonRibbon.id = 'closePreviewRibbon';
+  closeButtonRibbon.style.borderLeft = '1px solid #dfdfdf';
+  closeButtonRibbon.style.textAlign = 'center';
+  closeButtonRibbon.style.width = '80px';
+  closeButtonRibbon.style.cursor = 'pointer';
+  
+  const closeButtonInner = document.createElement('div');
+  closeButtonInner.className = 'd-flex justify-content-center gap-3 mt-2';
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'btn grid-view mt-0';
+  closeBtn.style.marginTop = '0px';
+  
+  const closeSpan = document.createElement('span');
+  closeSpan.className = 'mt-2 mb-1';
+  closeSpan.setAttribute('data-tooltip', 'Close Preview');
+  
   const closeIcon = document.createElement('img');
-closeIcon.src = require('../assets/backnew.png'); // Upload File wala icon
-closeIcon.alt = 'Back';
-
-closeIcon.style.cursor = 'pointer';
-
-closeButton.appendChild(closeIcon);
-  closeButton.title = 'Close Preview';
- 
-  closeButton.style.background = 'transparent';
-  closeButton.style.border = 'none';
-  closeButton.style.fontSize = '28px';
-  closeButton.style.fontWeight = 'bold';
-  closeButton.style.color = '#333';
-  closeButton.style.cursor = 'pointer';
-  closeButton.style.justifySelf = 'end';
-  closeButton.style.lineHeight = '1';
-  closeButton.style.marginBottom = '5px';
-  closeButton.style.padding = '0 10px';
- 
-  closeButton.onmouseover = () => closeButton.style.color = 'red';
-  closeButton.onmouseout = () => closeButton.style.color = '#333';
+  closeIcon.className = 'sidebariconssmall';
+  closeIcon.src = require('../assets/backnew.png');
+  closeIcon.alt = 'Close';
+  
+  closeSpan.appendChild(closeIcon);
+  closeBtn.appendChild(closeSpan);
+  closeButtonInner.appendChild(closeBtn);
+  
+  const closeText = document.createElement('p');
+  closeText.style.fontSize = '14px';
+  closeText.className = 'mb-0 mt-2';
+  closeText.textContent = 'Close';
+  
+  closeButtonRibbon.appendChild(closeButtonInner);
+  closeButtonRibbon.appendChild(closeText);
  
   // *** ON CLOSE LOGIC ***
-  closeButton.onclick = function(e) {
+  closeButtonRibbon.onclick = function(e) {
     e.preventDefault();
     e.stopPropagation();
    
@@ -7788,15 +7972,23 @@ closeButton.appendChild(closeIcon);
     librarydiv.style.display = originalLayout;
    
     // C. Show the original files again
-    // No extra cast needed here because existingFiles is already typed as HTMLElement[]
     existingFiles.forEach(child => child.style.display = '');
+    
+    // D. Remove the close button from ribbon
+    if (ribbonDiv && ribbonDiv.contains(closeButtonRibbon)) {
+      ribbonDiv.removeChild(closeButtonRibbon);
+    }
   };
  
-  createpreviewdiv.appendChild(closeButton);
+  // Add close button to ribbon at the first position
+  if (ribbonDiv) {
+    ribbonDiv.insertBefore(closeButtonRibbon, ribbonDiv.firstChild);
+  }
+ 
+  createpreviewdiv.appendChild(previewInfoText);
   createpreviewdiv.appendChild(previewfileframe);
   librarydiv.appendChild(createpreviewdiv);
 }
-
 
 
 const RemoveSSearchFile = async (event: React.FormEvent) => {
