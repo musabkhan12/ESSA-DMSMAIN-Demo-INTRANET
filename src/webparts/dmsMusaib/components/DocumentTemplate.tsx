@@ -286,6 +286,8 @@ for (const file of files) {
     // const previewUrl = `${siteUrl}${locationPath}/${currentfolderpath.Entity}/${currentfolderpath.DocumentLibrary}/Forms/AllItems.aspx?id=${encodedFilePath}&parent=${encodeSharePointURL(parentFolder)}`;
     const previewUrl = `https://officeindia.sharepoint.com/sites/Intranetdemos/Location/Section/Forms/AllItems.aspx?id=${encodedFilePath}&parent=${encodeSharePointURL(parentFolder)}`;
     
+
+    
     console.log("Preview URL:", previewUrl);
   // 3. update list item metadata directly with formValues
   // Generate unique DocumentNo
