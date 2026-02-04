@@ -813,7 +813,6 @@ if (!matchedFile) {
   const listId = matchedFile.ListItemAllFields.ParentList.Id;
 
   // Build edit URL
-  // const editUrl = `https://officeindia.sharepoint.com/:w:/r/sites/Intranetdemos/_layouts/15/Doc.aspx?sourcedoc=%7B${uniqueId}%7D&action=edit&uid=%7B${uniqueId.toUpperCase()}%7D&ListItemId=${itemId}&ListId=%7B${listId}%7D&odsp=1&env=prod`;
   const editUrl = `https://multiverse.sharepoint.com/:w:/r/sites/multiverseintranetportal/_layouts/15/Doc.aspx?sourcedoc=%7B${uniqueId}%7D&action=edit&uid=%7B${uniqueId.toUpperCase()}%7D&ListItemId=${itemId}&ListId=%7B${listId}%7D&odsp=1&env=prod`;
   documenttemplatetofill = editUrl;
   console.log("Edit URL:", editUrl);
@@ -2425,7 +2424,7 @@ const myrequestbuttonclick =()=>{
             if(getcontainer){ 
                     // getcontainer.innerHTML = "";
             }
-           //musaib chane on entity click
+          //  comment this becz when click on entity breadcrumb should not update
           // const breadcrumbElement=document.getElementById("breadcrumb");
           //  breadcrumbElement.style.display="block";
           //  breadcrumbElement.textContent = value.entityTitle;
@@ -6007,6 +6006,11 @@ const createFileCardForDocumentLibrary=(file:any,fileIcon:any,siteID:string,IsHa
                   <img src=${deleteIcon} alt="Delete"/>
                   Delete
           </li>
+           <!-- srs 2/2/26 -->
+                     <li onclick="confirmArchiveFile('${file.UniqueId}', '${siteID}', '${IsHardDelete}', '${null}'); closeMenuByFileId('${file.UniqueId}');">
+                            <img src=${deleteIcon} alt="Archive"/>
+                            Archive
+                    </li>
           <li onclick="auditHistory('${file.UniqueId}', '${siteID}','${currentDocumentLibrary}','${currentEntity}'); closeMenuByFileId('${file.UniqueId}');">
           <img src=${AuditHistoryIcon} alt="Audit History"/>
                       Audit History
@@ -6049,7 +6053,11 @@ const createFileCardForDocumentLibrary=(file:any,fileIcon:any,siteID:string,IsHa
                   <img src=${deleteIcon} alt="Delete"/>
                   Delete
           </li>
-      
+      <!-- srs 2/2/26 -->
+           <li onclick="confirmArchiveFile('${file.UniqueId}', '${siteID}', '${IsHardDelete}', '${null}'); closeMenuByFileId('${file.UniqueId}');">
+                  <img src=${deleteIcon} alt="Archive"/>
+                  Archive
+          </li>
           <li onclick="PreviewFile('${file.ServerRelativeUrl}', '${siteID}' , '${docLibName}','${file.ListItemAllFields.Status}'); closeMenuByFileId('${file.UniqueId}');">
           <img src=${FilePreview} alt="Preview"/>
                       Preview File
@@ -7624,8 +7632,7 @@ function PreviewFileFromMail (path :any , SiteID:any , docLibName:any,status:str
 //     }
 //   }
 // }
-
-//previous working code of previeew file with close or back button isndei preview only
+// previously working code perfect before back button moving from preview file section to ribbon 
 // window.PreviewFile = function(path: any, SiteID: any, docLibName: any, status: string, filepreviewurl: string) {
  
 //   const librarydiv = document.getElementById('files-container');
@@ -7991,6 +7998,7 @@ window.PreviewFile = function(path: any, SiteID: any, docLibName: any, status: s
 }
 
 
+
 const RemoveSSearchFile = async (event: React.FormEvent) => {
   event.preventDefault();
   event.stopPropagation();
@@ -8124,6 +8132,11 @@ const searchFiles = async (event: React.FormEvent) => {
                     <img src=${deleteIcon} alt="Delete"/>
                     Delete
                   </li>
+                       <!-- srs 2/2/26 -->
+                             <li onclick="confirmArchiveFile('${file.UniqueId}', '${currentsiteID}'); closeMenuByFileId('${file.UniqueId}');">
+                                    <img src=${deleteIcon} alt="Archive"/>
+                                    Archive
+                            </li>
                   <li onclick="auditHistory('${file.UniqueId}', '${currentsiteID}','${file.Title}'); closeMenuByFileId('${file.UniqueId}');">
                     <img src=${AuditHistoryIcon} alt="Audit History"/>
                     Audit History
@@ -12248,7 +12261,141 @@ document.addEventListener('click', (e) => {
  
 }
 
+// srs 2/2/26
+(window as any).confirmArchiveFile = async (fileId: string, siteID: string, IsHardDelete: any, ListToUpdate: any = null) => {
+    // 1. Fetch Popup configurations from SharePoint
+    const popupData = await sp.web.lists.getByTitle('DMSPopupMaster').items
+        .select('PopupText', 'Typeofpopup', 'Isrequires')();
 
+    popupData.forEach(async (popItems) => {
+        switch (popItems.Typeofpopup) {
+            case 'Archive':
+                if (popItems.Isrequires) {
+                    console.log("Archive popup required");
+
+                    // 2. Create and Inject the Modal
+                    const archivePop = document.createElement('div');
+                    archivePop.className = "popup-modal";
+                    archivePop.innerHTML = `
+                        <div class="popup-content">
+                            <p id="confirmation-text">${popItems.PopupText}</p>
+                            <div class="popup-actions">
+                                <button style="background-color: green !important;" id="confirm-yes">Yes</button>
+                                <button style="background-color: red !important;" id="confirm-no">No</button>
+                            </div>
+                        </div>`;
+
+                    document.body.appendChild(archivePop);
+
+                    // 3. Handle Confirmation Click
+                    const yesBtn = archivePop.querySelector('#confirm-yes') as HTMLButtonElement;
+                    const noBtn = archivePop.querySelector('#confirm-no') as HTMLButtonElement;
+                    const statusText = archivePop.querySelector('#confirmation-text');
+
+                    yesBtn.addEventListener('click', async () => {
+                        try {
+                            // Change UI to show progress
+                            if (statusText) statusText.innerHTML = "Processing archive... Please wait.";
+                            yesBtn.disabled = true; // Disable to prevent multiple clicks
+                            noBtn.style.display = "none"; // Hide No button during process
+
+                            // 4. WAIT for the Archive function to finish
+                            await (window as any).ArchiveFile(fileId, siteID, IsHardDelete, ListToUpdate, props.context);
+
+                            // 5. SUCCESS: Remove the popup from DOM only after success
+                            console.log("Archive successful. Removing popup.");
+                            if (document.body.contains(archivePop)) {
+                                document.body.removeChild(archivePop);
+                            }
+
+                        } catch (error) {
+                            // 6. FAILURE: Keep popup open and show error
+                            console.error("Archive operation failed:", error);
+                            if (statusText) {
+                                statusText.innerHTML = "Error: Could not archive file. Please try again.";
+                                (statusText as HTMLElement).style.color = "red";
+                            }
+                            yesBtn.disabled = false;
+                            noBtn.style.display = "inline-block";
+                        }
+                    });
+
+                    // Handle Cancel Click
+                    noBtn.addEventListener('click', () => {
+                        if (document.body.contains(archivePop)) {
+                            document.body.removeChild(archivePop);
+                        }
+                    });
+
+                } else {
+                    // If no popup required, run immediately
+                    console.log("Archiving without popup...");
+                    await (window as any).ArchiveFile(fileId, siteID, IsHardDelete, ListToUpdate, props.context);
+                }
+                break;
+        }
+    });
+};
+
+// srs 2/2/26
+(window as any).ArchiveFile = async (fileId: string, siteID: string) => {
+  console.log("--- Archive Action: Dynamic Pathing with Status Update ---");
+
+  const isoDate = new Date().toISOString();
+  const targetLibraryName = "ArchivedDocuments"; 
+
+  try {
+    // 1. Get the subsite context
+    const { web } = await sp.site.openWebById(siteID);
+    
+    // 2. Get the root web and its relative URL dynamically
+    const rootWeb = await sp.site.getRootWeb();
+    const rootSiteData = await rootWeb.select("ServerRelativeUrl")();
+    const rootSiteRelativeUrl = rootSiteData.ServerRelativeUrl;
+    
+    const destinationFolderPath = `${rootSiteRelativeUrl.replace(/\/$/, "")}/${targetLibraryName}`;
+
+    // 3. Get the source file info
+    const file = await web.getFileById(fileId);
+    const fileData = await file.select("Name", "ServerRelativeUrl")();
+    
+    const destinationFullUrl = `${destinationFolderPath}/${fileData.Name}`;
+
+    console.log(`Copying to: ${destinationFullUrl}`);
+
+    // 4. Execute Copy
+    await web.getFileByServerRelativePath(fileData.ServerRelativeUrl)
+             .copyByPath(destinationFullUrl, true, false);
+    
+    // 5. Update 'Status' in the destination library
+    // We fetch the newly copied file from the root web
+    const destFile = await rootWeb.getFileByServerRelativePath(destinationFullUrl);
+    const destItem = await destFile.getItem();
+    
+    await destItem.update({
+      Status: "Complete"
+    });
+    
+    console.log("Destination status updated to Complete.");
+
+    // 6. Update original file metadata (Source)
+    const listItem = await file.getItem();
+    await listItem.update({
+      IsDeleted: isoDate 
+    });
+    
+    console.log("Archive process successful.");
+
+    // 7. Refresh UI
+    if (typeof (window as any).getdoclibdata === 'function') {
+      (window as any).getdoclibdata((window as any).currentfolderpath, (window as any).currentsiteID, (window as any).currentDocumentLibrary, "");
+    }
+
+  } catch (error) {
+    console.error("Archive failed:", error);
+    throw error; 
+  }
+};
 // Without Pop-up
 // @ts-ignore
 // window.deleteFile = async(fileId:string, siteID:string, IsHardDelete:any, ListToUpdate:any=null) => {
@@ -24254,7 +24401,15 @@ window.rework=async(fileId:any,siteId:any,documentLibrary:any,siteName:any,fileP
       console.log("Previewing file at URL:", previewUrl);
       const iframe = document.getElementById("filePreview") as HTMLIFrameElement;
       const spinner = document.getElementById("spinner") as HTMLElement;
-  
+   
+      const librarydiv = document.getElementById('files-container');
+      const ribbonDiv = document.querySelector('.col-lg-10.newbutton.tool') as HTMLElement;
+     
+       // 🔹 REMOVE EXISTING CLOSE BUTTON IF IT EXISTS
+  const existingCloseButton = document.getElementById('closePreviewRibbon');
+  if (existingCloseButton && ribbonDiv && ribbonDiv.contains(existingCloseButton)) {
+    ribbonDiv.removeChild(existingCloseButton);
+  }
       // Show the spinner and hide the iframe initially
       spinner.style.display = "block";
       iframe.style.display = "none";

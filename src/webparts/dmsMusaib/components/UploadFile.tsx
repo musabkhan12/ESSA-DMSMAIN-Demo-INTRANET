@@ -90,6 +90,12 @@ useEffect(() => {
 
 }, []);
 
+useEffect(() => {
+  if (isChecked) {
+    clearFilePreview();
+  }
+}, [isChecked]);
+
 
 console.log(data, "data"  )
 console.log(data.Entity, "entity"  )
@@ -289,6 +295,20 @@ const previewFile = async (previewUrl: string,flag:string) => {
     }
 
   };
+
+  const clearFilePreview = () => {
+  const iframe = document.getElementById("filePreview") as HTMLIFrameElement;
+  const spinner = document.getElementById("spinner") as HTMLElement;
+
+  if (iframe) {
+    iframe.src = "about:blank";
+    iframe.style.display = "none";
+  }
+
+  if (spinner) {
+    spinner.style.display = "none";
+  }
+};
 
 
   //  handle bulk file
@@ -1381,7 +1401,7 @@ const handleSubmitBulk = async (event: any) => {
 //             console.log("Error in uploading the file infolder",error);
             
 // 		}
-		
+    
 // 		}
 //         Deletemedia();
 //    } catch (error) {
@@ -2045,6 +2065,9 @@ useEffect(()=>{
     getsubmitbuttonbulk.style.display= isChecked ? 'block': 'none';
     getsubmitbuttonbulk.disabled = !(isChecked && uploadedFiles.length > 0);
   }
+  if (isChecked && uploadedFiles.length === 0) {
+    clearFilePreview();
+  }
 },[isChecked,uploadedFiles]);
 const breadcrumbParts = useMemo(() => {
   try{
@@ -2117,54 +2140,17 @@ const breadcrumbParts = useMemo(() => {
             )}
           </nav> */}
     
-    {isChecked && (
-        
-        <div className="input-container mt-3">
-                  {/* <label htmlFor="Uplaod bulk">Bulk upload</label> */}
-                  
-                  {/* <label htmlFor="bulkfile" style={{ fontWeight: "bold" }}>
-                      Upload File <span style={{ color: "red" }}>*</span>
-                  </label> */}
-        <input type="file" name="bulkfile" id="bulkfile" multiple onChange={(e)=>handlebulkFileChange(e)}/>
-        <ul className="newbulnup">
-        <div className="d-flex align-items-center justify-content-between"><p className="fw-bold font-14">Selected</p>
-           <span className="clearall">Clear All    <img style={{margin:'-3px 0px 0px 3px'}} src={require("../assets/delnew1.png")} /></span>
-          </div>
-            {uploadedFiles.map((file, index, ) => (
-              
-    <li 
-      key={index}
-      style={{
-        backgroundColor: selectedIndex === index ? "#e0f7fa" : "transparent",
-      }}
-    >
-        <div style={{width:'20px', textAlign:'center', fontSize:'14px', float:'left'}}>     
-          {index + 1}.
-        </div> 
-        <div className="font-14" style={{overflow:'hidden', width:'85%', textAlign:'left', textOverflow:'ellipsis',whiteSpace:'nowrap', padding:'0px 5px',  fontWeight:'500'}}>  
-          <a style={{color:'#858585'}} href="#" onClick={() => {
-              handlePreview(file.url)
-              setSelectedIndex(index);
-            }
-            }>
-            {file.name}
-          </a>
-        </div> 
-        <div>   
-          <a href="" onClick={() => handleRemove(index)} >
-            <img src={require("../assets/delnew.png")} className="fas fa-trash"   alt="delete" />
-          </a>
-      </div> 
-    </li>
-  ))}
-</ul>
-<div style={{display:'flex', justifyContent:'right'}}>
-        <div style={{display:'none', marginTop:'10px'}} id="submitBtn2" className="btncolorCreate1" onClick={handleSubmitBulk}> 
-        <span className="mb-1" data-tooltip='Bulk Submit'> <img src={require("../assets/submit-new.png")}    alt="delete" /> </span> </div> 
-        </div>
-        </div>
-       
-      )}  
+                      {isChecked && (
+  <div className="input-container mt-3">
+    <input
+      type="file"
+      name="bulkfile"
+      id="bulkfile"
+      multiple
+      onChange={(e) => handlebulkFileChange(e)}
+    />
+  </div>
+)}
                       {/* <h1>File Preview</h1> */}
                       <div className="borderprev">
                         {isUploading && (
@@ -2235,10 +2221,10 @@ Files uploaded to this folder require approval and will be visible only after ap
                              )} */}
                              <div>
       {showBulkUpload === false && ( // Show only if IsApproval is false
-      <div style={{display:'flex', justifyContent:'space-between',alignItems:'center'}} className="mt-0 mb-3">
-        <p className="mb-0 text-dark mt-0">Bulk  Upload :</p>
+      <div style={{display:'flex', justifyContent:'end',alignItems:'center'}} className="mt-0 mb-0">
+      
         <div style={{display:'flex', gap:'5px', alignItems:'center'}} className="mtminu54">
-          <label className="switch">
+          <p className="mb-0 text-dark mt-0">Bulk  Upload :</p>  <label className="switch">
           <input type="checkbox" checked={isChecked} onChange={handleToggle} />
           <span className="slider round"></span>
           
@@ -2254,6 +2240,84 @@ Files uploaded to this folder require approval and will be visible only after ap
       )}
        <div>
        <div className="overscroll">
+        {isChecked && uploadedFiles.length > 0 && (
+    <div className="input-container mt-0">
+
+      <ul className="newbulnup">
+        <div className="d-flex align-items-center justify-content-between">
+          <p className="fw-bold font-14">Selected</p>
+          <span className="clearall">
+            Clear All
+            <img
+              style={{ margin: '-3px 0px 0px 3px' }}
+              src={require("../assets/delnew1.png")}
+            />
+          </span>
+        </div>
+
+        {uploadedFiles.map((file, index) => (
+          <li
+            key={index}
+            style={{
+              backgroundColor:
+                selectedIndex === index ? "#e0f7fa" : "transparent",
+            }}
+          >
+            <div style={{ width: '20px', textAlign: 'center' }}>
+              {index + 1}.
+            </div>
+
+            <div
+              className="font-14"
+              style={{
+                overflow: 'hidden',
+                width: '85%',
+                textAlign: 'left',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                padding: '0px 5px',
+                fontWeight: '500',
+              }}
+            >
+              <a
+                style={{ color: '#858585' }}
+                href="#"
+                onClick={() => {
+                  handlePreview(file.url);
+                  setSelectedIndex(index);
+                }}
+              >
+                {file.name}
+              </a>
+            </div>
+
+            <div>
+              <a href="#" onClick={() => handleRemove(index)}>
+                <img
+                  src={require("../assets/delnew.png")}
+                  className="fas fa-trash"
+                  alt="delete"
+                />
+              </a>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <div style={{ display: 'flex', justifyContent: 'right' }}>
+        <div
+          id="submitBtn2"
+          className="btncolorCreate1"
+          onClick={handleSubmitBulk}
+        >
+          <span className="mb-1" data-tooltip="Bulk Submit">
+            <img src={require("../assets/submit-new.png")} alt="submit" />
+          </span>
+        </div>
+      </div>
+
+    </div>
+  )}
       </div>
     </div>
     {!isChecked ?   
